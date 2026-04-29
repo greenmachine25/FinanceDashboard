@@ -1,0 +1,16 @@
+{
+  "name": "Personal Finance Hub",
+  "short_name": "FinanceHub",
+  "start_url": "./finance_app.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2dd4bf",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
