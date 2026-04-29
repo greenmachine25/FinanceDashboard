@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Hub</title>
+    
+    <!-- PWA Setup -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#2dd4bf">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            teal: '#2dd4bf',
+                            blue: '#3b82f6'
+                        }
+                    },
+                    animation: {
+                        'pop-in': 'popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-down': 'slideDown 0.3s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #2dd4bf, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(to right, #2dd4bf, #3b82f6);
+        }
+        
+        /* Smooth number updates */
+        .value-update { transition: all 0.3s ease; }
+        
+        #aiContent p { margin-bottom: 0.75rem; }
+        #aiContent ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        #aiContent li { margin-bottom: 0.5rem; }
+        #aiContent strong { font-weight: 600; color: #1f2937; }
+        .dark #aiContent strong { color: #f3f4f6; }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased">
+
+    <!-- Navbar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2 hover:scale-105 transition-transform duration-300 cursor-pointer">
+                    <i data-lucide="wallet" class="text-teal-400 w-6 h-6"></i>
+                    <span class="text-xl font-bold gradient-text">FinanceHub</span>
+                </div>
+                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto" id="tabs">
+                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200">Dashboards</button>
+                    <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Loans</button>
+                    <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">APY Savings</button>
+                    <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Stock Ideas</button>
+                </div>
+                <div>
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:rotate-12 transition-all duration-300">
+                        <i data-lucide="moon" id="moonIcon" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
+                        <i data-lucide="sun" id="sunIcon" class="w-5 h-5 text-yellow-400 hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-hidden">
+        
+        <!-- Tab: Dashboards -->
+        <div id="dashboard" class="tab-content active">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Budget Scenarios</h2>
+                <button onclick="addDashboard()" class="bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                </button>
+            </div>
+            <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Tab: Loans -->
+        <div id="loan" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Loan Scenarios</h2>
+                <button onclick="addLoan()" class="bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                </button>
+            </div>
+            <div id="loansContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Tab: Interest -->
+        <div id="interest" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">APY Scenarios</h2>
+                <button onclick="addInvestment()" class="bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                </button>
+            </div>
+            <div id="interestContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Tab: Stock Ideas -->
+        <div id="stocks" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
+                <button onclick="fetchStockIdeas()" class="bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 mr-2"></i> Scan Market
+                </button>
+            </div>
+            <div id="stockContainer" class="bg-gray-50/50 dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[300px]">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- AI Insights Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-lg w-full mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+            <button onclick="closeAIModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
+                <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-brand-blue animate-pulse"></i>
+                AI Financial Insights
+            </h3>
+            <div id="aiContent" class="text-sm text-gray-700 dark:text-gray-300 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- AI response goes here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let appData = {
+            theme: 'light',
+            dashboards: [],
+            loans: [],
+            investments: [],
+            lastStockIdeas: ''
+        };
+
+        const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+        const apiKey = ""; // Keep empty for standard environment runtime
+
+        // --- Initialization & Cache ---
+        function init() {
+            const saved = localStorage.getItem('financeHubData');
+            if (saved) {
+                let parsed = JSON.parse(saved);
+                if (!parsed.dashboards) {
+                    parsed = {
+                        theme: parsed.theme || 'light',
+                        dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [] }],
+                        loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0 }],
+                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0 }],
+                        lastStockIdeas: ''
+                    };
+                }
+                appData = parsed;
+                if(appData.lastStockIdeas === undefined) appData.lastStockIdeas = '';
+            } else {
+                addDashboard(false);
+                addLoan(false);
+                addInvestment(false);
+            }
+            applyTheme(appData.theme);
+            renderAll();
+        }
+
+        function saveData() {
+            localStorage.setItem('financeHubData', JSON.stringify(appData));
+        }
+
+        // --- Theme & Navigation ---
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            appData.theme = appData.theme === 'light' ? 'dark' : 'light';
+            applyTheme(appData.theme);
+            saveData();
+        });
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('moonIcon').classList.add('hidden');
+                document.getElementById('sunIcon').classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('moonIcon').classList.remove('hidden');
+                document.getElementById('sunIcon').classList.add('hidden');
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+                el.classList.add('text-gray-500', 'dark:text-gray-300');
+            });
+            document.getElementById(tabId).classList.add('active');
+            const btn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
+            btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+        }
+
+        function renderAll() {
+            renderDashboards();
+            renderLoans();
+            renderInvestments();
+            renderStocks();
+        }
+
+        // ==========================================
+        // DASHBOARDS (INCOME & EXPENSES)
+        // ==========================================
+        function addDashboard(save = true) {
+            appData.dashboards.unshift({ id: Date.now(), name: `Budget Scenario ${appData.dashboards.length + 1}`, income: 0, expenses: [] });
+            if (save) { saveData(); renderDashboards(); }
+        }
+
+        function removeDashboard(id) {
+            const el = document.getElementById(`dash-${id}`);
+            if(el) {
+                el.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    appData.dashboards = appData.dashboards.filter(d => d.id !== id);
+                    saveData();
+                    renderDashboards();
+                }, 200);
+            }
+        }
+
+        function renderDashboards() {
+            const container = document.getElementById('dashboardsContainer');
+            container.innerHTML = appData.dashboards.map(dash => `
+                <div id="dash-${dash.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group transition-all duration-300">
+                    <button onclick="removeDashboard(${dash.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- Income -->
+                        <div>
+                            <label class="block text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
+                            <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
+                            <div class="grid grid-cols-3 gap-3 mt-3">
+                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
+                            </div>
+                        </div>
+
+                        <!-- Expenses -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium">Expenses</span>
+                                <button onclick="addExpense(${dash.id})" class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
+                            </div>
+                            <div id="expList-${dash.id}" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar"></div>
+                        </div>
+
+                        <!-- Net Summary -->
+                        <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-sm font-medium opacity-90">Net Realized Cashflow</h3>
+                                <button onclick="runAIAnalysis(${dash.id})" class="bg-white/20 hover:bg-white/30 hover:scale-105 px-2 py-1 rounded text-xs font-bold transition-all flex items-center backdrop-blur-sm">✨ AI Analysis</button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><p class="text-xs opacity-80">Monthly Net</p><p class="text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
+                                <div><p class="text-xs opacity-80">Yearly Net</p><p class="text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
+                            </div>
+                        </div>
+
+                        <!-- Emerg Fund -->
+                         <div class="flex space-x-3">
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"><p class="text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"><p class="text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
+                         </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            appData.dashboards.forEach(dash => {
+                renderExpenses(dash.id);
+                calcDashboard(dash.id);
+            });
+            lucide.createIcons();
+        }
+
+        function updateDashName(id, val) {
+            const d = appData.dashboards.find(x => x.id === id);
+            if(d) { d.name = val; saveData(); }
+        }
+
+        function addExpense(dashId) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            if(d) {
+                d.expenses.push({ id: Date.now(), name: '', amount: '', freq: 'monthly' });
+                saveData();
+                renderExpenses(dashId);
+                calcDashboard(dashId);
+            }
+        }
+
+        function removeExpense(dashId, expId) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            if(d) {
+                d.expenses = d.expenses.filter(e => e.id !== expId);
+                saveData();
+                renderExpenses(dashId);
+                calcDashboard(dashId);
+            }
+        }
+
+        function renderExpenses(dashId) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            const list = document.getElementById(`expList-${dashId}`);
+            if(!d || !list) return;
+
+            if (d.expenses.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 italic animate-fade-in">No expenses in this scenario.</p>';
+            } else {
+                list.innerHTML = d.expenses.map(exp => `
+                    <div class="animate-slide-down flex items-center space-x-2 bg-gray-50 dark:bg-gray-700 p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="flex-1 p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
+                        <input type="number" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="w-20 p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
+                        <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all cursor-pointer">
+                            <option value="weekly" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
+                            <option value="monthly" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
+                            <option value="yearly" ${exp.freq === 'yearly' ? 'selected' : ''}>Yr</option>
+                        </select>
+                        <button onclick="removeExpense(${dashId}, ${exp.id})" class="p-1.5 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 hover:scale-110 rounded transition-all"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        }
+
+        function updateExpense(dashId, expId, field, val) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            if(d) {
+                const e = d.expenses.find(x => x.id === expId);
+                if(e) {
+                    e[field] = field === 'amount' ? (parseFloat(val) || 0) : val;
+                    saveData();
+                    calcDashboard(dashId);
+                }
+            }
+        }
+
+        function calcDashboard(dashId) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            if(!d) return;
+
+            const incInput = document.getElementById(`inc-${dashId}`);
+            d.income = parseFloat(incInput.value) || 0;
+
+            const wInc = d.income;
+            const yInc = wInc * 52;
+            const mInc = yInc / 12;
+            const dInc = wInc / 7;
+
+            document.getElementById(`d-day-${dashId}`).innerText = fmt.format(dInc);
+            document.getElementById(`d-mo-${dashId}`).innerText = fmt.format(mInc);
+            document.getElementById(`d-yr-${dashId}`).innerText = fmt.format(yInc);
+
+            let yearlyExp = 0;
+            d.expenses.forEach(e => {
+                const amt = parseFloat(e.amount) || 0;
+                if (e.freq === 'weekly') yearlyExp += amt * 52;
+                if (e.freq === 'monthly') yearlyExp += amt * 12;
+                if (e.freq === 'yearly') yearlyExp += amt;
+            });
+
+            const netYr = yInc - yearlyExp;
+            const netMo = netYr / 12;
+            
+            document.getElementById(`net-mo-${dashId}`).innerText = fmt.format(netMo);
+            document.getElementById(`net-yr-${dashId}`).innerText = fmt.format(netYr);
+
+            const moExp = yearlyExp / 12;
+            document.getElementById(`ef3-${dashId}`).innerText = fmt.format(moExp * 3);
+            document.getElementById(`ef6-${dashId}`).innerText = fmt.format(moExp * 6);
+
+            saveData();
+        }
+
+        // ==========================================
+        // LOAN CALCULATORS
+        // ==========================================
+        function addLoan(save = true) {
+            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '' });
+            if(save) { saveData(); renderLoans(); }
+        }
+
+        function removeLoan(id) {
+            const el = document.getElementById(`loan-${id}`);
+            if(el) {
+                el.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    appData.loans = appData.loans.filter(l => l.id !== id);
+                    saveData();
+                    renderLoans();
+                }, 200);
+            }
+        }
+
+        function renderLoans() {
+            const container = document.getElementById('loansContainer');
+            container.innerHTML = appData.loans.map(loan => `
+                <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 relative group hover:shadow-xl transition-all duration-300">
+                    <button onclick="removeLoan(${loan.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    
+                    <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-teal w-10/12 placeholder-gray-400 mb-4 border-b border-transparent focus:border-brand-teal transition-all" placeholder="Scenario Name">
+                    
+                    <div class="space-y-3 mb-5">
+                        <div>
+                            <label class="block text-xs font-medium mb-1">Amount ($)</label>
+                            <input type="number" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Rate (%)</label>
+                                <input type="number" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Term (Yrs)</label>
+                                <input type="number" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Monthly Payment</p>
+                        <p class="text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
+                        <div class="mt-3 flex justify-between text-[10px] border-t border-gray-200 dark:border-gray-600 pt-2">
+                            <span class="text-gray-500">Interest: <strong id="l-int-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
+                            <span class="text-gray-500">Total: <strong id="l-tot-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            appData.loans.forEach(loan => calcLoan(loan.id));
+            lucide.createIcons();
+        }
+
+        function updateLoanProp(id, prop, val) {
+            const l = appData.loans.find(x => x.id === id);
+            if(l) { l[prop] = val; saveData(); }
+        }
+
+        function calcLoan(id) {
+            const l = appData.loans.find(x => x.id === id);
+            if(!l) return;
+
+            l.amount = parseFloat(document.getElementById(`l-amt-${id}`).value) || 0;
+            l.rate = parseFloat(document.getElementById(`l-rate-${id}`).value) || 0;
+            l.years = parseFloat(document.getElementById(`l-yrs-${id}`).value) || 0;
+
+            const P = l.amount;
+            const r = l.rate / 100 / 12;
+            const n = l.years * 12;
+            
+            let payment = 0, total = 0;
+            
+            if (P > 0 && n > 0) {
+                if (r === 0) {
+                    payment = P / n;
+                    total = P;
+                } else {
+                    payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    total = payment * n;
+                }
+            }
+
+            document.getElementById(`l-pay-${id}`).innerText = fmt.format(payment);
+            document.getElementById(`l-tot-${id}`).innerText = fmt.format(total);
+            document.getElementById(`l-int-${id}`).innerText = fmt.format(Math.max(0, total - P));
+            
+            saveData();
+        }
+
+        // ==========================================
+        // APY SAVINGS CALCULATORS
+        // ==========================================
+        function addInvestment(save = true) {
+            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', rate: '' });
+            if(save) { saveData(); renderInvestments(); }
+        }
+
+        function removeInvestment(id) {
+            const el = document.getElementById(`inv-${id}`);
+            if(el) {
+                el.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    appData.investments = appData.investments.filter(i => i.id !== id);
+                    saveData();
+                    renderInvestments();
+                }, 200);
+            }
+        }
+
+        function renderInvestments() {
+            const container = document.getElementById('interestContainer');
+            container.innerHTML = appData.investments.map(inv => `
+                <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-blue w-9/12 placeholder-gray-400 border-b border-transparent focus:border-brand-blue transition-all" placeholder="Bank Name">
+                        <div class="flex space-x-1 relative z-10">
+                             <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue hover:bg-blue-50 dark:hover:bg-gray-700 p-1.5 rounded hover:scale-110 transition-all" title="AI Advice"><i data-lucide="sparkles" class="w-4 h-4"></i></button>
+                             <button onclick="removeInvestment(${inv.id})" class="text-gray-400 hover:text-rose-500 p-1.5 rounded hover:rotate-90 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <div>
+                            <label class="block text-xs font-medium mb-1">Balance ($)</label>
+                            <input type="number" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1">APY (%)</label>
+                            <input type="number" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm">
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mt-auto group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
+                        <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-center">
+                            <div><p class="text-[10px] text-gray-500 uppercase">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">5 Years</p><p class="font-bold text-sm value-update" id="i-5-${inv.id}">$0</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">10 Years</p><p class="font-bold text-sm text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            appData.investments.forEach(inv => calcInvestment(inv.id));
+            lucide.createIcons();
+        }
+
+        function updateInvProp(id, prop, val) {
+            const i = appData.investments.find(x => x.id === id);
+            if(i) { i[prop] = val; saveData(); }
+        }
+
+        function calcInvestment(id) {
+            const i = appData.investments.find(x => x.id === id);
+            if(!i) return;
+
+            i.principal = parseFloat(document.getElementById(`i-prin-${id}`).value) || 0;
+            i.rate = parseFloat(document.getElementById(`i-rate-${id}`).value) || 0;
+
+            const P = i.principal;
+            const r = i.rate / 100;
+
+            const calcAPY = (years) => P * Math.pow(1 + r, years);
+
+            document.getElementById(`i-1-${id}`).innerText = fmt.format(calcAPY(1));
+            document.getElementById(`i-2-${id}`).innerText = fmt.format(calcAPY(2));
+            document.getElementById(`i-5-${id}`).innerText = fmt.format(calcAPY(5));
+            document.getElementById(`i-10-${id}`).innerText = fmt.format(calcAPY(10));
+            
+            saveData();
+        }
+
+        // ==========================================
+        // AI INTEGRATION
+        // ==========================================
+        async function callGemini(prompt, useGrounding = false, retries = 5) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: "You are a helpful, encouraging financial advisor. Provide responses formatted cleanly using ONLY standard HTML tags like <p>, <ul>, <li>, <strong>, <a>, <h3>, <div>, <br>. Keep answers concise. Do NOT use Markdown formatting like **." }] }
+            };
+
+            if (useGrounding) {
+                payload.tools = [{ "google_search": {} }];
+            }
+
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                    const data = await response.json();
+                    return data.candidates[0].content.parts[0].text;
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        function openAIModal() {
+            const modal = document.getElementById('aiModal');
+            const content = document.getElementById('aiModalContent');
+            modal.classList.remove('hidden');
+            // Slight delay to allow display block to apply before animating opacity
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            });
+        }
+
+        function closeAIModal() {
+            const modal = document.getElementById('aiModal');
+            const content = document.getElementById('aiModalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // Matches transition duration
+        }
+
+        async function runAIAnalysis(dashId) {
+            const dash = appData.dashboards.find(d => d.id === dashId);
+            if(!dash) return;
+
+            openAIModal();
+            const content = document.getElementById('aiContent');
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-teal mb-4"></i><span class="text-gray-500 dark:text-gray-400">Analyzing scenario...</span></div>';
+            lucide.createIcons();
+
+            const yInc = dash.income * 52;
+            let expensesText = dash.expenses.map(e => `${e.name}: $${e.amount} (${e.freq})`).join(', ');
+            if (!expensesText) expensesText = "No expenses listed.";
+
+            const prompt = `Here is my financial snapshot for my scenario named "${dash.name}":
+            Estimated Yearly Income: $${yInc.toFixed(2)}
+            Current Expenses: ${expensesText}
+            
+            Please provide a brief, actionable 3-point summary analyzing my spending habits and giving me tips to optimize my savings. Keep it very concise.`;
+
+            try {
+                content.innerHTML = `<div class="animate-fade-in">${await callGemini(prompt)}</div>`;
+            } catch (error) {
+                content.innerHTML = `<div class="text-rose-500 p-4 bg-rose-50 dark:bg-gray-700 rounded-lg animate-fade-in">Failed to load AI insights. Please try again later.</div>`;
+            }
+        }
+
+        async function runInvestmentAI(invId) {
+            const inv = appData.investments.find(i => i.id === invId);
+            if(!inv) return;
+
+            openAIModal();
+            const content = document.getElementById('aiContent');
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-blue mb-4"></i><span class="text-gray-500 dark:text-gray-400">Evaluating yield strategy...</span></div>';
+            lucide.createIcons();
+
+            const prompt = `I have a scenario named "${inv.name}". I currently have $${(inv.principal || 0).toFixed(2)} in a bank account offering an APY of ${(inv.rate || 0)}%. 
+            Can you give me a brief 3-point analysis of this rate in the current economic climate, and suggest what other low-risk or medium-risk vehicles I could use to diversify or improve my yield? Keep it concise.`;
+
+            try {
+                content.innerHTML = `<div class="animate-fade-in">${await callGemini(prompt)}</div>`;
+            } catch (error) {
+                content.innerHTML = `<div class="text-rose-500 p-4 bg-rose-50 dark:bg-gray-700 rounded-lg animate-fade-in">Failed to load AI insights. Please try again later.</div>`;
+            }
+        }
+
+        // ==========================================
+        // LIVE STOCK SCANNER
+        // ==========================================
+        async function fetchStockIdeas() {
+            const container = document.getElementById('stockContainer');
+            container.innerHTML = '<div class="flex flex-col items-center justify-center py-16"><i data-lucide="loader-2" class="w-12 h-12 animate-spin text-indigo-500 mb-4"></i><span class="text-gray-500 dark:text-gray-400 font-medium">Scanning live market news...</span><p class="text-xs text-gray-400 mt-2">This utilizes Google Search grounding to find today\'s data.</p></div>';
+            lucide.createIcons();
+
+            const prompt = `Search the live web for 3 trending stocks that financial analysts are highly recommending to buy this week.
+            For each stock, provide:
+            1. The company name and ticker symbol.
+            2. A 2-sentence reasoning on why it's a good buy right now based on recent news.
+            3. A real, clickable URL to a recent news article about it.
+            
+            Format the output strictly as a series of HTML cards exactly like this:
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (TICKER)</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Reasoning goes here...</p>
+                <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
+            </div>`;
+
+            try {
+                // Pass 'true' to enable Google Search grounding
+                const response = await callGemini(prompt, true); 
+                appData.lastStockIdeas = `<div class="animate-fade-in max-w-3xl mx-auto">${response}</div>`;
+                saveData();
+                renderStocks();
+            } catch (error) {
+                container.innerHTML = `<div class="text-rose-500 p-4 bg-rose-50 dark:bg-gray-700 rounded-lg animate-fade-in max-w-2xl mx-auto">Failed to scan live market data. Please try again later.</div>`;
+            }
+        }
+
+        function renderStocks() {
+            const container = document.getElementById('stockContainer');
+            if (appData.lastStockIdeas && appData.lastStockIdeas.trim() !== '') {
+                container.innerHTML = appData.lastStockIdeas;
+            } else {
+                 container.innerHTML = `
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-16 animate-fade-in">
+                        <div class="bg-indigo-100 dark:bg-gray-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="trending-up" class="w-10 h-10 text-indigo-500"></i>
+                        </div>
+                        <p class="font-medium text-lg mb-1">Ready to explore?</p>
+                        <p class="text-sm">Click "Scan Market" to have AI analyze live news and find trending stock ideas.</p>
+                    </div>`;
+            }
+            lucide.createIcons();
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+            });
+        }
+
+        // Boot
+        init();
+
+    </script>
+</body>
+</html>
