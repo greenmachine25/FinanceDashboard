@@ -3,7 +3,7 @@ const ASSETS = [
   './finance_app.html',
   './manifest.json',
   './icon.png',
-  './favicon.png'
+  './favicon.svg'
 ];
 
 // Install Service Worker and Cache Assets
