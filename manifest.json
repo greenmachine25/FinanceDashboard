@@ -1,7 +1,7 @@
 {
-  "name": "Personal Finance Hub",
+  "name": "Finance Dashboard",
   "short_name": "FinanceHub",
-  "start_url": "./finance_app.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2dd4bf",
