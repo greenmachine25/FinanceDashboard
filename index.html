@@ -7,7 +7,7 @@
     
     <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="favicon.svg">
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="theme-color" content="#2dd4bf">
 
@@ -62,6 +62,10 @@
         
         /* Smooth number updates */
         .value-update { transition: all 0.3s ease; }
+
+        /* Hide scrollbar for navbar but allow scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         #aiContent p { margin-bottom: 0.75rem; }
         #aiContent ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
@@ -81,11 +85,11 @@
                     <i data-lucide="wallet" class="text-teal-400 w-6 h-6"></i>
                     <span class="text-xl font-bold gradient-text">FinanceHub</span>
                 </div>
-                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto" id="tabs">
-                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200">Dashboards</button>
-                    <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Loans</button>
-                    <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">APY Savings</button>
-                    <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Stock Ideas</button>
+                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar pb-1 w-full sm:w-auto" id="tabs">
+                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200 whitespace-nowrap">Dashboards</button>
+                    <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
+                    <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
+                    <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Stock Ideas</button>
                 </div>
                 <div>
                     <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:rotate-12 transition-all duration-300">
@@ -98,56 +102,56 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-hidden">
+    <main class="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
         
         <!-- Tab: Dashboards -->
         <div id="dashboard" class="tab-content active">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Budget Scenarios</h2>
-                <button onclick="addDashboard()" class="bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addDashboard()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
-            <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-8">
                 <!-- Injected via JS -->
             </div>
         </div>
 
         <!-- Tab: Loans -->
         <div id="loan" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Loan Scenarios</h2>
-                <button onclick="addLoan()" class="bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addLoan()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
-            <div id="loansContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div id="loansContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
             </div>
         </div>
 
         <!-- Tab: Interest -->
         <div id="interest" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">APY Scenarios</h2>
-                <button onclick="addInvestment()" class="bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addInvestment()" class="w-full sm:w-auto justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
-            <div id="interestContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div id="interestContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
             </div>
         </div>
 
         <!-- Tab: Stock Ideas -->
         <div id="stocks" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
-                <button onclick="fetchStockIdeas()" class="bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="search" class="w-4 h-4 mr-2"></i> Scan Market
                 </button>
             </div>
-            <div id="stockContainer" class="bg-gray-50/50 dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[300px]">
+            <div id="stockContainer" class="bg-gray-50/50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[300px]">
                 <!-- Injected via JS -->
             </div>
         </div>
@@ -155,16 +159,16 @@
     </main>
 
     <!-- AI Insights Modal -->
-    <div id="aiModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-lg w-full mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+    <div id="aiModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
             <button onclick="closeAIModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
+            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text shrink-0">
                 <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-brand-blue animate-pulse"></i>
                 AI Financial Insights
             </h3>
-            <div id="aiContent" class="text-sm text-gray-700 dark:text-gray-300 max-h-[60vh] overflow-y-auto pr-2">
+            <div id="aiContent" class="text-sm text-gray-700 dark:text-gray-300 overflow-y-auto pr-2 custom-scrollbar">
                 <!-- AI response goes here -->
             </div>
         </div>
@@ -275,19 +279,19 @@
                 <div id="dash-${dash.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group transition-all duration-300">
                     <button onclick="removeDashboard(${dash.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
-                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
-                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                    <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-lg sm:text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
                     </div>
 
-                    <div class="p-6 space-y-6">
+                    <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
                         <!-- Income -->
                         <div>
-                            <label class="block text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
-                            <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
-                            <div class="grid grid-cols-3 gap-3 mt-3">
-                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-xl text-center border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600"><p class="text-[10px] uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
+                            <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
+                            <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-3">
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
@@ -297,25 +301,25 @@
                                 <span class="text-sm font-medium">Expenses</span>
                                 <button onclick="addExpense(${dash.id})" class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
                             </div>
-                            <div id="expList-${dash.id}" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar"></div>
+                            <div id="expList-${dash.id}" class="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar"></div>
                         </div>
 
                         <!-- Net Summary -->
                         <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300">
-                            <div class="flex justify-between items-start mb-2">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2 sm:gap-0">
                                 <h3 class="text-sm font-medium opacity-90">Net Realized Cashflow</h3>
-                                <button onclick="runAIAnalysis(${dash.id})" class="bg-white/20 hover:bg-white/30 hover:scale-105 px-2 py-1 rounded text-xs font-bold transition-all flex items-center backdrop-blur-sm">✨ AI Analysis</button>
+                                <button onclick="runAIAnalysis(${dash.id})" class="w-full sm:w-auto justify-center bg-white/20 hover:bg-white/30 hover:scale-105 px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center backdrop-blur-sm">✨ AI Analysis</button>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div><p class="text-xs opacity-80">Monthly Net</p><p class="text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
-                                <div><p class="text-xs opacity-80">Yearly Net</p><p class="text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
+                                <div><p class="text-xs opacity-80">Monthly Net</p><p class="text-lg sm:text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
+                                <div><p class="text-xs opacity-80">Yearly Net</p><p class="text-lg sm:text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
                         <!-- Emerg Fund -->
-                         <div class="flex space-x-3">
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"><p class="text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"><p class="text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
+                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
                          </div>
                     </div>
                 </div>
@@ -362,15 +366,17 @@
                 list.innerHTML = '<p class="text-xs text-gray-500 italic animate-fade-in">No expenses in this scenario.</p>';
             } else {
                 list.innerHTML = d.expenses.map(exp => `
-                    <div class="animate-slide-down flex items-center space-x-2 bg-gray-50 dark:bg-gray-700 p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
-                        <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="flex-1 p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
-                        <input type="number" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="w-20 p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
-                        <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all cursor-pointer">
-                            <option value="weekly" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
-                            <option value="monthly" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
-                            <option value="yearly" ${exp.freq === 'yearly' ? 'selected' : ''}>Yr</option>
-                        </select>
-                        <button onclick="removeExpense(${dashId}, ${exp.id})" class="p-1.5 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 hover:scale-110 rounded transition-all"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    <div class="animate-slide-down flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 sm:p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="w-full sm:flex-1 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="number" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="flex-1 sm:w-20 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all">
+                            <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all cursor-pointer">
+                                <option value="weekly" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
+                                <option value="monthly" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
+                                <option value="yearly" ${exp.freq === 'yearly' ? 'selected' : ''}>Yr</option>
+                            </select>
+                            <button onclick="removeExpense(${dashId}, ${exp.id})" class="p-2 sm:p-1.5 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 hover:scale-110 rounded transition-all flex-shrink-0"><i data-lucide="trash-2" class="w-4 h-4 sm:w-3 sm:h-3"></i></button>
+                        </div>
                     </div>
                 `).join('');
                 lucide.createIcons();
@@ -449,7 +455,7 @@
         function renderLoans() {
             const container = document.getElementById('loansContainer');
             container.innerHTML = appData.loans.map(loan => `
-                <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 relative group hover:shadow-xl transition-all duration-300">
+                <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700 relative group hover:shadow-xl transition-all duration-300">
                     <button onclick="removeLoan(${loan.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
                     <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-teal w-10/12 placeholder-gray-400 mb-4 border-b border-transparent focus:border-brand-teal transition-all" placeholder="Scenario Name">
@@ -459,7 +465,7 @@
                             <label class="block text-xs font-medium mb-1">Amount ($)</label>
                             <input type="number" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium mb-1">Rate (%)</label>
                                 <input type="number" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
@@ -473,8 +479,8 @@
 
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Monthly Payment</p>
-                        <p class="text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
-                        <div class="mt-3 flex justify-between text-[10px] border-t border-gray-200 dark:border-gray-600 pt-2">
+                        <p class="text-2xl sm:text-3xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
+                        <div class="mt-3 flex flex-col sm:flex-row justify-between text-[10px] sm:text-xs border-t border-gray-200 dark:border-gray-600 pt-3 sm:pt-2 gap-2 sm:gap-0">
                             <span class="text-gray-500">Interest: <strong id="l-int-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
                             <span class="text-gray-500">Total: <strong id="l-tot-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
                         </div>
@@ -545,7 +551,7 @@
         function renderInvestments() {
             const container = document.getElementById('interestContainer');
             container.innerHTML = appData.investments.map(inv => `
-                <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
+                <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700 relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
                     <div class="flex justify-between items-start mb-4">
                         <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-blue w-9/12 placeholder-gray-400 border-b border-transparent focus:border-brand-blue transition-all" placeholder="Bank Name">
                         <div class="flex space-x-1 relative z-10">
@@ -554,7 +560,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                         <div>
                             <label class="block text-xs font-medium mb-1">Balance ($)</label>
                             <input type="number" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm">
@@ -566,11 +572,11 @@
                     </div>
 
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mt-auto group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
-                        <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-center">
+                        <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-center">
                             <div><p class="text-[10px] text-gray-500 uppercase">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
                             <div><p class="text-[10px] text-gray-500 uppercase">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
                             <div><p class="text-[10px] text-gray-500 uppercase">5 Years</p><p class="font-bold text-sm value-update" id="i-5-${inv.id}">$0</p></div>
-                            <div><p class="text-[10px] text-gray-500 uppercase">10 Years</p><p class="font-bold text-sm text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
+                            <div><p class="text-[10px] text-gray-500 uppercase">10 Years</p><p class="font-bold text-sm sm:text-base text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
                         </div>
                     </div>
                 </div>
