@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-hub-v1';
+const CACHE_NAME = 'finance-hub-v1.1';
 const ASSETS = [
   './finance_app.html',
   './manifest.json',
