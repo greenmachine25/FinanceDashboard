@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Dashboard</title>
+    <title>Personal Finance Hub</title>
     
-    <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="theme-color" content="#2dd4bf">
+
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -63,6 +65,11 @@
         /* Smooth number updates */
         .value-update { transition: all 0.3s ease; }
 
+        /* Hardware Acceleration for smooth animations */
+        .animate-pop-in, .animate-slide-down, .animate-fade-in, .tab-content {
+            will-change: transform, opacity;
+        }
+
         /* Hide scrollbar for navbar but allow scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -77,34 +84,50 @@
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased">
 
-    <!-- Navbar -->
-    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-20 transition-colors duration-300 relative">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center space-x-2 hover:scale-105 transition-transform duration-300 cursor-pointer">
                     <i data-lucide="wallet" class="text-teal-400 w-6 h-6"></i>
                     <span class="text-xl font-bold gradient-text">FinanceHub</span>
                 </div>
-                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto no-scrollbar pb-1 w-full sm:w-auto" id="tabs">
+                
+                <div class="hidden sm:flex space-x-4" id="tabs-desktop">
                     <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200 whitespace-nowrap">Dashboards</button>
                     <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
                     <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
                     <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Stock Ideas</button>
                 </div>
-                <div>
+
+                <div class="flex items-center space-x-2 sm:space-x-1">
+                    <button onclick="openSettingsModal()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300" title="Data Settings">
+                        <i data-lucide="settings" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
+                    </button>
+
                     <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:rotate-12 transition-all duration-300">
                         <i data-lucide="moon" id="moonIcon" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
                         <i data-lucide="sun" id="sunIcon" class="w-5 h-5 text-yellow-400 hidden"></i>
                     </button>
+                    
+                    <button onclick="toggleMobileMenu()" class="sm:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200">
+                        <i data-lucide="menu" id="mobileMenuIcon" class="w-6 h-6"></i>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden sm:hidden absolute w-full bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-xl top-16 left-0 origin-top">
+            <div class="px-4 py-3 flex flex-col space-y-2">
+                <button onclick="switchTab('dashboard')" class="tab-btn active w-full text-left px-4 py-3 rounded-md text-base font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200">Dashboards</button>
+                <button onclick="switchTab('loan')" class="tab-btn w-full text-left px-4 py-3 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Loans</button>
+                <button onclick="switchTab('interest')" class="tab-btn w-full text-left px-4 py-3 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">APY Savings</button>
+                <button onclick="switchTab('stocks')" class="tab-btn w-full text-left px-4 py-3 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200">Stock Ideas</button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
         
-        <!-- Tab: Dashboards -->
         <div id="dashboard" class="tab-content active">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Budget Scenarios</h2>
@@ -113,11 +136,9 @@
                 </button>
             </div>
             <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-8">
-                <!-- Injected via JS -->
-            </div>
+                </div>
         </div>
 
-        <!-- Tab: Loans -->
         <div id="loan" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Loan Scenarios</h2>
@@ -126,11 +147,9 @@
                 </button>
             </div>
             <div id="loansContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                <!-- Injected via JS -->
-            </div>
+                </div>
         </div>
 
-        <!-- Tab: Interest -->
         <div id="interest" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">APY Scenarios</h2>
@@ -139,11 +158,9 @@
                 </button>
             </div>
             <div id="interestContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                <!-- Injected via JS -->
-            </div>
+                </div>
         </div>
 
-        <!-- Tab: Stock Ideas -->
         <div id="stocks" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
@@ -152,13 +169,11 @@
                 </button>
             </div>
             <div id="stockContainer" class="bg-gray-50/50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[300px]">
-                <!-- Injected via JS -->
-            </div>
+                </div>
         </div>
 
     </main>
 
-    <!-- AI Insights Modal -->
     <div id="aiModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
         <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
             <button onclick="closeAIModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
@@ -169,7 +184,42 @@
                 AI Financial Insights
             </h3>
             <div id="aiContent" class="text-sm text-gray-700 dark:text-gray-300 overflow-y-auto pr-2 custom-scrollbar">
-                <!-- AI response goes here -->
+                </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="settingsModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
+                <i data-lucide="database" class="w-5 h-5 mr-2 text-brand-teal"></i>
+                Data Backup & Sync
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-sm font-bold mb-2">Local File Backup</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
+                    <div class="flex space-x-2">
+                        <button onclick="exportFile()" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
+                        <label class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm cursor-pointer">
+                            <i data-lucide="upload" class="w-4 h-4 mr-2 text-brand-blue"></i> Import
+                            <input type="file" class="hidden" accept=".json" onchange="importFile(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-sm font-bold mb-2">Sync Code</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
+                    <button onclick="exportCode()" class="w-full mb-3 bg-brand-blue hover:bg-blue-600 text-white text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-bold shadow-md"><i data-lucide="copy" class="w-4 h-4 mr-2"></i> Copy Sync Code</button>
+                    <div class="flex space-x-2">
+                        <input type="text" id="importCodeInput" placeholder="Paste code here..." class="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-sm">
+                        <button onclick="importCode()" class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors shadow-sm">Load</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -212,8 +262,13 @@
             renderAll();
         }
 
+        // --- Performance: Debounced Saving ---
+        let saveTimeout;
         function saveData() {
-            localStorage.setItem('financeHubData', JSON.stringify(appData));
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                localStorage.setItem('financeHubData', JSON.stringify(appData));
+            }, 500); // Saves 500ms after you stop typing to prevent lag
         }
 
         // --- Theme & Navigation ---
@@ -242,8 +297,32 @@
                 el.classList.add('text-gray-500', 'dark:text-gray-300');
             });
             document.getElementById(tabId).classList.add('active');
-            const btn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
-            btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+            
+            // Update BOTH mobile and desktop buttons
+            document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => {
+                btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+                btn.classList.remove('text-gray-500', 'dark:text-gray-300');
+            });
+
+            const menu = document.getElementById('mobileMenu');
+            if (menu && !menu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('mobileMenuIcon');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('animate-slide-down');
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('animate-slide-down');
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
         }
 
         function renderAll() {
@@ -252,6 +331,98 @@
             renderInvestments();
             renderStocks();
         }
+
+        // ==========================================
+        // DATA MANAGEMENT (BACKUP / SYNC)
+        // ==========================================
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            const content = document.getElementById('settingsModalContent');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            });
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            const content = document.getElementById('settingsModalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function exportFile() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `financehub_backup_${new Date().getTime()}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }
+
+        function importFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (parsedData && parsedData.dashboards) {
+                        appData = parsedData;
+                        localStorage.setItem('financeHubData', JSON.stringify(appData));
+                        init();
+                        closeSettingsModal();
+                        alert("Data successfully imported!");
+                    } else {
+                        alert("Invalid backup file format.");
+                    }
+                } catch (error) {
+                    alert("Error reading backup file.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+        }
+
+        function exportCode() {
+            try {
+                // btoa handles basic base64 encoding. encodeURIComponent handles special characters/emojis.
+                const code = btoa(encodeURIComponent(JSON.stringify(appData)));
+                navigator.clipboard.writeText(code).then(() => {
+                    alert("Sync Code copied to clipboard! Paste this on your other device.");
+                });
+            } catch (error) {
+                alert("Failed to generate code. Data might be too large.");
+            }
+        }
+
+        function importCode() {
+            const inputField = document.getElementById('importCodeInput');
+            const code = inputField.value.trim();
+            if (!code) return;
+            
+            try {
+                const parsedData = JSON.parse(decodeURIComponent(atob(code)));
+                if (parsedData && parsedData.dashboards) {
+                    appData = parsedData;
+                    localStorage.setItem('financeHubData', JSON.stringify(appData));
+                    init();
+                    closeSettingsModal();
+                    inputField.value = '';
+                    alert("Sync successful! Data loaded.");
+                } else {
+                    alert("Invalid Sync Code.");
+                }
+            } catch (error) {
+                alert("Corrupted or Invalid Sync Code.");
+            }
+        }
+
 
         // ==========================================
         // DASHBOARDS (INCOME & EXPENSES)
@@ -284,7 +455,6 @@
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
-                        <!-- Income -->
                         <div>
                             <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
                             <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
@@ -295,7 +465,6 @@
                             </div>
                         </div>
 
-                        <!-- Expenses -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-sm font-medium">Expenses</span>
@@ -304,20 +473,19 @@
                             <div id="expList-${dash.id}" class="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar"></div>
                         </div>
 
-                        <!-- Net Summary -->
                         <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2 sm:gap-0">
-                                <h3 class="text-sm font-medium opacity-90">Net Realized Cashflow</h3>
+                                <h3 class="text-sm font-medium opacity-90">Disposable Income (Wiggle Room)</h3>
                                 <button onclick="runAIAnalysis(${dash.id})" class="w-full sm:w-auto justify-center bg-white/20 hover:bg-white/30 hover:scale-105 px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center backdrop-blur-sm">✨ AI Analysis</button>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><p class="text-xs opacity-80">Monthly Net</p><p class="text-lg sm:text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
-                                <div><p class="text-xs opacity-80">Yearly Net</p><p class="text-lg sm:text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
+                            <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                                <div><p class="text-[10px] sm:text-xs opacity-80">Weekly</p><p class="text-base sm:text-xl font-bold value-update" id="net-wk-${dash.id}">$0</p></div>
+                                <div><p class="text-[10px] sm:text-xs opacity-80">Monthly</p><p class="text-base sm:text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
+                                <div><p class="text-[10px] sm:text-xs opacity-80">Yearly</p><p class="text-base sm:text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
-                        <!-- Emerg Fund -->
-                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                              <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
                              <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
                          </div>
@@ -421,7 +589,9 @@
 
             const netYr = yInc - yearlyExp;
             const netMo = netYr / 12;
+            const netWk = netYr / 52;
             
+            document.getElementById(`net-wk-${dashId}`).innerText = fmt.format(netWk);
             document.getElementById(`net-mo-${dashId}`).innerText = fmt.format(netMo);
             document.getElementById(`net-yr-${dashId}`).innerText = fmt.format(netYr);
 
@@ -429,6 +599,7 @@
             document.getElementById(`ef3-${dashId}`).innerText = fmt.format(moExp * 3);
             document.getElementById(`ef6-${dashId}`).innerText = fmt.format(moExp * 6);
 
+            // Trigger debounced save
             saveData();
         }
 
@@ -572,6 +743,10 @@
                     </div>
 
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mt-auto group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
+                        <div class="mb-4 bg-brand-blue/10 dark:bg-brand-blue/20 p-3 rounded-lg flex justify-between items-center border border-brand-blue/20">
+                            <span class="text-xs font-medium text-brand-blue dark:text-blue-300">Est. Monthly Earned</span>
+                            <span class="font-bold text-brand-blue dark:text-blue-300 value-update" id="i-mo-${inv.id}">$0.00</span>
+                        </div>
                         <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-center">
                             <div><p class="text-[10px] text-gray-500 uppercase">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
                             <div><p class="text-[10px] text-gray-500 uppercase">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
@@ -602,7 +777,9 @@
             const r = i.rate / 100;
 
             const calcAPY = (years) => P * Math.pow(1 + r, years);
+            const estMonthlyYield = (P * r) / 12;
 
+            document.getElementById(`i-mo-${id}`).innerText = fmt.format(estMonthlyYield);
             document.getElementById(`i-1-${id}`).innerText = fmt.format(calcAPY(1));
             document.getElementById(`i-2-${id}`).innerText = fmt.format(calcAPY(2));
             document.getElementById(`i-5-${id}`).innerText = fmt.format(calcAPY(5));
@@ -644,7 +821,6 @@
             const modal = document.getElementById('aiModal');
             const content = document.getElementById('aiModalContent');
             modal.classList.remove('hidden');
-            // Slight delay to allow display block to apply before animating opacity
             requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
@@ -660,7 +836,7 @@
             content.classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
-            }, 300); // Matches transition duration
+            }, 300);
         }
 
         async function runAIAnalysis(dashId) {
@@ -730,7 +906,6 @@
             </div>`;
 
             try {
-                // Pass 'true' to enable Google Search grounding
                 const response = await callGemini(prompt, true); 
                 appData.lastStockIdeas = `<div class="animate-fade-in max-w-3xl mx-auto">${response}</div>`;
                 saveData();
