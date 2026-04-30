@@ -266,7 +266,7 @@
                     parsed = {
                         theme: parsed.theme || 'light',
                         dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [] }],
-                        loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0 }],
+                        loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0 }],
                         investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0 }],
                         lastStockIdeas: ''
                     };
@@ -346,8 +346,8 @@
         }
 
         function renderAll() {
+            renderLoans(); // Calculate loans first so payments are ready
             renderDashboards();
-            renderLoans();
             renderInvestments();
             renderStocks();
         }
@@ -376,13 +376,18 @@
         }
 
         function exportFile() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const dataStr = JSON.stringify(appData);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
             const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("href", url);
             dlAnchorElem.setAttribute("download", `financehub_backup_${new Date().getTime()}.json`);
             document.body.appendChild(dlAnchorElem);
             dlAnchorElem.click();
             dlAnchorElem.remove();
+            
+            URL.revokeObjectURL(url); // Clean up memory
         }
 
         function importFile(event) {
@@ -411,7 +416,6 @@
 
         function exportCode() {
             try {
-                // btoa handles basic base64 encoding. encodeURIComponent handles special characters/emojis.
                 const code = btoa(encodeURIComponent(JSON.stringify(appData)));
                 navigator.clipboard.writeText(code).then(() => {
                     alert("Sync Code copied to clipboard! Paste this on your other device.");
@@ -475,10 +479,22 @@
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
+                                <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Link Monthly Loan</label>
+                                <select onchange="updateLinkedLoan(${dash.id}, this.value)" class="w-full p-2 sm:p-3 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm cursor-pointer">
+                                    <option value="">-- None --</option>
+                                    ${appData.loans.map(l => `<option value="${l.id}" ${dash.linkedLoanId == l.id ? 'selected' : ''}>${l.name} (${fmt.format(l.calculatedPayment || 0)}/mo)</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
                         <div>
-                            <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
-                            <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-1">
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
@@ -523,6 +539,15 @@
         function updateDashName(id, val) {
             const d = appData.dashboards.find(x => x.id === id);
             if(d) { d.name = val; saveData(); }
+        }
+
+        function updateLinkedLoan(dashId, loanId) {
+            const d = appData.dashboards.find(x => x.id === dashId);
+            if(d) {
+                d.linkedLoanId = loanId ? parseInt(loanId) : null;
+                saveData();
+                calcDashboard(dashId);
+            }
         }
 
         function addExpense(dashId) {
@@ -607,6 +632,13 @@
                 if (e.freq === 'yearly') yearlyExp += amt;
             });
 
+            if (d.linkedLoanId) {
+                const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
+                if (linkedLoan && linkedLoan.calculatedPayment) {
+                    yearlyExp += linkedLoan.calculatedPayment * 12;
+                }
+            }
+
             const netYr = yInc - yearlyExp;
             const netMo = netYr / 12;
             const netWk = netYr / 52;
@@ -619,7 +651,6 @@
             document.getElementById(`ef3-${dashId}`).innerText = fmt.format(moExp * 3);
             document.getElementById(`ef6-${dashId}`).innerText = fmt.format(moExp * 6);
 
-            // Trigger debounced save
             saveData();
         }
 
@@ -627,8 +658,12 @@
         // LOAN CALCULATORS
         // ==========================================
         function addLoan(save = true) {
-            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '' });
-            if(save) { saveData(); renderLoans(); }
+            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '', extra: '' });
+            if(save) { 
+                saveData(); 
+                renderLoans(); 
+                renderDashboards(); // Update dropdowns in background
+            }
         }
 
         function removeLoan(id) {
@@ -637,8 +672,12 @@
                 el.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     appData.loans = appData.loans.filter(l => l.id !== id);
+                    appData.dashboards.forEach(d => {
+                        if (d.linkedLoanId === id) d.linkedLoanId = null;
+                    });
                     saveData();
                     renderLoans();
+                    renderDashboards();
                 }, 200);
             }
         }
@@ -646,34 +685,69 @@
         function renderLoans() {
             const container = document.getElementById('loansContainer');
             container.innerHTML = appData.loans.map(loan => `
-                <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700 relative group hover:shadow-xl transition-all duration-300">
+                <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700 relative group hover:shadow-xl transition-all duration-300 flex flex-col">
                     <button onclick="removeLoan(${loan.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
                     <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-teal w-10/12 placeholder-gray-400 mb-4 border-b border-transparent focus:border-brand-teal transition-all" placeholder="Scenario Name">
                     
-                    <div class="space-y-3 mb-5">
-                        <div>
-                            <label class="block text-xs font-medium mb-1">Amount ($)</label>
-                            <input type="number" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-3 mb-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs font-medium mb-1">Rate (%)</label>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Amount ($)</label>
+                                <input type="number" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Rate (%)</label>
                                 <input type="number" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium mb-1">Term (Yrs)</label>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Term (Yrs)</label>
                                 <input type="number" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm">
                             </div>
                         </div>
+
+                        <!-- Initial Payment Interest vs Principal Breakdown Bar -->
+                        <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
+                                <span class="text-brand-teal font-bold">Principal</span>
+                            </div>
+                            <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden">
+                                <div id="l-int-bar-${loan.id}" class="bg-rose-500 dark:bg-rose-600 h-2 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
+                                <span id="l-int-val-${loan.id}">$0</span>
+                                <span id="l-prin-val-${loan.id}">$0</span>
+                            </div>
+                        </div>
+
+                        <!-- Extra Payment Input -->
+                        <div class="pt-1">
+                            <label class="block text-[11px] font-bold mb-1 text-brand-teal flex items-center"><i data-lucide="zap" class="w-3 h-3 mr-1"></i> Beat the Interest: Extra Monthly ($)</label>
+                            <input type="number" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm font-bold text-brand-teal placeholder-brand-teal/40" placeholder="Add extra payment...">
+                        </div>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Monthly Payment</p>
-                        <p class="text-2xl sm:text-3xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
-                        <div class="mt-3 flex flex-col sm:flex-row justify-between text-[10px] sm:text-xs border-t border-gray-200 dark:border-gray-600 pt-3 sm:pt-2 gap-2 sm:gap-0">
-                            <span class="text-gray-500">Interest: <strong id="l-int-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
-                            <span class="text-gray-500">Total: <strong id="l-tot-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mt-auto group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 mb-1 uppercase font-bold">Base Payment</p>
+                                <p class="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100 value-update" id="l-base-pay-${loan.id}">$0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-brand-teal dark:text-brand-teal mb-1 uppercase font-bold">Actual Payment</p>
+                                <p class="text-2xl sm:text-3xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 flex flex-col sm:flex-row justify-between text-[10px] sm:text-[11px] border-t border-gray-200 dark:border-gray-600 pt-3 gap-2 sm:gap-0 font-medium">
+                            <span class="text-gray-500">Base Int: <strong id="l-int-${loan.id}" class="text-gray-700 dark:text-gray-200 value-update">$0</strong></span>
+                            
+                            <span class="text-brand-teal font-bold hidden value-update" id="l-saved-container-${loan.id}">
+                                <i data-lucide="trending-down" class="w-3 h-3 inline mr-0.5"></i> Saved: <strong id="l-saved-${loan.id}">$0</strong>
+                            </span>
+                            
+                            <span class="text-brand-blue font-bold hidden value-update" id="l-time-saved-${loan.id}">0 mo earlier</span>
                         </div>
                     </div>
                 </div>
@@ -685,7 +759,11 @@
 
         function updateLoanProp(id, prop, val) {
             const l = appData.loans.find(x => x.id === id);
-            if(l) { l[prop] = val; saveData(); }
+            if(l) { 
+                l[prop] = val; 
+                saveData(); 
+                if (prop === 'name') renderDashboards(); 
+            }
         }
 
         function calcLoan(id) {
@@ -695,28 +773,86 @@
             l.amount = parseFloat(document.getElementById(`l-amt-${id}`).value) || 0;
             l.rate = parseFloat(document.getElementById(`l-rate-${id}`).value) || 0;
             l.years = parseFloat(document.getElementById(`l-yrs-${id}`).value) || 0;
+            l.extra = parseFloat(document.getElementById(`l-extra-${id}`).value) || 0;
 
             const P = l.amount;
             const r = l.rate / 100 / 12;
             const n = l.years * 12;
             
-            let payment = 0, total = 0;
+            let base_payment = 0, base_interest = 0;
+            let actual_payment = 0, new_n = 0, new_interest = 0;
+            let interest_saved = 0, months_saved = 0;
             
             if (P > 0 && n > 0) {
                 if (r === 0) {
-                    payment = P / n;
-                    total = P;
+                    base_payment = P / n;
+                    base_interest = 0;
+                    
+                    actual_payment = base_payment + l.extra;
+                    new_n = actual_payment > 0 ? P / actual_payment : n;
+                    new_interest = 0;
                 } else {
-                    payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    total = payment * n;
+                    base_payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    base_interest = (base_payment * n) - P;
+                    
+                    actual_payment = base_payment + l.extra;
+                    
+                    if (actual_payment > P * r) {
+                        new_n = Math.log(actual_payment / (actual_payment - P * r)) / Math.log(1 + r);
+                        new_interest = (new_n * actual_payment) - P;
+                    } else {
+                        new_n = n;
+                        new_interest = base_interest;
+                    }
                 }
+                interest_saved = Math.max(0, base_interest - new_interest);
+                months_saved = Math.max(0, n - new_n);
             }
 
-            document.getElementById(`l-pay-${id}`).innerText = fmt.format(payment);
-            document.getElementById(`l-tot-${id}`).innerText = fmt.format(total);
-            document.getElementById(`l-int-${id}`).innerText = fmt.format(Math.max(0, total - P));
+            // First Month Interest vs Principal Breakdown
+            let first_mo_int = (P > 0 && r > 0) ? P * r : 0;
+            let first_mo_prin = base_payment > 0 ? base_payment - first_mo_int : 0;
+            let int_pct = base_payment > 0 ? (first_mo_int / base_payment) * 100 : 0;
+
+            const intBar = document.getElementById(`l-int-bar-${id}`);
+            if(intBar) intBar.style.width = `${Math.min(100, Math.max(0, int_pct))}%`;
+            
+            const intVal = document.getElementById(`l-int-val-${id}`);
+            if(intVal) intVal.innerText = fmt.format(first_mo_int);
+
+            const prinVal = document.getElementById(`l-prin-val-${id}`);
+            if(prinVal) prinVal.innerText = fmt.format(first_mo_prin);
+
+            // Save calculated payment for dashboards to pull from
+            l.calculatedPayment = actual_payment > 0 ? actual_payment : base_payment;
+
+            // Update UI Outputs
+            document.getElementById(`l-base-pay-${id}`).innerText = fmt.format(base_payment);
+            document.getElementById(`l-pay-${id}`).innerText = fmt.format(actual_payment > 0 ? actual_payment : base_payment);
+            document.getElementById(`l-int-${id}`).innerText = fmt.format(Math.max(0, base_interest));
+            
+            const savedContainer = document.getElementById(`l-saved-container-${id}`);
+            const savedEl = document.getElementById(`l-saved-${id}`);
+            const timeSavedEl = document.getElementById(`l-time-saved-${id}`);
+            
+            if (l.extra > 0 && months_saved > 0.5) {
+                savedEl.innerText = fmt.format(interest_saved);
+                savedContainer.classList.remove('hidden');
+                
+                let yrs = Math.floor(months_saved / 12);
+                let mos = Math.ceil(months_saved % 12);
+                let timeStr = yrs > 0 ? `${yrs}y ${mos}mo earlier` : `${mos}mo earlier`;
+                timeSavedEl.innerText = timeStr;
+                timeSavedEl.classList.remove('hidden');
+            } else {
+                savedContainer.classList.add('hidden');
+                timeSavedEl.classList.add('hidden');
+            }
             
             saveData();
+            
+            // Re-render dashboards to update linked loan values and dropdown menus
+            renderDashboards();
         }
 
         // ==========================================
