@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://www.gstatic.com"> 
+    
+    <!-- Chart.js for Sweet Spot Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -171,6 +174,7 @@
 
     </main>
 
+    <!-- Mobile Bottom Navigation -->
     <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
         <button onclick="switchTab('dashboard')" class="mobile-nav-btn active flex flex-col items-center py-3 flex-1 text-brand-teal transition-colors">
             <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
@@ -186,6 +190,7 @@
         </button>
     </nav>
 
+    <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
         <div id="settingsModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300">
             <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
@@ -195,7 +200,6 @@
                 <i data-lucide="database" class="w-5 h-5 mr-2 text-brand-teal"></i>
                 Local Backup & Sync
             </h3>
-            
             <div class="space-y-4">
                 <div class="p-4 bg-gray-50/80 dark:bg-gray-700/80 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                     <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Download a local backup to keep your data safe.">Local File Backup</h4>
@@ -208,7 +212,6 @@
                         </label>
                     </div>
                 </div>
-
                 <div class="p-4 bg-gray-50/80 dark:bg-gray-700/80 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                     <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Generate a unique code block to quickly copy and paste data across your devices without logging in.">Offline Sync Code</h4>
                     <p class="text-sm sm:text-xs text-gray-600 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
@@ -218,6 +221,73 @@
                         <button onclick="importCode()" class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-base sm:text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors shadow-sm">Load</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amortization Modal -->
+    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="amortModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center text-brand-teal">
+                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
+                </h3>
+                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
+                <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
+                    <thead class="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-sm z-10">
+                        <tr class="text-gray-600 dark:text-gray-300 border-b dark:border-gray-700/50">
+                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Month number in the payment term.">Month</span></th>
+                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Total amount paid this month (Base + Extra).">Payment</span></th>
+                            <th class="py-3 px-2 font-medium text-rose-500"><span class="tooltip-help" title="Portion of payment going towards bank interest.">Interest</span></th>
+                            <th class="py-3 px-2 font-medium text-brand-teal"><span class="tooltip-help" title="Portion of payment paying down your actual debt.">Principal</span></th>
+                            <th class="py-3 px-2 font-medium text-right"><span class="tooltip-help" title="Remaining loan balance after payment.">Balance</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortTableBody" class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sweet Spot Chart Modal -->
+    <div id="chartModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="chartModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-4xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold flex items-center text-indigo-500 dark:text-indigo-400">
+                        <i data-lucide="line-chart" class="w-5 h-5 mr-2"></i> The "Sweet Spot" Curve
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visualize how extra payments affect your total interest and payoff time.</p>
+                </div>
+                <button onclick="closeModal('chartModal', 'chartModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 self-start">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-2 sm:p-6 custom-scrollbar flex-1 relative flex items-center justify-center">
+                <div class="w-full h-full min-h-[300px] relative">
+                    <canvas id="sweetSpotCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="logoutModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-sm mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300">
+            <h3 class="text-xl font-bold mb-4 flex items-center text-gray-900 dark:text-white">
+                <i data-lucide="log-out" class="w-5 h-5 mr-2 text-rose-500"></i>
+                Sign Out
+            </h3>
+            <p class="text-sm text-gray-700 dark:text-gray-200 mb-6">Are you sure you want to sign out? Your data will remain safely synced to the cloud.</p>
+            <div class="flex space-x-3">
+                <button onclick="closeModal('logoutModal', 'logoutModalContent')" class="flex-1 px-4 py-2 bg-gray-100/80 hover:bg-gray-200 dark:bg-gray-700/80 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg text-sm font-bold transition-colors">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-bold transition-colors shadow-sm">Sign Out</button>
             </div>
         </div>
     </div>
@@ -239,10 +309,12 @@
         // State Management
         var appData = {
             theme: 'light',
-            dashboards: [], // includes linkedLoanId, linkedInvestmentId
+            dashboards: [], 
             loans: [],
             investments: []
         };
+        
+        let sweetSpotChartInstance = null; // Holds the Chart.js instance
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
         const tabList = ['dashboard', 'loan', 'interest']; // For mobile swiping
@@ -377,6 +449,12 @@
             appData.theme = appData.theme === 'light' ? 'dark' : 'light';
             applyTheme(appData.theme);
             saveData();
+            
+            // Re-render chart if it's open to update colors
+            if(sweetSpotChartInstance && !document.getElementById('chartModal').classList.contains('hidden')) {
+                const activeLoan = appData.loans.find(l => l.lastCharted);
+                if(activeLoan) showSweetSpot(activeLoan.id);
+            }
         });
 
         function applyTheme(theme) {
@@ -462,6 +540,7 @@
         function openModal(modalId, contentId) {
             const modal = document.getElementById(modalId);
             const content = document.getElementById(contentId);
+            if (!modal || !content) return; 
             modal.classList.remove('hidden');
             requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
@@ -473,10 +552,16 @@
         function closeModal(modalId, contentId) {
             const modal = document.getElementById(modalId);
             const content = document.getElementById(contentId);
+            if (!modal || !content) return;
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
+            
+            // Clean up chart flag if closing chart
+            if(modalId === 'chartModal') {
+                appData.loans.forEach(l => l.lastCharted = false);
+            }
         }
 
         function showToast(message, isError = false, customIcon = null) {
@@ -493,7 +578,7 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
-            }, 4000); // Slightly longer for reading tooltips
+            }, 4000); 
         }
 
         // Mobile Tooltip Handling via Tap
@@ -527,7 +612,7 @@
                 if (mobileDoneBtn && document.activeElement?.tagName !== 'INPUT') {
                     mobileDoneBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-8');
                 }
-            }, 100); // Slight delay to ensure the tap registers before hiding
+            }, 100); 
         });
 
         // ==========================================
@@ -1097,9 +1182,14 @@
                                 <p class="tooltip-help text-xs sm:text-[11px] font-bold text-brand-blue value-update hidden mt-1" id="l-time-saved-${loan.id}" title="How much earlier you will be debt free.">0 mo earlier</p>
                             </div>
                         </div>
-                        <button onclick="showAmortization(${loan.id})" class="w-full py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-base sm:text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
-                            <i data-lucide="list" class="w-4 h-4 mr-2 text-brand-blue"></i> View Schedule
-                        </button>
+                        <div class="flex space-x-2 w-full">
+                            <button onclick="showAmortization(${loan.id})" class="flex-1 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-base sm:text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                                <i data-lucide="list" class="w-4 h-4 mr-2 text-brand-teal"></i> Schedule
+                            </button>
+                            <button onclick="showSweetSpot(${loan.id})" class="flex-1 py-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-base sm:text-sm font-bold rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shadow-sm text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                                <i data-lucide="line-chart" class="w-4 h-4 mr-2"></i> Chart
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1205,47 +1295,186 @@
         }
 
         function showAmortization(id) {
-            const l = appData.loans.find(x => x.id === id);
-            if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
+            try {
+                const l = appData.loans.find(x => x.id === id);
+                if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
 
-            let balance = l.amount;
-            const r = l.rate / 100 / 12;
-            const n = l.years * 12;
-            let base_payment = r === 0 ? (balance / n) : balance * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-            let payment = base_payment + (l.extra || 0);
-            
-            // Failsafe for mathematically unpayable loans
-            if (payment <= balance * r) return showToast("Payment is too low to cover interest.", true);
+                let balance = l.amount;
+                const r = l.rate / 100 / 12;
+                const n = l.years * 12;
+                let base_payment = r === 0 ? (balance / n) : balance * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                let payment = base_payment + (l.extra || 0);
+                
+                // Failsafe for mathematically unpayable loans
+                if (payment <= balance * r) return showToast("Payment is too low to cover interest.", true);
 
-            let tableHTML = '';
-            let month = 1;
+                let tableHTML = '';
+                let month = 1;
 
-            while (balance > 0.01 && month <= 360) { // Limit to 30 years to avoid DOM lag
-                let interest = balance * r;
-                let principal = payment - interest;
+                while (balance > 0.01 && month <= 360) { // Limit to 30 years to avoid DOM lag
+                    let interest = balance * r;
+                    let principal = payment - interest;
 
-                if (balance < principal) {
-                    principal = balance;
-                    payment = principal + interest;
-                    balance = 0;
-                } else {
-                    balance -= principal;
+                    if (balance < principal) {
+                        principal = balance;
+                        payment = principal + interest;
+                        balance = 0;
+                    } else {
+                        balance -= principal;
+                    }
+
+                    tableHTML += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <td class="py-2 px-2 font-medium">${month}</td>
+                            <td class="py-2 px-2">${fmt.format(payment)}</td>
+                            <td class="py-2 px-2 text-rose-500">${fmt.format(interest)}</td>
+                            <td class="py-2 px-2 text-brand-teal">${fmt.format(principal)}</td>
+                            <td class="py-2 px-2 text-right">${fmt.format(balance)}</td>
+                        </tr>
+                    `;
+                    month++;
                 }
 
-                tableHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td class="py-2 px-2 font-medium">${month}</td>
-                        <td class="py-2 px-2">${fmt.format(payment)}</td>
-                        <td class="py-2 px-2 text-rose-500">${fmt.format(interest)}</td>
-                        <td class="py-2 px-2 text-brand-teal">${fmt.format(principal)}</td>
-                        <td class="py-2 px-2 text-right">${fmt.format(balance)}</td>
-                    </tr>
-                `;
-                month++;
+                document.getElementById('amortTableBody').innerHTML = tableHTML;
+                openModal('amortModal', 'amortModalContent');
+            } catch (err) {
+                showToast("Error generating schedule. Please check your numbers.", true);
             }
+        }
 
-            document.getElementById('amortTableBody').innerHTML = tableHTML;
-            openModal('amortModal', 'amortModalContent');
+        function showSweetSpot(id) {
+            try {
+                const l = appData.loans.find(x => x.id === id);
+                if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
+
+                const P = l.amount;
+                const r = l.rate / 100 / 12;
+                const n = l.years * 12;
+                
+                let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                if (base_payment <= 0) return;
+
+                // Prepare Chart Data
+                const labels = [];
+                const interestData = [];
+                const timeData = [];
+                
+                // Track current scenario state
+                appData.loans.forEach(loan => loan.lastCharted = false);
+                l.lastCharted = true;
+
+                // Generate 20 data points. From $0 extra up to Double the base payment (or $500 min)
+                const maxExtra = Math.max(base_payment * 2, 500);
+                const step = maxExtra / 20;
+
+                for (let i = 0; i <= 20; i++) {
+                    const extra = i * step;
+                    const payment = base_payment + extra;
+                    labels.push('$' + Math.round(extra));
+
+                    let calc_n = 0;
+                    let calc_interest = 0;
+
+                    if (r === 0) {
+                        calc_n = P / payment;
+                        calc_interest = 0;
+                    } else if (payment > P * r) {
+                        calc_n = Math.log(payment / (payment - P * r)) / Math.log(1 + r);
+                        calc_interest = (calc_n * payment) - P;
+                    } else {
+                        // Unpayable
+                        calc_n = n;
+                        calc_interest = (base_payment * n) - P;
+                    }
+
+                    interestData.push(Math.max(0, Math.round(calc_interest)));
+                    timeData.push(Math.max(0, Math.round(calc_n / 12 * 10) / 10)); // Years
+                }
+
+                // Render Chart
+                openModal('chartModal', 'chartModalContent');
+                
+                const ctx = document.getElementById('sweetSpotCanvas').getContext('2d');
+                if (sweetSpotChartInstance) {
+                    sweetSpotChartInstance.destroy();
+                }
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                const textColor = isDark ? '#9ca3af' : '#6b7280';
+
+                sweetSpotChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Total Interest Paid ($)',
+                                data: interestData,
+                                borderColor: '#f43f5e', // rose-500
+                                backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Years to Payoff',
+                                data: timeData,
+                                borderColor: '#3b82f6', // blue-500
+                                backgroundColor: 'transparent',
+                                borderWidth: 3,
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
+                            tooltip: {
+                                backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                titleColor: isDark ? '#fff' : '#000',
+                                bodyColor: isDark ? '#d1d5db' : '#374151',
+                                borderColor: isDark ? '#374151' : '#e5e7eb',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
+                                usePointStyle: true,
+                                callbacks: {
+                                    title: function(context) { return 'Extra Payment: ' + context[0].label; }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Extra Monthly Payment', color: textColor, font: { weight: 'bold' } },
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: { color: textColor, maxTicksLimit: 10 }
+                            },
+                            y: {
+                                type: 'linear', display: true, position: 'left',
+                                title: { display: true, text: 'Total Interest', color: '#f43f5e', font: { weight: 'bold' } },
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: { color: textColor, callback: function(value) { return '$' + value; } }
+                            },
+                            y1: {
+                                type: 'linear', display: true, position: 'right',
+                                title: { display: true, text: 'Years Remaining', color: '#3b82f6', font: { weight: 'bold' } },
+                                grid: { drawOnChartArea: false }, 
+                                ticks: { color: textColor }
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                showToast("Error generating chart. Please check your numbers.", true);
+            }
         }
 
         // ==========================================
