@@ -306,6 +306,17 @@
         window.promptLogout = () => showToast("Connecting to secure server...");
         window.confirmLogout = () => showToast("Connecting to secure server...");
 
+        // Colors Palette for flair
+        const cardColors = [
+            'bg-rose-500', 'bg-orange-500', 'bg-amber-500', 'bg-emerald-500', 'bg-teal-500', 
+            'bg-cyan-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-fuchsia-500'
+        ];
+
+        function getRandomColor(excludeColor = null) {
+            let colors = cardColors.filter(c => c !== excludeColor);
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         // State Management
         var appData = {
             theme: 'light',
@@ -338,15 +349,15 @@
                 if (!parsed.dashboards) {
                     parsed = {
                         theme: parsed.theme || 'light',
-                        dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [], earnings: [] }],
-                        loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0 }],
-                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0 }]
+                        dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [], earnings: [], color: getRandomColor() }],
+                        loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0, color: getRandomColor() }],
+                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0, color: getRandomColor() }]
                     };
                 }
-                // Ensure all dashboards have earnings array (backward compatibility)
-                if(parsed.dashboards) {
-                    parsed.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; });
-                }
+                // Back-compat upgrades
+                if(parsed.dashboards) parsed.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
+                if(parsed.loans) parsed.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); });
+                if(parsed.investments) parsed.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
                 appData = parsed;
             } else {
                 addDashboard(false);
@@ -402,7 +413,10 @@
                             if (docSnap.exists() && docSnap.data().appData) {
                                 appData = docSnap.data().appData;
                                 // backward compat
-                                appData.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; });
+                                appData.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
+                                appData.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); });
+                                appData.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
+                                
                                 localStorage.setItem('financeHubData', JSON.stringify(appData));
                                 renderAll();
                                 showToast("Cloud data synced!");
@@ -527,6 +541,30 @@
                 switchTab(tabList[currentIndex - 1]);
             }
         }
+
+        // --- Colors Feature ---
+        function updateColor(type, id, colorStr) {
+            const list = type === 'dashboard' ? appData.dashboards : (type === 'loan' ? appData.loans : appData.investments);
+            const item = list.find(x => x.id === id);
+            if (item) {
+                item.color = colorStr;
+                saveData();
+                if (type === 'dashboard') renderDashboards();
+                if (type === 'loan') renderLoans();
+                if (type === 'interest') renderInvestments();
+            }
+        }
+
+        function closeAllColorMenus() {
+            document.querySelectorAll('.color-menu').forEach(m => m.classList.add('hidden'));
+        }
+        
+        // Hide color menus when clicking anywhere else
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.color-picker-container')) {
+                closeAllColorMenus();
+            }
+        });
 
         function renderAll() {
             renderLoans(); 
@@ -697,7 +735,7 @@
         // DASHBOARDS (INCOME & EXPENSES)
         // ==========================================
         function addDashboard(save = true) {
-            appData.dashboards.unshift({ id: Date.now(), name: `Budget Scenario ${appData.dashboards.length + 1}`, income: 0, expenses: [], earnings: [] });
+            appData.dashboards.unshift({ id: Date.now(), name: `Budget Scenario ${appData.dashboards.length + 1}`, income: 0, expenses: [], earnings: [], color: getRandomColor() });
             if (save) { saveData(); renderDashboards(); }
         }
 
@@ -707,6 +745,7 @@
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.id = Date.now();
                 copy.name = copy.name + ' (Copy)';
+                copy.color = getRandomColor(item.color); // Change color flair
                 if(copy.expenses) copy.expenses.forEach(e => e.id = Date.now() + Math.random());
                 if(copy.earnings) copy.earnings.forEach(e => e.id = Date.now() + Math.random());
                 appData.dashboards.unshift(copy);
@@ -732,13 +771,25 @@
             const container = document.getElementById('dashboardsContainer');
             container.innerHTML = appData.dashboards.map(dash => `
                 <div id="dash-${dash.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group transition-all duration-300">
-                    <div class="absolute top-4 right-4 flex space-x-2 z-10">
+                    <!-- Flair Color Bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${dash.color || 'bg-brand-teal'} transition-colors duration-300 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
+                        <!-- Color Palette Menu -->
+                        <div class="relative inline-block text-left">
+                            <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                            </button>
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                                ${cardColors.map(c => `<button onclick="updateColor('dashboard', ${dash.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${dash.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
+                            </div>
+                        </div>
                         <button onclick="duplicateDashboard(${dash.id})" class="text-gray-400 hover:text-brand-blue hover:scale-110 transition-all duration-200" title="Duplicate Scenario"><i data-lucide="copy" class="w-5 h-5"></i></button>
                         <button onclick="removeDashboard(${dash.id})" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200" title="Delete Scenario"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
                     
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
-                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-9/12 sm:w-10/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-9/12 sm:w-8/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
@@ -1063,7 +1114,7 @@
         // LOAN CALCULATORS
         // ==========================================
         function addLoan(save = true) {
-            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '', extra: '' });
+            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '', extra: '', color: getRandomColor() });
             if(save) { 
                 saveData(); 
                 renderLoans(); 
@@ -1077,6 +1128,7 @@
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.id = Date.now();
                 copy.name = copy.name + ' (Copy)';
+                copy.color = getRandomColor(item.color); // Change color flair
                 appData.loans.unshift(copy);
                 saveData();
                 renderLoans();
@@ -1104,7 +1156,19 @@
             const container = document.getElementById('loansContainer');
             container.innerHTML = appData.loans.map(loan => `
                 <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group hover:shadow-xl transition-all duration-300 flex flex-col">
-                    <div class="absolute top-4 right-4 flex space-x-2 z-10">
+                    <!-- Flair Color Bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${loan.color || 'bg-brand-teal'} transition-colors duration-300 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
+                        <!-- Color Palette Menu -->
+                        <div class="relative inline-block text-left">
+                            <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                            </button>
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                                ${cardColors.map(c => `<button onclick="updateColor('loan', ${loan.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${loan.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
+                            </div>
+                        </div>
                         <button onclick="duplicateLoan(${loan.id})" class="text-gray-400 hover:text-brand-blue hover:scale-110 transition-all duration-200" title="Duplicate Scenario"><i data-lucide="copy" class="w-5 h-5"></i></button>
                         <button onclick="removeLoan(${loan.id})" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200" title="Delete Scenario"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
@@ -1481,7 +1545,7 @@
         // APY SAVINGS CALCULATORS
         // ==========================================
         function addInvestment(save = true) {
-            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', monthly: '', rate: '', taxBracket: '' });
+            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', monthly: '', rate: '', taxBracket: '', color: getRandomColor() });
             if(save) { 
                 saveData(); 
                 renderInvestments();
@@ -1495,6 +1559,7 @@
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.id = Date.now();
                 copy.name = copy.name + ' (Copy)';
+                copy.color = getRandomColor(item.color); // Change color flair
                 appData.investments.unshift(copy);
                 saveData();
                 renderInvestments();
@@ -1522,7 +1587,19 @@
             const container = document.getElementById('interestContainer');
             container.innerHTML = appData.investments.map(inv => `
                 <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
-                    <div class="absolute top-4 right-4 flex space-x-2 z-10">
+                    <!-- Flair Color Bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${inv.color || 'bg-brand-blue'} transition-colors duration-300 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
+                        <!-- Color Palette Menu -->
+                        <div class="relative inline-block text-left">
+                            <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                            </button>
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                                ${cardColors.map(c => `<button onclick="updateColor('interest', ${inv.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${inv.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
+                            </div>
+                        </div>
                         <button onclick="duplicateInvestment(${inv.id})" class="text-gray-400 hover:text-brand-blue hover:scale-110 transition-all duration-200" title="Duplicate Scenario"><i data-lucide="copy" class="w-5 h-5"></i></button>
                         <button onclick="removeInvestment(${inv.id})" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200" title="Delete Scenario"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
