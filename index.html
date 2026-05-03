@@ -221,72 +221,8 @@
         </div>
     </div>
 
-    <!-- Data Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="settingsModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
-            <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
-                <i data-lucide="database" class="w-5 h-5 mr-2 text-brand-teal"></i>
-                Data Backup & Sync
-            </h3>
-            
-            <div class="space-y-4">
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-                    <h4 class="text-sm font-bold mb-2">Local File Backup</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
-                    <div class="flex space-x-2">
-                        <button onclick="exportFile()" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
-                        <label class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm cursor-pointer">
-                            <i data-lucide="upload" class="w-4 h-4 mr-2 text-brand-blue"></i> Import
-                            <input type="file" class="hidden" accept=".json" onchange="importFile(event)">
-                        </label>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-                    <h4 class="text-sm font-bold mb-2">Sync Code</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
-                    <button onclick="exportCode()" class="w-full mb-3 bg-brand-blue hover:bg-blue-600 text-white text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-bold shadow-md"><i data-lucide="copy" class="w-4 h-4 mr-2"></i> Copy Sync Code</button>
-                    <div class="flex space-x-2">
-                        <input type="text" id="importCodeInput" placeholder="Paste code here..." class="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-sm">
-                        <button onclick="importCode()" class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors shadow-sm">Load</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Amortization Modal -->
-    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="amortModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
-            <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-700 shrink-0 flex justify-between items-center">
-                <h3 class="text-xl font-bold flex items-center text-brand-teal">
-                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
-                </h3>
-                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="sticky top-0 bg-white dark:bg-gray-800 shadow-sm z-10">
-                        <tr class="text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                            <th class="py-3 px-2 font-medium">Month</th>
-                            <th class="py-3 px-2 font-medium">Payment</th>
-                            <th class="py-3 px-2 font-medium text-rose-500">Interest</th>
-                            <th class="py-3 px-2 font-medium text-brand-teal">Principal</th>
-                            <th class="py-3 px-2 font-medium text-right">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="amortTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
-                        <!-- Injected via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         // State Management
@@ -422,7 +358,7 @@
         }
 
         // ==========================================
-        // UI MODAL HELPERS
+        // UI MODAL HELPERS & TOASTS
         // ==========================================
         function openModal(modalId, contentId) {
             const modal = document.getElementById(modalId);
@@ -442,6 +378,22 @@
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgClass = isError ? 'bg-rose-500' : 'bg-gray-800 dark:bg-white';
+            const textClass = isError ? 'text-white' : 'text-white dark:text-gray-900';
+            toast.className = `${bgClass} ${textClass} px-4 py-3 rounded-lg shadow-xl text-sm font-bold animate-slide-down flex items-center pointer-events-auto`;
+            toast.innerHTML = `<i data-lucide="${isError ? 'alert-circle' : 'check-circle'}" class="w-5 h-5 mr-2"></i> ${message}`;
+            container.appendChild(toast);
+            if(window.lucide) lucide.createIcons();
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         // ==========================================
@@ -476,12 +428,12 @@
                         localStorage.setItem('financeHubData', JSON.stringify(appData));
                         init();
                         closeModal('settingsModal', 'settingsModalContent');
-                        alert("Data successfully imported!");
+                        showToast("Data successfully imported!");
                     } else {
-                        alert("Invalid backup file format.");
+                        showToast("Invalid backup file format.", true);
                     }
                 } catch (error) {
-                    alert("Error reading backup file.");
+                    showToast("Error reading backup file.", true);
                 }
             };
             reader.readAsText(file);
@@ -492,10 +444,10 @@
             try {
                 const code = btoa(encodeURIComponent(JSON.stringify(appData)));
                 navigator.clipboard.writeText(code).then(() => {
-                    alert("Sync Code copied to clipboard! Paste this on your other device.");
+                    showToast("Sync Code copied to clipboard!");
                 });
             } catch (error) {
-                alert("Failed to generate code. Data might be too large.");
+                showToast("Failed to generate code. Data might be too large.", true);
             }
         }
 
@@ -512,12 +464,12 @@
                     init();
                     closeModal('settingsModal', 'settingsModalContent');
                     inputField.value = '';
-                    alert("Sync successful! Data loaded.");
+                    showToast("Sync successful! Data loaded.");
                 } else {
-                    alert("Invalid Sync Code.");
+                    showToast("Invalid Sync Code.", true);
                 }
             } catch (error) {
-                alert("Corrupted or Invalid Sync Code.");
+                showToast("Corrupted or Invalid Sync Code.", true);
             }
         }
 
@@ -664,15 +616,30 @@
             const list = document.getElementById(`expList-${dashId}`);
             if(!d || !list) return;
 
+            // Sort expenses: Yearly, Monthly, Weekly
+            const freqOrder = { 'yearly': 1, 'monthly': 2, 'weekly': 3 };
+            d.expenses.sort((a, b) => freqOrder[a.freq] - freqOrder[b.freq]);
+
             if (d.expenses.length === 0) {
                 list.innerHTML = '<p class="text-xs text-gray-500 italic animate-fade-in">No expenses in this scenario.</p>';
             } else {
-                list.innerHTML = d.expenses.map(exp => `
+                list.innerHTML = d.expenses.map(exp => {
+                    const freqColors = {
+                        'weekly': 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400 border-rose-200 dark:border-rose-800',
+                        'monthly': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+                        'yearly': 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400 border-teal-200 dark:border-teal-800'
+                    };
+                    const fClass = freqColors[exp.freq] || '';
+
+                    return `
                     <div class="animate-slide-down flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 sm:p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
                         <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="w-full sm:flex-1 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
                         <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="flex-1 sm:w-20 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
-                            <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all cursor-pointer text-gray-900 dark:text-gray-100">
+                            <div class="relative flex-1 sm:w-24 flex items-center">
+                                <span class="absolute left-2.5 text-gray-400 text-xs font-bold">$</span>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="w-full pl-6 pr-2 py-2 sm:py-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
+                            </div>
+                            <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded-lg border outline-none text-xs font-bold transition-all cursor-pointer ${fClass}">
                                 <option value="weekly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
                                 <option value="monthly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
                                 <option value="yearly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'yearly' ? 'selected' : ''}>Yr</option>
@@ -680,7 +647,7 @@
                             <button onclick="removeExpense(${dashId}, ${exp.id})" class="p-2 sm:p-1.5 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 hover:scale-110 rounded transition-all flex-shrink-0"><i data-lucide="trash-2" class="w-4 h-4 sm:w-3 sm:h-3"></i></button>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
                 lucide.createIcons();
             }
         }
@@ -693,6 +660,7 @@
                     e[field] = field === 'amount' ? (parseFloat(val) || 0) : val;
                     saveData();
                     calcDashboard(dashId);
+                    if(field === 'freq') renderExpenses(dashId); // Resort and update colors on frequency change
                 }
             }
         }
@@ -978,7 +946,7 @@
 
         function showAmortization(id) {
             const l = appData.loans.find(x => x.id === id);
-            if(!l || l.amount <= 0 || l.years <= 0) return alert("Please enter valid loan details first.");
+            if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
 
             let balance = l.amount;
             const r = l.rate / 100 / 12;
@@ -987,7 +955,7 @@
             let payment = base_payment + (l.extra || 0);
             
             // Failsafe for mathematically unpayable loans
-            if (payment <= balance * r) return alert("Payment is too low to cover interest.");
+            if (payment <= balance * r) return showToast("Payment is too low to cover interest.", true);
 
             let tableHTML = '';
             let month = 1;
