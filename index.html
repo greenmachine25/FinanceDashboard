@@ -105,10 +105,10 @@
                 
                 <!-- Desktop Menu (Hidden on Mobile) -->
                 <div class="hidden sm:flex space-x-4" id="tabs-desktop">
-                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200 whitespace-nowrap">Dashboards</button>
-                    <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
-                    <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
-                    <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Stock Ideas</button>
+                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200 whitespace-nowrap">Dashboards</button>
+                    <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
+                    <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
+                    <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Stock Ideas</button>
                 </div>
 
                 <div class="flex items-center space-x-2 sm:space-x-1">
@@ -132,7 +132,7 @@
         <div id="dashboard" class="tab-content active">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Budget Scenarios</h2>
-                <button onclick="addDashboard()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addDashboard()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
@@ -145,7 +145,7 @@
         <div id="loan" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Loan Scenarios</h2>
-                <button onclick="addLoan()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addLoan()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
@@ -158,7 +158,7 @@
         <div id="interest" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">APY Scenarios</h2>
-                <button onclick="addInvestment()" class="w-full sm:w-auto justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                <button onclick="addInvestment()" class="w-full sm:w-auto justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
             </div>
@@ -172,8 +172,8 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
                 <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="stockSearchInput" placeholder="Ticker (e.g. AAPL) or leave blank" class="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                    <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <input type="text" id="stockSearchInput" placeholder="Ticker (e.g. AAPL) or leave blank" class="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm">
+                    <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                         <i data-lucide="search" class="w-4 h-4 mr-2"></i> Scan
                     </button>
                 </div>
@@ -189,19 +189,19 @@
     <nav class="sm:hidden fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
         <button onclick="switchTab('dashboard')" class="mobile-nav-btn active flex flex-col items-center py-3 flex-1 text-brand-teal transition-colors">
             <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Budget</span>
+            <span class="text-xs font-bold">Budget</span>
         </button>
         <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="landmark" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Loans</span>
+            <span class="text-xs font-bold">Loans</span>
         </button>
         <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="trending-up" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">APY</span>
+            <span class="text-xs font-bold">APY</span>
         </button>
         <button onclick="switchTab('stocks')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="sparkles" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Stocks</span>
+            <span class="text-xs font-bold">Stocks</span>
         </button>
     </nav>
 
@@ -211,12 +211,79 @@
             <button onclick="closeModal('aiModal', 'aiModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text shrink-0">
+            <h3 class="text-2xl sm:text-xl font-bold mb-4 flex items-center gradient-text shrink-0">
                 <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-brand-blue animate-pulse"></i>
                 AI Financial Insights
             </h3>
-            <div id="aiContent" class="text-sm text-gray-700 dark:text-gray-300 overflow-y-auto pr-2 custom-scrollbar">
+            <div id="aiContent" class="text-base sm:text-sm text-gray-700 dark:text-gray-300 overflow-y-auto pr-2 custom-scrollbar">
                 <!-- AI response goes here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="settingsModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+            <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
+                <i data-lucide="database" class="w-5 h-5 mr-2 text-brand-teal"></i>
+                Data Backup & Sync
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-base sm:text-sm font-bold mb-2">Local File Backup</h4>
+                    <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
+                    <div class="flex space-x-2">
+                        <button onclick="exportFile()" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
+                        <label class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm cursor-pointer">
+                            <i data-lucide="upload" class="w-4 h-4 mr-2 text-brand-blue"></i> Import
+                            <input type="file" class="hidden" accept=".json" onchange="importFile(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-base sm:text-sm font-bold mb-2">Sync Code</h4>
+                    <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
+                    <button onclick="exportCode()" class="w-full mb-3 bg-brand-blue hover:bg-blue-600 text-white text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-bold shadow-md"><i data-lucide="copy" class="w-4 h-4 mr-2"></i> Copy Sync Code</button>
+                    <div class="flex space-x-2">
+                        <input type="text" id="importCodeInput" placeholder="Paste code here..." class="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-base sm:text-sm">
+                        <button onclick="importCode()" class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-base sm:text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors shadow-sm">Load</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amortization Modal -->
+    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="amortModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-700 shrink-0 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center text-brand-teal">
+                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
+                </h3>
+                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
+                <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
+                    <thead class="sticky top-0 bg-white dark:bg-gray-800 shadow-sm z-10">
+                        <tr class="text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                            <th class="py-3 px-2 font-medium">Month</th>
+                            <th class="py-3 px-2 font-medium">Payment</th>
+                            <th class="py-3 px-2 font-medium text-rose-500">Interest</th>
+                            <th class="py-3 px-2 font-medium text-brand-teal">Principal</th>
+                            <th class="py-3 px-2 font-medium text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -501,25 +568,25 @@
                     <button onclick="removeDashboard(${dash.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
-                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-lg sm:text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                        <input type="text" value="${dash.name}" oninput="updateDashName(${dash.id}, this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (Net) $</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
+                                <label class="block text-sm font-medium mb-1 transition-colors">Weekly Income (Net) $</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all text-base sm:text-sm">
                             </div>
                             <div>
-                                <label class="block text-[11px] sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
-                                <select onchange="updateLinkedItem(${dash.id}, 'linkedLoanId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm cursor-pointer">
+                                <label class="block text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedLoanId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm cursor-pointer">
                                     <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
                                     ${appData.loans.map(l => `<option value="${l.id}" class="bg-white dark:bg-gray-800" ${dash.linkedLoanId == l.id ? 'selected' : ''}>${l.name} (${fmt.format(l.calculatedPayment || 0)}/mo)</option>`).join('')}
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[11px] sm:text-xs font-medium mb-1 transition-colors text-brand-blue flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Investment</label>
-                                <select onchange="updateLinkedItem(${dash.id}, 'linkedInvestmentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm cursor-pointer">
+                                <label class="block text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-blue flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Investment</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedInvestmentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm cursor-pointer">
                                     <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
                                     ${appData.investments.map(i => `<option value="${i.id}" class="bg-white dark:bg-gray-800" ${dash.linkedInvestmentId == i.id ? 'selected' : ''}>${i.name} (${fmt.format(i.monthly || 0)}/mo)</option>`).join('')}
                                 </select>
@@ -528,16 +595,16 @@
 
                         <div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-1">
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] sm:text-xs uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium">Expenses</span>
-                                <button onclick="addExpense(${dash.id})" class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
+                                <span class="text-base sm:text-sm font-medium">Expenses</span>
+                                <button onclick="addExpense(${dash.id})" class="text-sm sm:text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
                             </div>
                             <div id="expList-${dash.id}" class="space-y-2"></div>
                         </div>
@@ -545,26 +612,26 @@
                         <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300 relative overflow-hidden">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
                                 <div>
-                                    <h3 class="text-sm font-bold opacity-90">Disposable Income (Wiggle Room)</h3>
-                                    <p class="text-[10px] opacity-75">After expenses & linked contributions</p>
+                                    <h3 class="text-base sm:text-sm font-bold opacity-90">Disposable Income (Wiggle Room)</h3>
+                                    <p class="text-xs sm:text-[10px] opacity-75">After expenses & linked contributions</p>
                                 </div>
                                 <div class="flex gap-2 w-full sm:w-auto">
-                                    <div class="bg-white/20 px-3 py-1.5 rounded flex items-center text-xs font-bold backdrop-blur-sm whitespace-nowrap">
+                                    <div class="bg-white/20 px-3 py-1.5 rounded flex items-center text-sm sm:text-xs font-bold backdrop-blur-sm whitespace-nowrap">
                                         Savings Rate: <span id="sr-${dash.id}" class="ml-1 text-white">0%</span>
                                     </div>
-                                    <button onclick="runAIAnalysis(${dash.id})" class="flex-1 sm:flex-none justify-center bg-white text-brand-blue hover:bg-gray-100 hover:scale-105 px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center shadow-sm">✨ AI</button>
+                                    <button onclick="runAIAnalysis(${dash.id})" class="flex-1 sm:flex-none justify-center bg-white text-brand-blue hover:bg-gray-100 hover:scale-105 px-3 py-1.5 rounded text-sm sm:text-xs font-bold transition-all flex items-center shadow-sm">✨ AI</button>
                                 </div>
                             </div>
                             <div class="grid grid-cols-3 gap-2 sm:gap-4">
-                                <div><p class="text-[10px] sm:text-xs opacity-80">Weekly</p><p class="text-base sm:text-xl font-bold value-update" id="net-wk-${dash.id}">$0</p></div>
-                                <div><p class="text-[10px] sm:text-xs opacity-80">Monthly</p><p class="text-base sm:text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
-                                <div><p class="text-[10px] sm:text-xs opacity-80">Yearly</p><p class="text-base sm:text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
+                                <div><p class="text-xs sm:text-[10px] opacity-80">Weekly</p><p class="text-lg sm:text-xl font-bold value-update" id="net-wk-${dash.id}">$0</p></div>
+                                <div><p class="text-xs sm:text-[10px] opacity-80">Monthly</p><p class="text-lg sm:text-xl font-bold value-update" id="net-mo-${dash.id}">$0</p></div>
+                                <div><p class="text-xs sm:text-[10px] opacity-80">Yearly</p><p class="text-lg sm:text-xl font-bold value-update" id="net-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
                          </div>
                     </div>
                 </div>
@@ -621,7 +688,7 @@
             d.expenses.sort((a, b) => freqOrder[a.freq] - freqOrder[b.freq]);
 
             if (d.expenses.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500 italic animate-fade-in">No expenses in this scenario.</p>';
+                list.innerHTML = '<p class="text-sm sm:text-xs text-gray-500 italic animate-fade-in">No expenses in this scenario.</p>';
             } else {
                 list.innerHTML = d.expenses.map(exp => {
                     const freqColors = {
@@ -633,13 +700,13 @@
 
                     return `
                     <div class="animate-slide-down flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 sm:p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
-                        <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="w-full sm:flex-1 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
+                        <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="w-full sm:flex-1 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-base sm:text-sm transition-all text-gray-900 dark:text-gray-100">
                         <div class="flex items-center gap-2 w-full sm:w-auto">
                             <div class="relative flex-1 sm:w-24 flex items-center">
-                                <span class="absolute left-2.5 text-gray-400 text-xs font-bold">$</span>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="w-full pl-6 pr-2 py-2 sm:py-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
+                                <span class="absolute left-2.5 text-gray-400 text-base sm:text-sm font-bold">$</span>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="w-full pl-6 pr-2 py-2 sm:py-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-base sm:text-sm transition-all text-gray-900 dark:text-gray-100">
                             </div>
-                            <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded-lg border outline-none text-xs font-bold transition-all cursor-pointer ${fClass}">
+                            <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded-lg border outline-none text-base sm:text-xs font-bold transition-all cursor-pointer ${fClass}">
                                 <option value="weekly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
                                 <option value="monthly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
                                 <option value="yearly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'yearly' ? 'selected' : ''}>Yr</option>
@@ -766,48 +833,48 @@
                     
                     <!-- Scenario Title -->
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
-                        <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-lg sm:text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                        <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
                     </div>
 
                     <!-- Core Inputs -->
                     <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Amount ($)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 10000">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Amount ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 10000">
                             </div>
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Rate (%)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5.5">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Rate (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5.5">
                             </div>
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Term (Yrs)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Term (Yrs)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5">
                             </div>
                         </div>
 
                         <!-- Core Output Metrics -->
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                             <div>
-                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase">Standard Monthly Payment</p>
-                                <p class="text-xl sm:text-2xl font-bold text-brand-blue value-update" id="l-base-pay-${loan.id}">$0.00</p>
+                                <p class="text-xs sm:text-[10px] font-bold text-gray-500 uppercase">Standard Monthly Payment</p>
+                                <p class="text-2xl font-bold text-brand-blue value-update" id="l-base-pay-${loan.id}">$0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase">Total Interest</p>
-                                <p class="text-lg sm:text-xl font-bold text-rose-500 value-update" id="l-int-${loan.id}">$0.00</p>
+                                <p class="text-xs sm:text-[10px] font-bold text-gray-500 uppercase">Total Interest</p>
+                                <p class="text-xl font-bold text-rose-500 value-update" id="l-int-${loan.id}">$0.00</p>
                             </div>
                         </div>
 
                         <!-- Initial Payment Break Down -->
                         <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
-                            <div class="flex justify-between text-xs mb-1.5">
+                            <div class="flex justify-between text-sm sm:text-xs mb-1.5">
                                 <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
                                 <span class="text-brand-teal font-bold">Principal</span>
                             </div>
                             <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden">
                                 <div id="l-int-bar-${loan.id}" class="bg-rose-500 dark:bg-rose-600 h-2 transition-all duration-500" style="width: 0%"></div>
                             </div>
-                            <div class="flex justify-between text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
+                            <div class="flex justify-between text-xs sm:text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
                                 <span id="l-int-val-${loan.id}">$0</span>
                                 <span id="l-prin-val-${loan.id}">$0</span>
                             </div>
@@ -815,10 +882,10 @@
 
                         <!-- Accelerator Section -->
                         <div class="pt-2">
-                            <h4 class="text-sm font-bold flex items-center mb-3 text-brand-teal"><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
+                            <h4 class="text-base sm:text-sm font-bold flex items-center mb-3 text-brand-teal"><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
                             <div>
-                                <label class="block text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">Extra Monthly Payment ($)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner" placeholder="How much extra can you pay?">
+                                <label class="block text-sm sm:text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">Extra Monthly Payment ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner" placeholder="How much extra can you pay?">
                             </div>
                         </div>
                     </div>
@@ -827,17 +894,17 @@
                     <div class="p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 transition-colors flex flex-col space-y-4">
                         <div class="flex justify-between items-end">
                             <div>
-                                <p class="text-[10px] sm:text-xs font-bold text-brand-teal uppercase">Actual Payment</p>
-                                <p class="text-xl sm:text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
+                                <p class="text-xs sm:text-[10px] font-bold text-brand-teal uppercase">Actual Payment</p>
+                                <p class="text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}">
+                                <p class="text-xs sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}">
                                     Saved: <span id="l-saved-${loan.id}">$0.00</span>
                                 </p>
-                                <p class="text-[10px] sm:text-[11px] font-bold text-brand-blue value-update hidden" id="l-time-saved-${loan.id}">0 mo earlier</p>
+                                <p class="text-xs sm:text-[11px] font-bold text-brand-blue value-update hidden" id="l-time-saved-${loan.id}">0 mo earlier</p>
                             </div>
                         </div>
-                        <button onclick="showAmortization(${loan.id})" class="w-full py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                        <button onclick="showAmortization(${loan.id})" class="w-full py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-base sm:text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
                             <i data-lucide="list" class="w-4 h-4 mr-2 text-brand-blue"></i> View Schedule
                         </button>
                     </div>
@@ -1024,30 +1091,30 @@
                     
                     <!-- Title -->
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors flex items-center pr-12">
-                        <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-lg sm:text-xl font-bold bg-transparent outline-none text-brand-blue w-full placeholder-gray-400 focus:border-b border-brand-blue transition-all" placeholder="Account Name">
+                        <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-blue w-full placeholder-gray-400 focus:border-b border-brand-blue transition-all" placeholder="Account Name">
                         <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 p-2 rounded-lg hover:scale-105 transition-all shadow-sm shrink-0 ml-2" title="AI Advice"><i data-lucide="sparkles" class="w-4 h-4"></i></button>
                     </div>
                     
                     <div class="p-4 sm:p-6 space-y-4">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Starting Balance ($)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="0">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Starting Balance ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="0">
                             </div>
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Monthly Contrib. ($)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-mo-contrib-${inv.id}" value="${inv.monthly || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-brand-blue/5 border border-brand-blue/30 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm font-bold text-brand-blue placeholder-brand-blue/40" placeholder="0">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Monthly Contrib. ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-mo-contrib-${inv.id}" value="${inv.monthly || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-brand-blue/5 border border-brand-blue/30 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm font-bold text-brand-blue placeholder-brand-blue/40" placeholder="0">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">APY Rate (%)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="e.g. 4.5">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">APY Rate (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 4.5">
                             </div>
                             <div>
-                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Tax Bracket (%)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-tax-${inv.id}" value="${inv.taxBracket || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="e.g. 22">
+                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Tax Bracket (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-tax-${inv.id}" value="${inv.taxBracket || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 22">
                             </div>
                         </div>
                     </div>
@@ -1055,15 +1122,15 @@
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-b-2xl p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 transition-colors">
                         <div class="mb-4 bg-white dark:bg-gray-800 p-3 rounded-xl border border-brand-blue/20 flex justify-between items-center shadow-sm">
                             <div>
-                                <span class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block">After-Tax 1st Mo. Yield</span>
+                                <span class="text-xs sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block">After-Tax 1st Mo. Yield</span>
                             </div>
-                            <span class="text-xl font-bold text-brand-blue dark:text-blue-400 value-update" id="i-mo-${inv.id}">$0.00</span>
+                            <span class="text-2xl font-bold text-brand-blue dark:text-blue-400 value-update" id="i-mo-${inv.id}">$0.00</span>
                         </div>
                         <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-center">
-                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
-                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
-                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">5 Years</p><p class="font-bold text-sm value-update" id="i-5-${inv.id}">$0</p></div>
-                            <div class="p-2 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-lg"><p class="text-[10px] text-brand-blue uppercase font-bold mb-1">10 Years</p><p class="font-bold text-base text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">1 Year</p><p class="font-bold text-base sm:text-sm value-update" id="i-1-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">2 Years</p><p class="font-bold text-base sm:text-sm value-update" id="i-2-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">5 Years</p><p class="font-bold text-base sm:text-sm value-update" id="i-5-${inv.id}">$0</p></div>
+                            <div class="p-2 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-lg"><p class="text-[11px] text-brand-blue uppercase font-bold mb-1">10 Years</p><p class="font-bold text-lg text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
                         </div>
                     </div>
                 </div>
@@ -1156,7 +1223,7 @@
 
             openModal('aiModal', 'aiModalContent');
             const content = document.getElementById('aiContent');
-            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-teal mb-4"></i><span class="text-gray-500 dark:text-gray-400">Analyzing scenario...</span></div>';
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-teal mb-4"></i><span class="text-gray-500 dark:text-gray-400 text-base sm:text-sm">Analyzing scenario...</span></div>';
             lucide.createIcons();
 
             const yInc = dash.income * 52;
@@ -1182,7 +1249,7 @@
 
             openModal('aiModal', 'aiModalContent');
             const content = document.getElementById('aiContent');
-            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-blue mb-4"></i><span class="text-gray-500 dark:text-gray-400">Evaluating yield strategy...</span></div>';
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-blue mb-4"></i><span class="text-gray-500 dark:text-gray-400 text-base sm:text-sm">Evaluating yield strategy...</span></div>';
             lucide.createIcons();
 
             const prompt = `I have a scenario named "${inv.name}". I currently have $${(inv.principal || 0).toFixed(2)} in a bank account offering an APY of ${(inv.rate || 0)}%. I am taxed at ${inv.taxBracket || 0}% for this interest. 
@@ -1202,7 +1269,7 @@
             const container = document.getElementById('stockContainer');
             const searchInput = document.getElementById('stockSearchInput').value.trim();
             
-            container.innerHTML = '<div class="flex flex-col items-center justify-center py-16"><i data-lucide="loader-2" class="w-12 h-12 animate-spin text-indigo-500 mb-4"></i><span class="text-gray-500 dark:text-gray-400 font-medium">Scanning live market news...</span><p class="text-xs text-gray-400 mt-2">This utilizes Google Search grounding to find today\'s data.</p></div>';
+            container.innerHTML = '<div class="flex flex-col items-center justify-center py-16"><i data-lucide="loader-2" class="w-12 h-12 animate-spin text-indigo-500 mb-4"></i><span class="text-gray-500 dark:text-gray-400 font-medium text-base sm:text-sm">Scanning live market news...</span><p class="text-sm sm:text-xs text-gray-400 mt-2">This utilizes Google Search grounding to find today\'s data.</p></div>';
             lucide.createIcons();
 
             let prompt;
@@ -1215,9 +1282,9 @@
                 
                 Format the output strictly as a HTML card exactly like this:
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                    <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (${searchInput.toUpperCase()})</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Analysis goes here...</p>
-                    <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
+                    <h3 class="text-xl sm:text-lg font-bold text-indigo-500 mb-2">Company Name (${searchInput.toUpperCase()})</h3>
+                    <p class="text-base sm:text-sm text-gray-700 dark:text-gray-300 mb-3">Analysis goes here...</p>
+                    <a href="URL_HERE" target="_blank" class="text-sm sm:text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
                 </div>`;
             } else {
                 prompt = `Search the live web for 3 trending stocks that financial analysts are highly recommending to buy this week.
@@ -1228,9 +1295,9 @@
                 
                 Format the output strictly as a series of HTML cards exactly like this:
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                    <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (TICKER)</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Reasoning goes here...</p>
-                    <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
+                    <h3 class="text-xl sm:text-lg font-bold text-indigo-500 mb-2">Company Name (TICKER)</h3>
+                    <p class="text-base sm:text-sm text-gray-700 dark:text-gray-300 mb-3">Reasoning goes here...</p>
+                    <a href="URL_HERE" target="_blank" class="text-sm sm:text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
                 </div>`;
             }
 
@@ -1240,7 +1307,7 @@
                 saveData();
                 renderStocks();
             } catch (error) {
-                container.innerHTML = `<div class="text-rose-500 p-4 bg-rose-50 dark:bg-gray-700 rounded-lg animate-fade-in max-w-2xl mx-auto">Failed to scan live market data. Please try again later.</div>`;
+                container.innerHTML = `<div class="text-rose-500 p-4 bg-rose-50 dark:bg-gray-700 rounded-lg animate-fade-in max-w-2xl mx-auto text-base sm:text-sm">Failed to scan live market data. Please try again later.</div>`;
             }
         }
 
@@ -1255,7 +1322,7 @@
                             <i data-lucide="trending-up" class="w-10 h-10 text-indigo-500"></i>
                         </div>
                         <p class="font-medium text-lg mb-1">Ready to explore?</p>
-                        <p class="text-sm max-w-md mx-auto">Search for a specific ticker above, or click "Scan" to have AI analyze live news and find trending stock ideas.</p>
+                        <p class="text-base sm:text-sm max-w-md mx-auto">Search for a specific ticker above, or click "Scan" to have AI analyze live news and find trending stock ideas.</p>
                     </div>`;
             }
             lucide.createIcons();
