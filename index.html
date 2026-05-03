@@ -12,7 +12,8 @@
 
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://www.gstatic.com"> <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://www.gstatic.com"> 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -99,9 +100,9 @@
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased selection:bg-brand-teal selection:text-white">
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen font-sans antialiased selection:bg-brand-teal selection:text-white relative">
 
-    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-20 transition-colors duration-300 relative">
+    <nav class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg shadow-sm sticky top-0 z-20 transition-colors duration-300 border-b border-gray-200/50 dark:border-gray-700/50">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center space-x-2 hover:scale-105 transition-transform duration-300 cursor-pointer">
@@ -110,22 +111,22 @@
                 </div>
                 
                 <div class="hidden sm:flex space-x-4" id="tabs-desktop">
-                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50 dark:bg-gray-700 transition-all duration-200 whitespace-nowrap">Dashboards</button>
+                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50/80 dark:bg-gray-700/80 transition-all duration-200 whitespace-nowrap">Dashboards</button>
                     <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
                     <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
                     <button onclick="switchTab('stocks')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Stock Ideas</button>
                 </div>
 
                 <div class="flex items-center space-x-2 sm:space-x-1">
-                    <button id="authBtn" onclick="loginWithGoogle()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 tooltip-help" title="Sign in with Google to securely sync your data to the cloud">
+                    <button id="authBtn" onclick="loginWithGoogle()" class="p-2 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-300 tooltip-help" title="Sign in with Google to securely sync your data to the cloud">
                         <i data-lucide="user" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
                     </button>
 
-                    <button onclick="openSettingsModal()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 tooltip-help" title="Local Data Settings & Export">
+                    <button onclick="openSettingsModal()" class="p-2 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-300 tooltip-help" title="Local Data Settings & Export">
                         <i data-lucide="settings" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
                     </button>
 
-                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 hover:rotate-12 transition-all duration-300">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-700/50 hover:rotate-12 transition-all duration-300">
                         <i data-lucide="moon" id="moonIcon" class="w-5 h-5 text-gray-600 dark:text-gray-300"></i>
                         <i data-lucide="sun" id="sunIcon" class="w-5 h-5 text-yellow-400 hidden"></i>
                     </button>
@@ -185,7 +186,7 @@
 
     </main>
 
-    <nav class="sm:hidden fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
+    <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
         <button onclick="switchTab('dashboard')" class="mobile-nav-btn active flex flex-col items-center py-3 flex-1 text-brand-teal transition-colors">
             <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
             <span class="text-xs font-bold">Budget</span>
@@ -205,22 +206,22 @@
     </nav>
 
     <div id="aiModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
-            <button onclick="closeModal('aiModal', 'aiModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+        <div id="aiModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('aiModal', 'aiModalContent')" class="absolute top-4 right-4 text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             <h3 class="text-2xl sm:text-xl font-bold mb-4 flex items-center gradient-text shrink-0">
                 <i data-lucide="sparkles" class="w-5 h-5 mr-2 text-brand-blue animate-pulse"></i>
                 AI Financial Insights
             </h3>
-            <div id="aiContent" class="text-base sm:text-sm text-gray-700 dark:text-gray-300 overflow-y-auto pr-2 custom-scrollbar">
+            <div id="aiContent" class="text-base sm:text-sm text-gray-800 dark:text-gray-200 overflow-y-auto pr-2 custom-scrollbar">
                 </div>
         </div>
     </div>
 
     <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="settingsModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
-            <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+        <div id="settingsModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300">
+            <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
@@ -229,24 +230,24 @@
             </h3>
             
             <div class="space-y-4">
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                <div class="p-4 bg-gray-50/80 dark:bg-gray-700/80 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                     <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Download a local backup to keep your data safe.">Local File Backup</h4>
-                    <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
+                    <p class="text-sm sm:text-xs text-gray-600 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
                     <div class="flex space-x-2">
-                        <button onclick="exportFile()" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
-                        <label class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm cursor-pointer">
+                        <button onclick="exportFile()" class="flex-1 bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
+                        <label class="flex-1 bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm cursor-pointer">
                             <i data-lucide="upload" class="w-4 h-4 mr-2 text-brand-blue"></i> Import
                             <input type="file" class="hidden" accept=".json" onchange="importFile(event)">
                         </label>
                     </div>
                 </div>
 
-                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                <div class="p-4 bg-gray-50/80 dark:bg-gray-700/80 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
                     <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Generate a unique code block to quickly copy and paste data across your devices without logging in.">Offline Sync Code</h4>
-                    <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
+                    <p class="text-sm sm:text-xs text-gray-600 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
                     <button onclick="exportCode()" class="w-full mb-3 bg-brand-blue hover:bg-blue-600 text-white text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-bold shadow-md"><i data-lucide="copy" class="w-4 h-4 mr-2"></i> Copy Sync Code</button>
                     <div class="flex space-x-2">
-                        <input type="text" id="importCodeInput" placeholder="Paste code here..." class="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-base sm:text-sm">
+                        <input type="text" id="importCodeInput" placeholder="Paste code here..." class="flex-1 p-2 rounded-lg bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-base sm:text-sm">
                         <button onclick="importCode()" class="bg-gray-800 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-base sm:text-sm font-bold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors shadow-sm">Load</button>
                     </div>
                 </div>
@@ -255,19 +256,19 @@
     </div>
 
     <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="amortModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
-            <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-700 shrink-0 flex justify-between items-center">
+        <div id="amortModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
                 <h3 class="text-xl font-bold flex items-center text-brand-teal">
                     <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
                 </h3>
-                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
                 <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
-                    <thead class="sticky top-0 bg-white dark:bg-gray-800 shadow-sm z-10">
-                        <tr class="text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                    <thead class="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-sm z-10">
+                        <tr class="text-gray-600 dark:text-gray-300 border-b dark:border-gray-700/50">
                             <th class="py-3 px-2 font-medium tooltip-help" title="Month number in the payment term.">Month</th>
                             <th class="py-3 px-2 font-medium tooltip-help" title="Total amount paid this month (Base + Extra).">Payment</th>
                             <th class="py-3 px-2 font-medium text-rose-500 tooltip-help" title="Portion of payment going towards bank interest.">Interest</th>
@@ -275,7 +276,7 @@
                             <th class="py-3 px-2 font-medium text-right tooltip-help" title="Remaining loan balance after payment.">Balance</th>
                         </tr>
                     </thead>
-                    <tbody id="amortTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody id="amortTableBody" class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
                         </tbody>
                 </table>
             </div>
@@ -284,14 +285,14 @@
 
     <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="logoutModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-sm mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+        <div id="logoutModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-sm mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300">
             <h3 class="text-xl font-bold mb-4 flex items-center text-gray-900 dark:text-white">
                 <i data-lucide="log-out" class="w-5 h-5 mr-2 text-rose-500"></i>
                 Sign Out
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to sign out? Your data will remain safely synced to the cloud.</p>
+            <p class="text-sm text-gray-700 dark:text-gray-200 mb-6">Are you sure you want to sign out? Your data will remain safely synced to the cloud.</p>
             <div class="flex space-x-3">
-                <button onclick="closeModal('logoutModal', 'logoutModalContent')" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg text-sm font-bold transition-colors">Cancel</button>
+                <button onclick="closeModal('logoutModal', 'logoutModalContent')" class="flex-1 px-4 py-2 bg-gray-100/80 hover:bg-gray-200 dark:bg-gray-700/80 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg text-sm font-bold transition-colors">Cancel</button>
                 <button onclick="confirmLogout()" class="flex-1 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-bold transition-colors shadow-sm">Sign Out</button>
             </div>
         </div>
@@ -463,7 +464,7 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             
             document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+                el.classList.remove('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50/80', 'dark:bg-gray-700/80', 'active');
                 el.classList.add('text-gray-500', 'dark:text-gray-300');
             });
 
@@ -475,7 +476,7 @@
             document.getElementById(tabId).classList.add('active');
             
             document.querySelectorAll(`.tab-btn[onclick="switchTab('${tabId}')"]`).forEach(btn => {
-                btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50', 'dark:bg-gray-700', 'active');
+                btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50/80', 'dark:bg-gray-700/80', 'active');
                 btn.classList.remove('text-gray-500', 'dark:text-gray-300');
             });
 
@@ -542,21 +543,33 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        function showToast(message, isError = false) {
+        function showToast(message, isError = false, customIcon = null) {
             const container = document.getElementById('toastContainer');
             if (!container) return;
             const toast = document.createElement('div');
-            const bgClass = isError ? 'bg-rose-500' : 'bg-gray-800 dark:bg-white';
+            const bgClass = isError ? 'bg-rose-500/90' : 'bg-gray-800/90 dark:bg-white/90';
             const textClass = isError ? 'text-white' : 'text-white dark:text-gray-900';
-            toast.className = `${bgClass} ${textClass} px-4 py-3 rounded-lg shadow-xl text-sm font-bold animate-slide-down flex items-center pointer-events-auto`;
-            toast.innerHTML = `<i data-lucide="${isError ? 'alert-circle' : 'check-circle'}" class="w-5 h-5 mr-2"></i> ${message}`;
+            const icon = customIcon || (isError ? 'alert-circle' : 'check-circle');
+            toast.className = `${bgClass} backdrop-blur-md ${textClass} px-4 py-3 rounded-lg shadow-xl text-sm font-bold animate-slide-down flex items-center pointer-events-auto`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 mr-2 shrink-0"></i> <span>${message}</span>`;
             container.appendChild(toast);
             if(window.lucide) lucide.createIcons();
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 4000); // Slightly longer for reading tooltips
         }
+
+        // Mobile Tooltip Handling via Tap
+        document.addEventListener('click', function(e) {
+            const tooltipEl = e.target.closest('.tooltip-help');
+            if (tooltipEl && window.innerWidth < 640) {
+                const message = tooltipEl.getAttribute('title');
+                if (message) {
+                    showToast(message, false, 'info');
+                }
+            }
+        });
 
         // ==========================================
         // DATA MANAGEMENT (BACKUP / SYNC)
@@ -926,10 +939,12 @@
                 <div id="loan-${loan.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group hover:shadow-xl transition-all duration-300 flex flex-col">
                     <button onclick="removeLoan(${loan.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
+                    <!-- Scenario Title -->
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
                         <input type="text" value="${loan.name}" oninput="updateLoanProp(${loan.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-10/12 sm:w-11/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
                     </div>
 
+                    <!-- Core Inputs -->
                     <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
@@ -946,6 +961,7 @@
                             </div>
                         </div>
 
+                        <!-- Core Output Metrics -->
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                             <div>
                                 <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Your required minimum monthly payment.">Standard Monthly Payment</p>
@@ -957,6 +973,7 @@
                             </div>
                         </div>
 
+                        <!-- Initial Payment Break Down -->
                         <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
                             <div class="flex justify-between text-sm sm:text-xs mb-1.5 tooltip-help" title="Shows how much of your first payment goes straight to the bank vs paying down your debt.">
                                 <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
@@ -971,6 +988,7 @@
                             </div>
                         </div>
 
+                        <!-- Accelerator Section -->
                         <div class="pt-2">
                             <h4 class="tooltip-help text-base sm:text-sm font-bold flex items-center mb-3 text-brand-teal" title="See how paying extra each month reduces your interest and shortens the loan."><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
                             <div>
@@ -980,6 +998,7 @@
                         </div>
                     </div>
 
+                    <!-- Accelerator Results & Amortization -->
                     <div class="p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 transition-colors flex flex-col space-y-4">
                         <div class="flex justify-between items-end">
                             <div>
@@ -1178,6 +1197,7 @@
                 <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
                     <button onclick="removeInvestment(${inv.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
                     
+                    <!-- Title -->
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors flex items-center pr-12">
                         <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-blue w-full placeholder-gray-400 focus:border-b border-brand-blue transition-all" placeholder="Account Name">
                         <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 p-2 rounded-lg hover:scale-105 transition-all shadow-sm shrink-0 ml-2 tooltip-help" title="Get AI insights on this yield strategy."><i data-lucide="sparkles" class="w-4 h-4"></i></button>
