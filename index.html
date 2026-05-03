@@ -126,7 +126,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="mainContainer" class="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden min-h-[calc(100vh-64px)]">
+    <main id="mainContainer" class="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-28 sm:py-8 overflow-x-hidden min-h-[calc(100vh-64px)]">
         
         <!-- Tab: Dashboards -->
         <div id="dashboard" class="tab-content active">
@@ -171,9 +171,12 @@
         <div id="stocks" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
-                <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
-                    <i data-lucide="search" class="w-4 h-4 mr-2"></i> Scan Market
-                </button>
+                <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="stockSearchInput" placeholder="Ticker (e.g. AAPL) or leave blank" class="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="search" class="w-4 h-4 mr-2"></i> Scan
+                    </button>
+                </div>
             </div>
             <div id="stockContainer" class="bg-gray-50/50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-gray-700 min-h-[300px]">
                 <!-- Injected via JS -->
@@ -205,7 +208,7 @@
     <!-- AI Insights Modal -->
     <div id="aiModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
         <div id="aiModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
-            <button onclick="closeAIModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+            <button onclick="closeModal('aiModal', 'aiModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             <h3 class="text-xl font-bold mb-4 flex items-center gradient-text shrink-0">
@@ -221,7 +224,7 @@
     <!-- Data Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
         <div id="settingsModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-md mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
-            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+            <button onclick="closeModal('settingsModal', 'settingsModalContent')" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             <h3 class="text-xl font-bold mb-4 flex items-center gradient-text">
@@ -230,7 +233,6 @@
             </h3>
             
             <div class="space-y-4">
-                <!-- File Backup -->
                 <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <h4 class="text-sm font-bold mb-2">Local File Backup</h4>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
@@ -243,7 +245,6 @@
                     </div>
                 </div>
 
-                <!-- Code Sync -->
                 <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <h4 class="text-sm font-bold mb-2">Sync Code</h4>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
@@ -257,13 +258,43 @@
         </div>
     </div>
 
+    <!-- Amortization Modal -->
+    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="amortModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-700 shrink-0 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center text-brand-teal">
+                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
+                </h3>
+                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="sticky top-0 bg-white dark:bg-gray-800 shadow-sm z-10">
+                        <tr class="text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                            <th class="py-3 px-2 font-medium">Month</th>
+                            <th class="py-3 px-2 font-medium">Payment</th>
+                            <th class="py-3 px-2 font-medium text-rose-500">Interest</th>
+                            <th class="py-3 px-2 font-medium text-brand-teal">Principal</th>
+                            <th class="py-3 px-2 font-medium text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State Management
         let appData = {
             theme: 'light',
-            dashboards: [],
+            dashboards: [], // includes linkedLoanId, linkedInvestmentId
             loans: [],
-            investments: [],
+            investments: [], // includes principal, rate, extra/monthly, taxBracket
             lastStockIdeas: ''
         };
 
@@ -281,7 +312,7 @@
                         theme: parsed.theme || 'light',
                         dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [] }],
                         loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0 }],
-                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0 }],
+                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0 }],
                         lastStockIdeas: ''
                     };
                 }
@@ -377,27 +408,25 @@
             const currentIndex = tabList.indexOf(currentTab);
 
             if (swipeDistance < -75 && currentIndex < tabList.length - 1) {
-                // Swipe Left -> Next Tab
                 switchTab(tabList[currentIndex + 1]);
             } else if (swipeDistance > 75 && currentIndex > 0) {
-                // Swipe Right -> Prev Tab
                 switchTab(tabList[currentIndex - 1]);
             }
         }
 
         function renderAll() {
             renderLoans(); 
-            renderDashboards();
             renderInvestments();
+            renderDashboards();
             renderStocks();
         }
 
         // ==========================================
-        // DATA MANAGEMENT (BACKUP / SYNC)
+        // UI MODAL HELPERS
         // ==========================================
-        function openSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            const content = document.getElementById('settingsModalContent');
+        function openModal(modalId, contentId) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
             modal.classList.remove('hidden');
             requestAnimationFrame(() => {
                 modal.classList.remove('opacity-0');
@@ -406,14 +435,19 @@
             });
         }
 
-        function closeSettingsModal() {
-            const modal = document.getElementById('settingsModal');
-            const content = document.getElementById('settingsModalContent');
+        function closeModal(modalId, contentId) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
+
+        // ==========================================
+        // DATA MANAGEMENT (BACKUP / SYNC)
+        // ==========================================
+        function openSettingsModal() { openModal('settingsModal', 'settingsModalContent'); }
 
         function exportFile() {
             const dataStr = JSON.stringify(appData);
@@ -441,7 +475,7 @@
                         appData = parsedData;
                         localStorage.setItem('financeHubData', JSON.stringify(appData));
                         init();
-                        closeSettingsModal();
+                        closeModal('settingsModal', 'settingsModalContent');
                         alert("Data successfully imported!");
                     } else {
                         alert("Invalid backup file format.");
@@ -476,7 +510,7 @@
                     appData = parsedData;
                     localStorage.setItem('financeHubData', JSON.stringify(appData));
                     init();
-                    closeSettingsModal();
+                    closeModal('settingsModal', 'settingsModalContent');
                     inputField.value = '';
                     alert("Sync successful! Data loaded.");
                 } else {
@@ -519,16 +553,23 @@
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (After Tax) $</label>
-                                <input type="number" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
+                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors">Weekly Income (Net) $</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs sm:text-sm font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Link Monthly Loan</label>
-                                <select onchange="updateLinkedLoan(${dash.id}, this.value)" class="w-full p-2 sm:p-3 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm cursor-pointer">
-                                    <option value="" class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800">-- None --</option>
-                                    ${appData.loans.map(l => `<option value="${l.id}" class="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800" ${dash.linkedLoanId == l.id ? 'selected' : ''}>${l.name} (${fmt.format(l.calculatedPayment || 0)}/mo)</option>`).join('')}
+                                <label class="block text-[11px] sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedLoanId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm cursor-pointer">
+                                    <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
+                                    ${appData.loans.map(l => `<option value="${l.id}" class="bg-white dark:bg-gray-800" ${dash.linkedLoanId == l.id ? 'selected' : ''}>${l.name} (${fmt.format(l.calculatedPayment || 0)}/mo)</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] sm:text-xs font-medium mb-1 transition-colors text-brand-blue flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Investment</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedInvestmentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm cursor-pointer">
+                                    <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
+                                    ${appData.investments.map(i => `<option value="${i.id}" class="bg-white dark:bg-gray-800" ${dash.linkedInvestmentId == i.id ? 'selected' : ''}>${i.name} (${fmt.format(i.monthly || 0)}/mo)</option>`).join('')}
                                 </select>
                             </div>
                         </div>
@@ -546,13 +587,21 @@
                                 <span class="text-sm font-medium">Expenses</span>
                                 <button onclick="addExpense(${dash.id})" class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
                             </div>
-                            <div id="expList-${dash.id}" class="space-y-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar"></div>
+                            <div id="expList-${dash.id}" class="space-y-2"></div>
                         </div>
 
-                        <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2 sm:gap-0">
-                                <h3 class="text-sm font-medium opacity-90">Disposable Income (Wiggle Room)</h3>
-                                <button onclick="runAIAnalysis(${dash.id})" class="w-full sm:w-auto justify-center bg-white/20 hover:bg-white/30 hover:scale-105 px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center backdrop-blur-sm">✨ AI Analysis</button>
+                        <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300 relative overflow-hidden">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
+                                <div>
+                                    <h3 class="text-sm font-bold opacity-90">Disposable Income (Wiggle Room)</h3>
+                                    <p class="text-[10px] opacity-75">After expenses & linked contributions</p>
+                                </div>
+                                <div class="flex gap-2 w-full sm:w-auto">
+                                    <div class="bg-white/20 px-3 py-1.5 rounded flex items-center text-xs font-bold backdrop-blur-sm whitespace-nowrap">
+                                        Savings Rate: <span id="sr-${dash.id}" class="ml-1 text-white">0%</span>
+                                    </div>
+                                    <button onclick="runAIAnalysis(${dash.id})" class="flex-1 sm:flex-none justify-center bg-white text-brand-blue hover:bg-gray-100 hover:scale-105 px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center shadow-sm">✨ AI</button>
+                                </div>
                             </div>
                             <div class="grid grid-cols-3 gap-2 sm:gap-4">
                                 <div><p class="text-[10px] sm:text-xs opacity-80">Weekly</p><p class="text-base sm:text-xl font-bold value-update" id="net-wk-${dash.id}">$0</p></div>
@@ -581,10 +630,10 @@
             if(d) { d.name = val; saveData(); }
         }
 
-        function updateLinkedLoan(dashId, loanId) {
+        function updateLinkedItem(dashId, prop, itemId) {
             const d = appData.dashboards.find(x => x.id === dashId);
             if(d) {
-                d.linkedLoanId = loanId ? parseInt(loanId) : null;
+                d[prop] = itemId ? parseInt(itemId) : null;
                 saveData();
                 calcDashboard(dashId);
             }
@@ -622,7 +671,7 @@
                     <div class="animate-slide-down flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50 dark:bg-gray-700 p-2 sm:p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
                         <input type="text" placeholder="Name" value="${exp.name}" oninput="updateExpense(${dashId}, ${exp.id}, 'name', this.value)" class="w-full sm:flex-1 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
                         <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <input type="number" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="flex-1 sm:w-20 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
+                            <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="0" value="${exp.amount}" oninput="updateExpense(${dashId}, ${exp.id}, 'amount', this.value)" class="flex-1 sm:w-20 p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all text-gray-900 dark:text-gray-100">
                             <select onchange="updateExpense(${dashId}, ${exp.id}, 'freq', this.value)" class="flex-1 sm:w-auto p-2 sm:p-1.5 rounded border border-transparent hover:border-gray-200 dark:hover:border-gray-600 focus:border-brand-teal focus:bg-white bg-transparent dark:focus:bg-gray-800 outline-none text-xs transition-all cursor-pointer text-gray-900 dark:text-gray-100">
                                 <option value="weekly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'weekly' ? 'selected' : ''}>Wk</option>
                                 <option value="monthly" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" ${exp.freq === 'monthly' ? 'selected' : ''}>Mo</option>
@@ -672,10 +721,21 @@
                 if (e.freq === 'yearly') yearlyExp += amt;
             });
 
+            // Deduct linked loan payments
             if (d.linkedLoanId) {
                 const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
                 if (linkedLoan && linkedLoan.calculatedPayment) {
                     yearlyExp += linkedLoan.calculatedPayment * 12;
+                }
+            }
+            
+            // Deduct linked investment contributions
+            let linkedInvContribution = 0;
+            if (d.linkedInvestmentId) {
+                const linkedInv = appData.investments.find(i => i.id === d.linkedInvestmentId);
+                if (linkedInv && linkedInv.monthly) {
+                    linkedInvContribution = linkedInv.monthly * 12;
+                    yearlyExp += linkedInvContribution;
                 }
             }
 
@@ -687,7 +747,15 @@
             document.getElementById(`net-mo-${dashId}`).innerText = fmt.format(netMo);
             document.getElementById(`net-yr-${dashId}`).innerText = fmt.format(netYr);
 
-            const moExp = yearlyExp / 12;
+            // Savings Rate = ((Wiggle Room + Inv Contributions) / Total Income) * 100
+            let savingsRate = 0;
+            if (yInc > 0) {
+                savingsRate = ((netYr + linkedInvContribution) / yInc) * 100;
+            }
+            document.getElementById(`sr-${dashId}`).innerText = `${savingsRate.toFixed(1)}%`;
+
+            // Emergency Fund (based on core expenses only, not wiggle room or investments)
+            const moExp = (yearlyExp - linkedInvContribution) / 12;
             document.getElementById(`ef3-${dashId}`).innerText = fmt.format(moExp * 3);
             document.getElementById(`ef6-${dashId}`).innerText = fmt.format(moExp * 6);
 
@@ -737,16 +805,16 @@
                     <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Total Amount ($)</label>
-                                <input type="number" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 10000">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Amount ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 10000">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Interest Rate (%)</label>
-                                <input type="number" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5.5">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Rate (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5.5">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Term (Years)</label>
-                                <input type="number" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5">
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Term (Yrs)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm" placeholder="e.g. 5">
                             </div>
                         </div>
 
@@ -762,28 +830,48 @@
                             </div>
                         </div>
 
+                        <!-- Initial Payment Break Down -->
+                        <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
+                                <span class="text-brand-teal font-bold">Principal</span>
+                            </div>
+                            <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden">
+                                <div id="l-int-bar-${loan.id}" class="bg-rose-500 dark:bg-rose-600 h-2 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
+                                <span id="l-int-val-${loan.id}">$0</span>
+                                <span id="l-prin-val-${loan.id}">$0</span>
+                            </div>
+                        </div>
+
                         <!-- Accelerator Section -->
                         <div class="pt-2">
                             <h4 class="text-sm font-bold flex items-center mb-3 text-brand-teal"><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
                             <div>
                                 <label class="block text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">Extra Monthly Payment ($)</label>
-                                <input type="number" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner" placeholder="How much extra can you pay?">
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner" placeholder="How much extra can you pay?">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Accelerator Results -->
-                    <div class="p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 transition-colors">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center p-3 rounded-lg bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600">
-                                <p class="text-[10px] uppercase font-bold text-gray-500 mb-1">Time Saved</p>
-                                <p class="text-sm sm:text-base font-bold text-brand-blue value-update" id="l-time-saved-${loan.id}">0 months</p>
+                    <!-- Accelerator Results & Amortization -->
+                    <div class="p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 transition-colors flex flex-col space-y-4">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] sm:text-xs font-bold text-brand-teal uppercase">Actual Payment</p>
+                                <p class="text-xl sm:text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
                             </div>
-                            <div class="text-center p-3 rounded-lg bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600">
-                                <p class="text-[10px] uppercase font-bold text-gray-500 mb-1">Interest Saved</p>
-                                <p class="text-sm sm:text-base font-bold text-brand-teal value-update" id="l-saved-${loan.id}">$0.00</p>
+                            <div class="text-right">
+                                <p class="text-[10px] sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}">
+                                    Saved: <span id="l-saved-${loan.id}">$0.00</span>
+                                </p>
+                                <p class="text-[10px] sm:text-[11px] font-bold text-brand-blue value-update hidden" id="l-time-saved-${loan.id}">0 mo earlier</p>
                             </div>
                         </div>
+                        <button onclick="showAmortization(${loan.id})" class="w-full py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                            <i data-lucide="list" class="w-4 h-4 mr-2 text-brand-blue"></i> View Schedule
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -844,40 +932,104 @@
                 months_saved = Math.max(0, n - new_n);
             }
 
-            // Save calculated payment for dashboards to pull from
+            // First Month Break Down
+            let first_mo_int = (P > 0 && r > 0) ? P * r : 0;
+            let first_mo_prin = base_payment > 0 ? base_payment - first_mo_int : 0;
+            let int_pct = base_payment > 0 ? (first_mo_int / base_payment) * 100 : 0;
+
+            const intBar = document.getElementById(`l-int-bar-${id}`);
+            if(intBar) intBar.style.width = `${Math.min(100, Math.max(0, int_pct))}%`;
+            
+            const intVal = document.getElementById(`l-int-val-${id}`);
+            if(intVal) intVal.innerText = fmt.format(first_mo_int);
+
+            const prinVal = document.getElementById(`l-prin-val-${id}`);
+            if(prinVal) prinVal.innerText = fmt.format(first_mo_prin);
+
+            // Save for dashboards
             l.calculatedPayment = actual_payment > 0 ? actual_payment : base_payment;
 
-            // Update UI Outputs
+            // Outputs
             document.getElementById(`l-base-pay-${id}`).innerText = fmt.format(base_payment);
+            document.getElementById(`l-pay-${id}`).innerText = fmt.format(actual_payment > 0 ? actual_payment : base_payment);
             document.getElementById(`l-int-${id}`).innerText = fmt.format(Math.max(0, base_interest));
             
+            const savedContainer = document.getElementById(`l-saved-container-${id}`);
             const savedEl = document.getElementById(`l-saved-${id}`);
             const timeSavedEl = document.getElementById(`l-time-saved-${id}`);
             
             if (l.extra > 0 && months_saved > 0.5) {
                 savedEl.innerText = fmt.format(interest_saved);
+                savedContainer.classList.remove('hidden');
+                
                 let yrs = Math.floor(months_saved / 12);
                 let mos = Math.ceil(months_saved % 12);
-                let timeStr = yrs > 0 ? `${yrs}y ${mos}mo` : `${mos}mo`;
+                let timeStr = yrs > 0 ? `${yrs}y ${mos}mo earlier` : `${mos}mo earlier`;
                 timeSavedEl.innerText = timeStr;
+                timeSavedEl.classList.remove('hidden');
             } else {
-                savedEl.innerText = "$0.00";
-                timeSavedEl.innerText = "0 months";
+                savedContainer.classList.add('hidden');
+                timeSavedEl.classList.add('hidden');
             }
             
             saveData();
+            if (appData.dashboards.some(d => d.linkedLoanId === id)) renderDashboards();
+        }
+
+        function showAmortization(id) {
+            const l = appData.loans.find(x => x.id === id);
+            if(!l || l.amount <= 0 || l.years <= 0) return alert("Please enter valid loan details first.");
+
+            let balance = l.amount;
+            const r = l.rate / 100 / 12;
+            const n = l.years * 12;
+            let base_payment = r === 0 ? (balance / n) : balance * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            let payment = base_payment + (l.extra || 0);
             
-            if (appData.dashboards.some(d => d.linkedLoanId === id)) {
-                renderDashboards();
+            // Failsafe for mathematically unpayable loans
+            if (payment <= balance * r) return alert("Payment is too low to cover interest.");
+
+            let tableHTML = '';
+            let month = 1;
+
+            while (balance > 0.01 && month <= 360) { // Limit to 30 years to avoid DOM lag
+                let interest = balance * r;
+                let principal = payment - interest;
+
+                if (balance < principal) {
+                    principal = balance;
+                    payment = principal + interest;
+                    balance = 0;
+                } else {
+                    balance -= principal;
+                }
+
+                tableHTML += `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="py-2 px-2 font-medium">${month}</td>
+                        <td class="py-2 px-2">${fmt.format(payment)}</td>
+                        <td class="py-2 px-2 text-rose-500">${fmt.format(interest)}</td>
+                        <td class="py-2 px-2 text-brand-teal">${fmt.format(principal)}</td>
+                        <td class="py-2 px-2 text-right">${fmt.format(balance)}</td>
+                    </tr>
+                `;
+                month++;
             }
+
+            document.getElementById('amortTableBody').innerHTML = tableHTML;
+            openModal('amortModal', 'amortModalContent');
         }
 
         // ==========================================
         // APY SAVINGS CALCULATORS
         // ==========================================
         function addInvestment(save = true) {
-            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', rate: '' });
-            if(save) { saveData(); renderInvestments(); }
+            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', monthly: '', rate: '', taxBracket: '' });
+            if(save) { 
+                saveData(); 
+                renderInvestments();
+                renderDashboards(); 
+            }
         }
 
         function removeInvestment(id) {
@@ -886,8 +1038,12 @@
                 el.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     appData.investments = appData.investments.filter(i => i.id !== id);
+                    appData.dashboards.forEach(d => {
+                        if (d.linkedInvestmentId === id) d.linkedInvestmentId = null;
+                    });
                     saveData();
                     renderInvestments();
+                    renderDashboards();
                 }, 200);
             }
         }
@@ -895,36 +1051,51 @@
         function renderInvestments() {
             const container = document.getElementById('interestContainer');
             container.innerHTML = appData.investments.map(inv => `
-                <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700 relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-4">
-                        <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-lg font-bold bg-transparent outline-none text-brand-blue w-9/12 placeholder-gray-400 border-b border-transparent focus:border-brand-blue transition-all" placeholder="Bank Name">
-                        <div class="flex space-x-1 relative z-10">
-                             <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue hover:bg-blue-50 dark:hover:bg-gray-700 p-1.5 rounded hover:scale-110 transition-all" title="AI Advice"><i data-lucide="sparkles" class="w-4 h-4"></i></button>
-                             <button onclick="removeInvestment(${inv.id})" class="text-gray-400 hover:text-rose-500 p-1.5 rounded hover:rotate-90 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button>
-                        </div>
+                <div id="inv-${inv.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative flex flex-col h-full group hover:shadow-xl transition-all duration-300">
+                    <button onclick="removeInvestment(${inv.id})" class="absolute top-4 right-4 text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    
+                    <!-- Title -->
+                    <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors flex items-center pr-12">
+                        <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-lg sm:text-xl font-bold bg-transparent outline-none text-brand-blue w-full placeholder-gray-400 focus:border-b border-brand-blue transition-all" placeholder="Account Name">
+                        <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 p-2 rounded-lg hover:scale-105 transition-all shadow-sm shrink-0 ml-2" title="AI Advice"><i data-lucide="sparkles" class="w-4 h-4"></i></button>
                     </div>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                        <div>
-                            <label class="block text-xs font-medium mb-1">Balance ($)</label>
-                            <input type="number" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm">
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Starting Balance ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Monthly Contrib. ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-mo-contrib-${inv.id}" value="${inv.monthly || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-brand-blue/5 border border-brand-blue/30 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm font-bold text-brand-blue placeholder-brand-blue/40" placeholder="0">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium mb-1">APY (%)</label>
-                            <input type="number" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2 rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm">
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">APY Rate (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="e.g. 4.5">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-gray-500 mb-1">Tax Bracket (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-tax-${inv.id}" value="${inv.taxBracket || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-sm" placeholder="e.g. 22">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mt-auto group-hover:bg-gray-100 dark:group-hover:bg-gray-600 transition-colors">
-                        <div class="mb-4 bg-brand-blue/10 dark:bg-brand-blue/20 p-3 rounded-lg flex justify-between items-center border border-brand-blue/20">
-                            <span class="text-xs font-medium text-brand-blue dark:text-blue-300">Est. Monthly Earned</span>
-                            <span class="font-bold text-brand-blue dark:text-blue-300 value-update" id="i-mo-${inv.id}">$0.00</span>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-b-2xl p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 transition-colors">
+                        <div class="mb-4 bg-white dark:bg-gray-800 p-3 rounded-xl border border-brand-blue/20 flex justify-between items-center shadow-sm">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block">After-Tax 1st Mo. Yield</span>
+                            </div>
+                            <span class="text-xl font-bold text-brand-blue dark:text-blue-400 value-update" id="i-mo-${inv.id}">$0.00</span>
                         </div>
                         <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-center">
-                            <div><p class="text-[10px] text-gray-500 uppercase">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
-                            <div><p class="text-[10px] text-gray-500 uppercase">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
-                            <div><p class="text-[10px] text-gray-500 uppercase">5 Years</p><p class="font-bold text-sm value-update" id="i-5-${inv.id}">$0</p></div>
-                            <div><p class="text-[10px] text-gray-500 uppercase">10 Years</p><p class="font-bold text-sm sm:text-base text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">1 Year</p><p class="font-bold text-sm value-update" id="i-1-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">2 Years</p><p class="font-bold text-sm value-update" id="i-2-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">5 Years</p><p class="font-bold text-sm value-update" id="i-5-${inv.id}">$0</p></div>
+                            <div class="p-2 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-lg"><p class="text-[10px] text-brand-blue uppercase font-bold mb-1">10 Years</p><p class="font-bold text-base text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
                         </div>
                     </div>
                 </div>
@@ -936,7 +1107,11 @@
 
         function updateInvProp(id, prop, val) {
             const i = appData.investments.find(x => x.id === id);
-            if(i) { i[prop] = val; saveData(); }
+            if(i) { 
+                i[prop] = val; 
+                saveData(); 
+                if(prop === 'name') renderDashboards();
+            }
         }
 
         function calcInvestment(id) {
@@ -944,21 +1119,38 @@
             if(!i) return;
 
             i.principal = parseFloat(document.getElementById(`i-prin-${id}`).value) || 0;
+            i.monthly = parseFloat(document.getElementById(`i-mo-contrib-${id}`).value) || 0;
             i.rate = parseFloat(document.getElementById(`i-rate-${id}`).value) || 0;
+            i.taxBracket = parseFloat(document.getElementById(`i-tax-${id}`).value) || 0;
 
             const P = i.principal;
-            const r = i.rate / 100;
+            const PMT = i.monthly;
+            
+            // Calculate Effective After-Tax Rate
+            const grossRate = i.rate / 100;
+            const netRate = grossRate * (1 - (i.taxBracket / 100));
+            const r_m = netRate / 12; 
 
-            const calcAPY = (years) => P * Math.pow(1 + r, years);
-            const estMonthlyYield = (P * r) / 12;
+            // FV Formula with monthly contributions
+            const calcFV = (years) => {
+                const n = years * 12;
+                if (r_m === 0) return P + (PMT * n);
+                return P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
+            };
+
+            const estMonthlyYield = (P * r_m); // First month yield
 
             document.getElementById(`i-mo-${id}`).innerText = fmt.format(estMonthlyYield);
-            document.getElementById(`i-1-${id}`).innerText = fmt.format(calcAPY(1));
-            document.getElementById(`i-2-${id}`).innerText = fmt.format(calcAPY(2));
-            document.getElementById(`i-5-${id}`).innerText = fmt.format(calcAPY(5));
-            document.getElementById(`i-10-${id}`).innerText = fmt.format(calcAPY(10));
+            document.getElementById(`i-1-${id}`).innerText = fmt.format(calcFV(1));
+            document.getElementById(`i-2-${id}`).innerText = fmt.format(calcFV(2));
+            document.getElementById(`i-5-${id}`).innerText = fmt.format(calcFV(5));
+            document.getElementById(`i-10-${id}`).innerText = fmt.format(calcFV(10));
             
             saveData();
+            
+            if (appData.dashboards.some(d => d.linkedInvestmentId === id)) {
+                renderDashboards();
+            }
         }
 
         // ==========================================
@@ -990,33 +1182,11 @@
             }
         }
 
-        function openAIModal() {
-            const modal = document.getElementById('aiModal');
-            const content = document.getElementById('aiModalContent');
-            modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                modal.classList.remove('opacity-0');
-                content.classList.remove('scale-95');
-                content.classList.add('scale-100');
-            });
-        }
-
-        function closeAIModal() {
-            const modal = document.getElementById('aiModal');
-            const content = document.getElementById('aiModalContent');
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
         async function runAIAnalysis(dashId) {
             const dash = appData.dashboards.find(d => d.id === dashId);
             if(!dash) return;
 
-            openAIModal();
+            openModal('aiModal', 'aiModalContent');
             const content = document.getElementById('aiContent');
             content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-teal mb-4"></i><span class="text-gray-500 dark:text-gray-400">Analyzing scenario...</span></div>';
             lucide.createIcons();
@@ -1042,12 +1212,12 @@
             const inv = appData.investments.find(i => i.id === invId);
             if(!inv) return;
 
-            openAIModal();
+            openModal('aiModal', 'aiModalContent');
             const content = document.getElementById('aiContent');
             content.innerHTML = '<div class="flex flex-col items-center justify-center py-10"><i data-lucide="loader-2" class="w-10 h-10 animate-spin text-brand-blue mb-4"></i><span class="text-gray-500 dark:text-gray-400">Evaluating yield strategy...</span></div>';
             lucide.createIcons();
 
-            const prompt = `I have a scenario named "${inv.name}". I currently have $${(inv.principal || 0).toFixed(2)} in a bank account offering an APY of ${(inv.rate || 0)}%. 
+            const prompt = `I have a scenario named "${inv.name}". I currently have $${(inv.principal || 0).toFixed(2)} in a bank account offering an APY of ${(inv.rate || 0)}%. I am taxed at ${inv.taxBracket || 0}% for this interest. 
             Can you give me a brief 3-point analysis of this rate in the current economic climate, and suggest what other low-risk or medium-risk vehicles I could use to diversify or improve my yield? Keep it concise.`;
 
             try {
@@ -1062,21 +1232,39 @@
         // ==========================================
         async function fetchStockIdeas() {
             const container = document.getElementById('stockContainer');
+            const searchInput = document.getElementById('stockSearchInput').value.trim();
+            
             container.innerHTML = '<div class="flex flex-col items-center justify-center py-16"><i data-lucide="loader-2" class="w-12 h-12 animate-spin text-indigo-500 mb-4"></i><span class="text-gray-500 dark:text-gray-400 font-medium">Scanning live market news...</span><p class="text-xs text-gray-400 mt-2">This utilizes Google Search grounding to find today\'s data.</p></div>';
             lucide.createIcons();
 
-            const prompt = `Search the live web for 3 trending stocks that financial analysts are highly recommending to buy this week.
-            For each stock, provide:
-            1. The company name and ticker symbol.
-            2. A 2-sentence reasoning on why it's a good buy right now based on recent news.
-            3. A real, clickable URL to a recent news article about it.
-            
-            Format the output strictly as a series of HTML cards exactly like this:
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (TICKER)</h3>
-                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Reasoning goes here...</p>
-                <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
-            </div>`;
+            let prompt;
+            if (searchInput) {
+                prompt = `Search the live web for the latest news on the stock ticker ${searchInput}.
+                Provide:
+                1. The company name and current general market sentiment.
+                2. A brief, factual 2-sentence analysis on why analysts are saying to buy, sell, or hold right now based on recent news.
+                3. A real, clickable URL to a recent news article about it.
+                
+                Format the output strictly as a HTML card exactly like this:
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (${searchInput.toUpperCase()})</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Analysis goes here...</p>
+                    <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
+                </div>`;
+            } else {
+                prompt = `Search the live web for 3 trending stocks that financial analysts are highly recommending to buy this week.
+                For each stock, provide:
+                1. The company name and ticker symbol.
+                2. A 2-sentence reasoning on why it's a good buy right now based on recent news.
+                3. A real, clickable URL to a recent news article about it.
+                
+                Format the output strictly as a series of HTML cards exactly like this:
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm mb-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-bold text-indigo-500 mb-2">Company Name (TICKER)</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Reasoning goes here...</p>
+                    <a href="URL_HERE" target="_blank" class="text-xs font-bold text-brand-teal hover:text-teal-600 hover:underline inline-flex items-center">Read Article &rarr;</a>
+                </div>`;
+            }
 
             try {
                 const response = await callGemini(prompt, true); 
@@ -1099,7 +1287,7 @@
                             <i data-lucide="trending-up" class="w-10 h-10 text-indigo-500"></i>
                         </div>
                         <p class="font-medium text-lg mb-1">Ready to explore?</p>
-                        <p class="text-sm">Click "Scan Market" to have AI analyze live news and find trending stock ideas.</p>
+                        <p class="text-sm max-w-md mx-auto">Search for a specific ticker above, or click "Scan" to have AI analyze live news and find trending stock ideas.</p>
                     </div>`;
             }
             lucide.createIcons();
