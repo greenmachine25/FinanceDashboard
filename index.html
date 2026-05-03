@@ -79,6 +79,16 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
         
+        /* Tooltip Helper Class */
+        .tooltip-help {
+            cursor: help;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: rgba(156, 163, 175, 0.6);
+            text-underline-offset: 4px;
+            display: inline-block;
+        }
+
         /* Fix for mobile bottom nav overlap */
         @media (max-width: 640px) {
             main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
@@ -131,7 +141,7 @@
         <!-- Tab: Dashboards -->
         <div id="dashboard" class="tab-content active">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
-                <h2 class="text-2xl font-bold">Budget Scenarios</h2>
+                <h2 class="text-2xl font-bold tooltip-help" title="Create and compare different budget variations to see how much money you can save.">Budget Scenarios</h2>
                 <button onclick="addDashboard()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
@@ -144,7 +154,7 @@
         <!-- Tab: Loans -->
         <div id="loan" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
-                <h2 class="text-2xl font-bold">Loan Scenarios</h2>
+                <h2 class="text-2xl font-bold tooltip-help" title="Calculate loan payments, interest, and how much you can save by paying extra.">Loan Scenarios</h2>
                 <button onclick="addLoan()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
@@ -157,7 +167,7 @@
         <!-- Tab: Interest -->
         <div id="interest" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
-                <h2 class="text-2xl font-bold">APY Scenarios</h2>
+                <h2 class="text-2xl font-bold tooltip-help" title="Estimate how your money will grow over time with compound interest.">APY Scenarios</h2>
                 <button onclick="addInvestment()" class="w-full sm:w-auto justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
                     <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
                 </button>
@@ -170,7 +180,7 @@
         <!-- Tab: Stock Ideas -->
         <div id="stocks" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
-                <h2 class="text-2xl font-bold">Live AI Stock Explorer</h2>
+                <h2 class="text-2xl font-bold tooltip-help" title="Search the live web for AI-analyzed stock recommendations based on recent news.">Live AI Stock Explorer</h2>
                 <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
                     <input type="text" id="stockSearchInput" placeholder="Ticker (e.g. AAPL) or leave blank" class="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm">
                     <button onclick="fetchStockIdeas()" class="w-full sm:w-auto justify-center bg-indigo-500 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
@@ -234,7 +244,7 @@
             
             <div class="space-y-4">
                 <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-                    <h4 class="text-base sm:text-sm font-bold mb-2">Local File Backup</h4>
+                    <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Download a local backup to keep your data safe.">Local File Backup</h4>
                     <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Download a .json file of your data to save safely on your device.</p>
                     <div class="flex space-x-2">
                         <button onclick="exportFile()" class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-medium shadow-sm"><i data-lucide="download" class="w-4 h-4 mr-2 text-brand-teal"></i> Export</button>
@@ -246,7 +256,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-                    <h4 class="text-base sm:text-sm font-bold mb-2">Sync Code</h4>
+                    <h4 class="text-base sm:text-sm font-bold mb-2 tooltip-help" title="Generate a unique code block to quickly copy and paste data across your devices.">Sync Code</h4>
                     <p class="text-sm sm:text-xs text-gray-500 dark:text-gray-400 mb-3">Copy your data as a code snippet to easily paste on another device.</p>
                     <button onclick="exportCode()" class="w-full mb-3 bg-brand-blue hover:bg-blue-600 text-white text-base sm:text-sm py-2 rounded-lg transition-colors flex items-center justify-center font-bold shadow-md"><i data-lucide="copy" class="w-4 h-4 mr-2"></i> Copy Sync Code</button>
                     <div class="flex space-x-2">
@@ -273,11 +283,11 @@
                 <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
                     <thead class="sticky top-0 bg-white dark:bg-gray-800 shadow-sm z-10">
                         <tr class="text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                            <th class="py-3 px-2 font-medium">Month</th>
-                            <th class="py-3 px-2 font-medium">Payment</th>
-                            <th class="py-3 px-2 font-medium text-rose-500">Interest</th>
-                            <th class="py-3 px-2 font-medium text-brand-teal">Principal</th>
-                            <th class="py-3 px-2 font-medium text-right">Balance</th>
+                            <th class="py-3 px-2 font-medium tooltip-help" title="Month number in the payment term.">Month</th>
+                            <th class="py-3 px-2 font-medium tooltip-help" title="Total amount paid this month (Base + Extra).">Payment</th>
+                            <th class="py-3 px-2 font-medium text-rose-500 tooltip-help" title="Portion of payment going towards bank interest.">Interest</th>
+                            <th class="py-3 px-2 font-medium text-brand-teal tooltip-help" title="Portion of payment paying down your actual debt.">Principal</th>
+                            <th class="py-3 px-2 font-medium text-right tooltip-help" title="Remaining loan balance after payment.">Balance</th>
                         </tr>
                     </thead>
                     <tbody id="amortTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -574,19 +584,19 @@
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1 transition-colors">Weekly Income (Net) $</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all text-base sm:text-sm">
+                                <label class="tooltip-help text-sm font-medium mb-1 transition-colors" title="Your take-home pay after taxes and deductions.">Weekly Income (Net) $</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all text-base sm:text-sm mt-1">
                             </div>
                             <div>
-                                <label class="block text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
-                                <select onchange="updateLinkedItem(${dash.id}, 'linkedLoanId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm cursor-pointer">
+                                <label class="tooltip-help text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center" title="Automatically deducts this loan's calculated monthly payment from your wiggle room."><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedLoanId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm cursor-pointer mt-1">
                                     <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
                                     ${appData.loans.map(l => `<option value="${l.id}" class="bg-white dark:bg-gray-800" ${dash.linkedLoanId == l.id ? 'selected' : ''}>${l.name} (${fmt.format(l.calculatedPayment || 0)}/mo)</option>`).join('')}
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-blue flex items-center"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Investment</label>
-                                <select onchange="updateLinkedItem(${dash.id}, 'linkedInvestmentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm cursor-pointer">
+                                <label class="tooltip-help text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-blue flex items-center" title="Automatically deducts this monthly investment contribution from your wiggle room."><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Investment</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedInvestmentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-blue/5 dark:bg-brand-blue/10 border border-brand-blue/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm cursor-pointer mt-1">
                                     <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
                                     ${appData.investments.map(i => `<option value="${i.id}" class="bg-white dark:bg-gray-800" ${dash.linkedInvestmentId == i.id ? 'selected' : ''}>${i.name} (${fmt.format(i.monthly || 0)}/mo)</option>`).join('')}
                                 </select>
@@ -595,15 +605,15 @@
 
                         <div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-1">
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500 tooltip-help" title="Your estimated income per day.">Daily</p><p class="font-bold value-update" id="d-day-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-teal transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500 tooltip-help" title="Your estimated income per month.">Monthly</p><p class="font-bold value-update" id="d-mo-${dash.id}">$0</p></div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-xl text-center border-l-4 sm:border-l-0 sm:border-b-2 border-brand-blue transition-colors hover:bg-gray-100 dark:hover:bg-gray-600 flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] uppercase text-gray-500 tooltip-help" title="Your estimated income per year.">Yearly</p><p class="font-bold value-update" id="d-yr-${dash.id}">$0</p></div>
                             </div>
                         </div>
 
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-base sm:text-sm font-medium">Expenses</span>
+                                <span class="tooltip-help text-base sm:text-sm font-medium" title="Your recurring bills and spending.">Expenses</span>
                                 <button onclick="addExpense(${dash.id})" class="text-sm sm:text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 hover:-translate-y-0.5 px-2 py-1 rounded transition-all flex items-center"><i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add</button>
                             </div>
                             <div id="expList-${dash.id}" class="space-y-2"></div>
@@ -612,14 +622,14 @@
                         <div class="p-4 gradient-bg rounded-xl text-white shadow-inner hover:shadow-lg transition-shadow duration-300 relative overflow-hidden">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
                                 <div>
-                                    <h3 class="text-base sm:text-sm font-bold opacity-90">Disposable Income (Wiggle Room)</h3>
-                                    <p class="text-xs sm:text-[10px] opacity-75">After expenses & linked contributions</p>
+                                    <h3 class="tooltip-help text-base sm:text-sm font-bold opacity-90" title="The money left over after all expenses and linked contributions are paid.">Disposable Income (Wiggle Room)</h3>
+                                    <p class="text-xs sm:text-[10px] opacity-75 mt-1">After expenses & linked contributions</p>
                                 </div>
                                 <div class="flex gap-2 w-full sm:w-auto">
-                                    <div class="bg-white/20 px-3 py-1.5 rounded flex items-center text-sm sm:text-xs font-bold backdrop-blur-sm whitespace-nowrap">
+                                    <div class="tooltip-help bg-white/20 px-3 py-1.5 rounded flex items-center text-sm sm:text-xs font-bold backdrop-blur-sm whitespace-nowrap" title="Percentage of your total income that goes towards savings or investments.">
                                         Savings Rate: <span id="sr-${dash.id}" class="ml-1 text-white">0%</span>
                                     </div>
-                                    <button onclick="runAIAnalysis(${dash.id})" class="flex-1 sm:flex-none justify-center bg-white text-brand-blue hover:bg-gray-100 hover:scale-105 px-3 py-1.5 rounded text-sm sm:text-xs font-bold transition-all flex items-center shadow-sm">✨ AI</button>
+                                    <button onclick="runAIAnalysis(${dash.id})" class="flex-1 sm:flex-none justify-center bg-white text-brand-blue hover:bg-gray-100 hover:scale-105 px-3 py-1.5 rounded text-sm sm:text-xs font-bold transition-all flex items-center shadow-sm" title="Get AI-powered insights on your budget.">✨ AI</button>
                                 </div>
                             </div>
                             <div class="grid grid-cols-3 gap-2 sm:gap-4">
@@ -630,8 +640,8 @@
                         </div>
 
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] text-gray-500">3Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
-                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="text-xs sm:text-[10px] text-gray-500">6Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="tooltip-help text-xs sm:text-[10px] text-gray-500" title="Target amount to save for 3 months of core expenses (ignores investments).">3Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-teal value-update" id="ef3-${dash.id}">$0</p></div>
+                             <div class="flex-1 bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg text-center hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors flex sm:block justify-between items-center sm:justify-start"><p class="tooltip-help text-xs sm:text-[10px] text-gray-500" title="Target amount to save for 6 months of core expenses (ignores investments).">6Mo Emerg. Fund</p><p class="text-base sm:text-sm font-bold text-brand-blue value-update" id="ef6-${dash.id}">$0</p></div>
                          </div>
                     </div>
                 </div>
@@ -840,15 +850,15 @@
                     <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Amount ($)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Total principal amount of the loan.">Amount ($)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 10000">
                             </div>
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Rate (%)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Rate (APR).">Rate (%)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5.5">
                             </div>
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Term (Yrs)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Duration of the loan in years.">Term (Yrs)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5">
                             </div>
                         </div>
@@ -856,22 +866,22 @@
                         <!-- Core Output Metrics -->
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 flex justify-between items-center">
                             <div>
-                                <p class="text-xs sm:text-[10px] font-bold text-gray-500 uppercase">Standard Monthly Payment</p>
-                                <p class="text-2xl font-bold text-brand-blue value-update" id="l-base-pay-${loan.id}">$0.00</p>
+                                <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Your required minimum monthly payment.">Standard Monthly Payment</p>
+                                <p class="text-2xl font-bold text-brand-blue value-update mt-1" id="l-base-pay-${loan.id}">$0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs sm:text-[10px] font-bold text-gray-500 uppercase">Total Interest</p>
-                                <p class="text-xl font-bold text-rose-500 value-update" id="l-int-${loan.id}">$0.00</p>
+                                <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Total amount of interest paid over the entire life of the loan.">Total Interest</p>
+                                <p class="text-xl font-bold text-rose-500 value-update mt-1" id="l-int-${loan.id}">$0.00</p>
                             </div>
                         </div>
 
                         <!-- Initial Payment Break Down -->
                         <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
-                            <div class="flex justify-between text-sm sm:text-xs mb-1.5">
+                            <div class="flex justify-between text-sm sm:text-xs mb-1.5 tooltip-help" title="Shows how much of your first payment goes straight to the bank vs paying down your debt.">
                                 <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
                                 <span class="text-brand-teal font-bold">Principal</span>
                             </div>
-                            <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden">
+                            <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden mt-1">
                                 <div id="l-int-bar-${loan.id}" class="bg-rose-500 dark:bg-rose-600 h-2 transition-all duration-500" style="width: 0%"></div>
                             </div>
                             <div class="flex justify-between text-xs sm:text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
@@ -882,10 +892,10 @@
 
                         <!-- Accelerator Section -->
                         <div class="pt-2">
-                            <h4 class="text-base sm:text-sm font-bold flex items-center mb-3 text-brand-teal"><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
+                            <h4 class="tooltip-help text-base sm:text-sm font-bold flex items-center mb-3 text-brand-teal" title="See how paying extra each month reduces your interest and shortens the loan."><i data-lucide="rocket" class="w-4 h-4 mr-1"></i> Payoff Accelerator</h4>
                             <div>
-                                <label class="block text-sm sm:text-xs font-bold mb-1 text-gray-600 dark:text-gray-400">Extra Monthly Payment ($)</label>
-                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner" placeholder="How much extra can you pay?">
+                                <label class="tooltip-help block text-sm sm:text-xs font-bold mb-1 text-gray-600 dark:text-gray-400" title="Additional amount you pay towards the principal each month.">Extra Monthly Payment ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-extra-${loan.id}" value="${loan.extra || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-brand-teal/50 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-bold text-brand-teal placeholder-gray-300 dark:placeholder-gray-600 shadow-inner mt-1" placeholder="How much extra can you pay?">
                             </div>
                         </div>
                     </div>
@@ -894,14 +904,14 @@
                     <div class="p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 transition-colors flex flex-col space-y-4">
                         <div class="flex justify-between items-end">
                             <div>
-                                <p class="text-xs sm:text-[10px] font-bold text-brand-teal uppercase">Actual Payment</p>
-                                <p class="text-2xl font-bold gradient-text value-update" id="l-pay-${loan.id}">$0.00</p>
+                                <p class="tooltip-help text-xs sm:text-[10px] font-bold text-brand-teal uppercase" title="Base Payment + Extra Payment">Actual Payment</p>
+                                <p class="text-2xl font-bold gradient-text value-update mt-1" id="l-pay-${loan.id}">$0.00</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}">
+                                <p class="tooltip-help text-xs sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}" title="Total interest saved over the life of the loan.">
                                     Saved: <span id="l-saved-${loan.id}">$0.00</span>
                                 </p>
-                                <p class="text-xs sm:text-[11px] font-bold text-brand-blue value-update hidden" id="l-time-saved-${loan.id}">0 mo earlier</p>
+                                <p class="tooltip-help text-xs sm:text-[11px] font-bold text-brand-blue value-update hidden mt-1" id="l-time-saved-${loan.id}" title="How much earlier you will be debt free.">0 mo earlier</p>
                             </div>
                         </div>
                         <button onclick="showAmortization(${loan.id})" class="w-full py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-base sm:text-sm font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm text-gray-700 dark:text-gray-300 flex items-center justify-center">
@@ -1092,28 +1102,28 @@
                     <!-- Title -->
                     <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors flex items-center pr-12">
                         <input type="text" value="${inv.name}" oninput="updateInvProp(${inv.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-blue w-full placeholder-gray-400 focus:border-b border-brand-blue transition-all" placeholder="Account Name">
-                        <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 p-2 rounded-lg hover:scale-105 transition-all shadow-sm shrink-0 ml-2" title="AI Advice"><i data-lucide="sparkles" class="w-4 h-4"></i></button>
+                        <button onclick="runInvestmentAI(${inv.id})" class="text-brand-blue bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 p-2 rounded-lg hover:scale-105 transition-all shadow-sm shrink-0 ml-2" title="Get AI insights on this yield strategy."><i data-lucide="sparkles" class="w-4 h-4"></i></button>
                     </div>
                     
                     <div class="p-4 sm:p-6 space-y-4">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Starting Balance ($)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Initial amount of money in the account.">Starting Balance ($)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-prin-${inv.id}" value="${inv.principal}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="0">
                             </div>
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Monthly Contrib. ($)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Extra money added to the account every month.">Monthly Contrib. ($)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-mo-contrib-${inv.id}" value="${inv.monthly || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-brand-blue/5 border border-brand-blue/30 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm font-bold text-brand-blue placeholder-brand-blue/40" placeholder="0">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">APY Rate (%)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Yield (expected yearly growth).">APY Rate (%)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 4.5">
                             </div>
                             <div>
-                                <label class="block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1">Tax Bracket (%)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Your estimated income tax rate. Interest earned is usually taxed!">Tax Bracket (%)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-tax-${inv.id}" value="${inv.taxBracket || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 22">
                             </div>
                         </div>
@@ -1122,15 +1132,15 @@
                     <div class="bg-gray-50 dark:bg-gray-700 rounded-b-2xl p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 transition-colors">
                         <div class="mb-4 bg-white dark:bg-gray-800 p-3 rounded-xl border border-brand-blue/20 flex justify-between items-center shadow-sm">
                             <div>
-                                <span class="text-xs sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block">After-Tax 1st Mo. Yield</span>
+                                <span class="tooltip-help text-xs sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block" title="Estimated interest earned in the very first month, after taxes.">After-Tax 1st Mo. Yield</span>
                             </div>
                             <span class="text-2xl font-bold text-brand-blue dark:text-blue-400 value-update" id="i-mo-${inv.id}">$0.00</span>
                         </div>
                         <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-center">
-                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">1 Year</p><p class="font-bold text-base sm:text-sm value-update" id="i-1-${inv.id}">$0</p></div>
-                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">2 Years</p><p class="font-bold text-base sm:text-sm value-update" id="i-2-${inv.id}">$0</p></div>
-                            <div class="p-2"><p class="text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1">5 Years</p><p class="font-bold text-base sm:text-sm value-update" id="i-5-${inv.id}">$0</p></div>
-                            <div class="p-2 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-lg"><p class="text-[11px] text-brand-blue uppercase font-bold mb-1">10 Years</p><p class="font-bold text-lg text-brand-blue value-update" id="i-10-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="tooltip-help text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1" title="Projected balance after 1 year.">1 Year</p><p class="font-bold text-base sm:text-sm value-update mt-1" id="i-1-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="tooltip-help text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1" title="Projected balance after 2 years.">2 Years</p><p class="font-bold text-base sm:text-sm value-update mt-1" id="i-2-${inv.id}">$0</p></div>
+                            <div class="p-2"><p class="tooltip-help text-xs sm:text-[10px] text-gray-500 uppercase font-bold mb-1" title="Projected balance after 5 years.">5 Years</p><p class="font-bold text-base sm:text-sm value-update mt-1" id="i-5-${inv.id}">$0</p></div>
+                            <div class="p-2 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-lg"><p class="tooltip-help text-[11px] text-brand-blue uppercase font-bold mb-1" title="Projected balance after 10 years.">10 Years</p><p class="font-bold text-lg text-brand-blue value-update mt-1" id="i-10-${inv.id}">$0</p></div>
                         </div>
                     </div>
                 </div>
