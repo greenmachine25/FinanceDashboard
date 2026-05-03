@@ -282,12 +282,29 @@
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="logoutModalContent" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-sm mx-auto border border-gray-100 dark:border-gray-700 relative scale-95 transition-transform duration-300">
+            <h3 class="text-xl font-bold mb-4 flex items-center text-gray-900 dark:text-white">
+                <i data-lucide="log-out" class="w-5 h-5 mr-2 text-rose-500"></i>
+                Sign Out
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to sign out? Your data will remain safely synced to the cloud.</p>
+            <div class="flex space-x-3">
+                <button onclick="closeModal('logoutModal', 'logoutModalContent')" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg text-sm font-bold transition-colors">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm font-bold transition-colors shadow-sm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
     <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         // Placeholder Auth function before Firebase loads
         window.loginWithGoogle = () => showToast("Connecting to secure server...");
-        window.logoutUser = () => showToast("Connecting to secure server...");
+        window.promptLogout = () => showToast("Connecting to secure server...");
+        window.confirmLogout = () => showToast("Connecting to secure server...");
 
         // State Management
         var appData = {
@@ -358,8 +375,15 @@
                     signInWithPopup(auth, provider).catch(err => showToast("Login failed: " + err.message, true));
                 };
 
-                window.logoutUser = () => {
-                    signOut(auth).then(() => showToast("Logged out successfully."));
+                window.promptLogout = () => {
+                    openModal('logoutModal', 'logoutModalContent');
+                };
+
+                window.confirmLogout = () => {
+                    signOut(auth).then(() => {
+                        closeModal('logoutModal', 'logoutModalContent');
+                        showToast("Logged out successfully.");
+                    });
                 };
 
                 onAuthStateChanged(auth, async (user) => {
@@ -368,7 +392,7 @@
                     
                     if (user) {
                         loginBtn.innerHTML = `<img src="${user.photoURL}" class="w-6 h-6 rounded-full border border-brand-teal" title="Logged in as ${user.email}">`;
-                        loginBtn.setAttribute('onclick', 'logoutUser()');
+                        loginBtn.setAttribute('onclick', 'promptLogout()');
                         showToast(`Welcome, ${user.displayName.split(' ')[0]}! Syncing data...`);
                         
                         try {
