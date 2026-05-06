@@ -109,6 +109,7 @@
                 
                 <div class="hidden sm:flex space-x-4" id="tabs-desktop">
                     <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50/80 dark:bg-gray-700/80 transition-all duration-200 whitespace-nowrap">Dashboards</button>
+                    <button onclick="switchTab('rent')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Rent</button>
                     <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
                     <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
                 </div>
@@ -146,6 +147,19 @@
             </div>
         </div>
 
+        <!-- Tab: Rent -->
+        <div id="rent" class="tab-content">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+                <h2 class="text-2xl font-bold tooltip-help" title="Calculate total monthly rent obligations including utilities.">Rent Scenarios</h2>
+                <button onclick="addRent()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                </button>
+            </div>
+            <div id="rentsContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
         <!-- Tab: Loans -->
         <div id="loan" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
@@ -178,15 +192,19 @@
     <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
         <button onclick="switchTab('dashboard')" class="mobile-nav-btn active flex flex-col items-center py-3 flex-1 text-brand-teal transition-colors">
             <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-            <span class="text-xs font-bold">Budget</span>
+            <span class="text-[10px] font-bold">Budget</span>
+        </button>
+        <button onclick="switchTab('rent')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+            <span class="text-[10px] font-bold">Rent</span>
         </button>
         <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="landmark" class="w-5 h-5 mb-1"></i>
-            <span class="text-xs font-bold">Loans</span>
+            <span class="text-[10px] font-bold">Loans</span>
         </button>
         <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="trending-up" class="w-5 h-5 mb-1"></i>
-            <span class="text-xs font-bold">APY</span>
+            <span class="text-[10px] font-bold">APY</span>
         </button>
     </nav>
 
@@ -269,6 +287,19 @@
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
+            
+            <!-- Calculated Sweet Spot Banner -->
+            <div id="sweetSpotResult" class="mx-5 mt-5 sm:mx-6 sm:mt-6 bg-indigo-50/80 dark:bg-indigo-900/30 p-4 rounded-xl border border-indigo-200/50 dark:border-indigo-800/50 flex justify-between items-center hidden shrink-0 backdrop-blur-md shadow-sm">
+                <div>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase mb-1 flex items-center tooltip-help" title="The mathematical 'elbow' of the curve where extra payments hit maximum diminishing returns.">Optimal Sweet Spot</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white" id="ss-payment">$0 Extra/mo</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total Interest: <span id="ss-interest" class="font-bold text-rose-500">$0</span></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Payoff Time: <span id="ss-time" class="font-bold text-brand-blue">0 yrs</span></p>
+                </div>
+            </div>
+
             <div class="overflow-y-auto p-2 sm:p-6 custom-scrollbar flex-1 relative flex items-center justify-center">
                 <div class="w-full h-full min-h-[300px] relative">
                     <canvas id="sweetSpotCanvas"></canvas>
@@ -321,14 +352,15 @@
         var appData = {
             theme: 'light',
             dashboards: [], 
+            rents: [], // New Rent Array
             loans: [],
             investments: []
         };
         
-        let sweetSpotChartInstance = null; // Holds the Chart.js instance
+        let sweetSpotChartInstance = null; 
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-        const tabList = ['dashboard', 'loan', 'interest']; // For mobile swiping
+        const tabList = ['dashboard', 'rent', 'loan', 'interest']; // Updated with rent
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -350,29 +382,32 @@
                     parsed = {
                         theme: parsed.theme || 'light',
                         dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [], earnings: [], color: getRandomColor() }],
+                        rents: [],
                         loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0, color: getRandomColor() }],
                         investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0, color: getRandomColor() }]
                     };
                 }
                 // Back-compat upgrades
                 if(parsed.dashboards) parsed.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
+                if(!parsed.rents) parsed.rents = [];
+                if(parsed.rents) parsed.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                 if(parsed.loans) parsed.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); });
                 if(parsed.investments) parsed.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
                 appData = parsed;
             } else {
                 addDashboard(false);
+                addRent(false);
                 addLoan(false);
                 addInvestment(false);
             }
             applyTheme(appData.theme);
             renderAll();
-            initFirebase(); // Boot Cloud Sync
+            initFirebase(); 
         }
 
         // --- Firebase Cloud Sync Module ---
         async function initFirebase() {
             try {
-                // Dynamically import Firebase v9+ modules 
                 const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
                 const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
                 const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
@@ -412,8 +447,10 @@
                             const docSnap = await getDoc(doc(db, "users", user.uid));
                             if (docSnap.exists() && docSnap.data().appData) {
                                 appData = docSnap.data().appData;
-                                // backward compat
+                                // backward compat upgrades
                                 appData.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
+                                if(!appData.rents) appData.rents = [];
+                                appData.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                                 appData.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); });
                                 appData.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
                                 
@@ -421,7 +458,6 @@
                                 renderAll();
                                 showToast("Cloud data synced!");
                             } else {
-                                // First time login, save current local data to cloud
                                 window.saveToCloud(appData);
                             }
                         } catch (e) {
@@ -448,14 +484,13 @@
             }
         }
 
-        // --- Performance: Debounced Saving ---
         let saveTimeout;
         function saveData() {
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 localStorage.setItem('financeHubData', JSON.stringify(appData));
-                if (window.saveToCloud) window.saveToCloud(appData); // Syncs to cloud if logged in!
-            }, 1000); // 1s debounce to prevent spamming database writes
+                if (window.saveToCloud) window.saveToCloud(appData); 
+            }, 1000); 
         }
 
         // --- Theme & Navigation ---
@@ -464,7 +499,6 @@
             applyTheme(appData.theme);
             saveData();
             
-            // Re-render chart if it's open to update colors
             if(sweetSpotChartInstance && !document.getElementById('chartModal').classList.contains('hidden')) {
                 const activeLoan = appData.loans.find(l => l.lastCharted);
                 if(activeLoan) showSweetSpot(activeLoan.id);
@@ -484,38 +518,31 @@
         }
 
         function switchTab(tabId) {
-            // Hide all contents
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             
-            // Reset Desktop buttons
             document.querySelectorAll('.tab-btn').forEach(el => {
                 el.classList.remove('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50/80', 'dark:bg-gray-700/80', 'active');
                 el.classList.add('text-gray-500', 'dark:text-gray-300');
             });
 
-            // Reset Mobile buttons
             document.querySelectorAll('.mobile-nav-btn').forEach(el => {
                 el.classList.remove('text-brand-teal', 'active');
                 el.classList.add('text-gray-400');
             });
 
-            // Activate new content
             document.getElementById(tabId).classList.add('active');
             
-            // Activate Desktop button
             document.querySelectorAll(`.tab-btn[onclick="switchTab('${tabId}')"]`).forEach(btn => {
                 btn.classList.add('text-brand-blue', 'dark:text-brand-teal', 'bg-blue-50/80', 'dark:bg-gray-700/80', 'active');
                 btn.classList.remove('text-gray-500', 'dark:text-gray-300');
             });
 
-            // Activate Mobile button
             document.querySelectorAll(`.mobile-nav-btn[onclick="switchTab('${tabId}')"]`).forEach(btn => {
                 btn.classList.add('text-brand-teal', 'active');
                 btn.classList.remove('text-gray-400');
             });
         }
 
-        // --- Mobile Swipe Logic ---
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -529,8 +556,7 @@
         }, { passive: true });
 
         function handleSwipe() {
-            if (window.innerWidth >= 640) return; // Only on mobile
-            
+            if (window.innerWidth >= 640) return; 
             const swipeDistance = touchEndX - touchStartX;
             const currentTab = document.querySelector('.tab-content.active').id;
             const currentIndex = tabList.indexOf(currentTab);
@@ -542,14 +568,14 @@
             }
         }
 
-        // --- Colors Feature ---
         function updateColor(type, id, colorStr) {
-            const list = type === 'dashboard' ? appData.dashboards : (type === 'loan' ? appData.loans : appData.investments);
+            const list = type === 'dashboard' ? appData.dashboards : (type === 'loan' ? appData.loans : (type === 'rent' ? appData.rents : appData.investments));
             const item = list.find(x => x.id === id);
             if (item) {
                 item.color = colorStr;
                 saveData();
                 if (type === 'dashboard') renderDashboards();
+                if (type === 'rent') renderRents();
                 if (type === 'loan') renderLoans();
                 if (type === 'interest') renderInvestments();
             }
@@ -559,7 +585,6 @@
             document.querySelectorAll('.color-menu').forEach(m => m.classList.add('hidden'));
         }
         
-        // Hide color menus when clicking anywhere else
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.color-picker-container')) {
                 closeAllColorMenus();
@@ -567,6 +592,7 @@
         });
 
         function renderAll() {
+            renderRents();
             renderLoans(); 
             renderInvestments();
             renderDashboards();
@@ -596,7 +622,6 @@
             content.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
             
-            // Clean up chart flag if closing chart
             if(modalId === 'chartModal') {
                 appData.loans.forEach(l => l.lastCharted = false);
             }
@@ -619,7 +644,6 @@
             }, 4000); 
         }
 
-        // Mobile Tooltip Handling via Tap
         document.addEventListener('click', function(e) {
             const tooltipEl = e.target.closest('.tooltip-help');
             if (tooltipEl && window.innerWidth < 640) {
@@ -630,7 +654,6 @@
             }
         });
 
-        // --- Global Input Enhancements (Enter & Mobile Done) ---
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
                 e.target.blur();
@@ -730,7 +753,6 @@
             }
         }
 
-
         // ==========================================
         // DASHBOARDS (INCOME & EXPENSES)
         // ==========================================
@@ -745,7 +767,7 @@
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.id = Date.now();
                 copy.name = copy.name + ' (Copy)';
-                copy.color = getRandomColor(item.color); // Change color flair
+                copy.color = getRandomColor(item.color); 
                 if(copy.expenses) copy.expenses.forEach(e => e.id = Date.now() + Math.random());
                 if(copy.earnings) copy.earnings.forEach(e => e.id = Date.now() + Math.random());
                 appData.dashboards.unshift(copy);
@@ -771,11 +793,9 @@
             const container = document.getElementById('dashboardsContainer');
             container.innerHTML = appData.dashboards.map(dash => `
                 <div id="dash-${dash.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group transition-all duration-300">
-                    <!-- Flair Color Bar -->
                     <div class="absolute top-0 left-0 right-0 h-1.5 ${dash.color || 'bg-brand-teal'} transition-colors duration-300 z-10"></div>
                     
                     <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
-                        <!-- Color Palette Menu -->
                         <div class="relative inline-block text-left">
                             <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
                                 <i data-lucide="palette" class="w-5 h-5"></i>
@@ -793,10 +813,17 @@
                     </div>
 
                     <div class="p-4 sm:p-6 space-y-5 sm:space-y-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="tooltip-help text-sm font-medium mb-1 transition-colors" title="Your primary take-home pay after taxes and deductions.">Primary Weekly Income (Net) $</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="inc-${dash.id}" value="${dash.income || ''}" placeholder="0.00" oninput="calcDashboard(${dash.id})" class="w-full p-2 sm:p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all text-base sm:text-sm mt-1">
+                            </div>
+                            <div>
+                                <label class="tooltip-help text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center" title="Automatically deducts this rent's total calculated monthly payment from your wiggle room."><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Rent</label>
+                                <select onchange="updateLinkedItem(${dash.id}, 'linkedRentId', this.value)" class="w-full p-2 sm:p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm cursor-pointer mt-1">
+                                    <option value="" class="bg-white dark:bg-gray-800">-- None --</option>
+                                    ${appData.rents.map(r => `<option value="${r.id}" class="bg-white dark:bg-gray-800" ${dash.linkedRentId == r.id ? 'selected' : ''}>${r.name} (${fmt.format(r.calculatedTotal || 0)}/mo)</option>`).join('')}
+                                </select>
                             </div>
                             <div>
                                 <label class="tooltip-help text-sm sm:text-xs font-medium mb-1 transition-colors text-brand-teal flex items-center" title="Automatically deducts this loan's calculated monthly payment from your wiggle room."><i data-lucide="link" class="w-3 h-3 mr-1"></i> Linked Loan</label>
@@ -1069,6 +1096,14 @@
                 if (e.freq === 'yearly') yearlyExp += amt;
             });
 
+            // Deduct linked rent payments
+            if (d.linkedRentId) {
+                const linkedRent = appData.rents.find(r => r.id === d.linkedRentId);
+                if (linkedRent && linkedRent.calculatedTotal) {
+                    yearlyExp += linkedRent.calculatedTotal * 12;
+                }
+            }
+
             // Deduct linked loan payments
             if (d.linkedLoanId) {
                 const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
@@ -1109,6 +1144,149 @@
 
             saveData();
         }
+
+        // ==========================================
+        // RENT CALCULATORS
+        // ==========================================
+        function addRent(save = true) {
+            appData.rents.unshift({ 
+                id: Date.now(), 
+                name: `Apartment Option ${appData.rents.length + 1}`, 
+                baseRent: '', water: '', electricity: '', internet: '', other: '', 
+                color: getRandomColor() 
+            });
+            if(save) { 
+                saveData(); 
+                renderRents(); 
+                renderDashboards(); 
+            }
+        }
+
+        function duplicateRent(id) {
+            const item = appData.rents.find(x => x.id === id);
+            if (item) {
+                const copy = JSON.parse(JSON.stringify(item));
+                copy.id = Date.now();
+                copy.name = copy.name + ' (Copy)';
+                copy.color = getRandomColor(item.color); 
+                appData.rents.unshift(copy);
+                saveData();
+                renderRents();
+                showToast("Rent Scenario duplicated!");
+            }
+        }
+
+        function removeRent(id) {
+            const el = document.getElementById(`rent-${id}`);
+            if(el) {
+                el.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    appData.rents = appData.rents.filter(r => r.id !== id);
+                    appData.dashboards.forEach(d => {
+                        if (d.linkedRentId === id) d.linkedRentId = null;
+                    });
+                    saveData();
+                    renderRents();
+                    renderDashboards();
+                }, 200);
+            }
+        }
+
+        function renderRents() {
+            const container = document.getElementById('rentsContainer');
+            container.innerHTML = appData.rents.map(rent => `
+                <div id="rent-${rent.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${rent.color || 'bg-brand-teal'} transition-colors duration-300 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
+                        <div class="relative inline-block text-left">
+                            <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                            </button>
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                                ${cardColors.map(c => `<button onclick="updateColor('rent', ${rent.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${rent.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
+                            </div>
+                        </div>
+                        <button onclick="duplicateRent(${rent.id})" class="text-gray-400 hover:text-brand-blue hover:scale-110 transition-all duration-200" title="Duplicate Scenario"><i data-lucide="copy" class="w-5 h-5"></i></button>
+                        <button onclick="removeRent(${rent.id})" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200" title="Delete Scenario"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+                    
+                    <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                        <input type="text" value="${rent.name}" oninput="updateRentProp(${rent.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-brand-teal w-9/12 sm:w-10/12 placeholder-gray-400 focus:border-b border-brand-teal transition-all" placeholder="Scenario Name">
+                    </div>
+
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div>
+                            <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Monthly base rent amount without utilities.">Base Rent ($/mo)</label>
+                            <input type="text" inputmode="decimal" pattern="[0-9]*" id="r-base-${rent.id}" value="${rent.baseRent}" oninput="calcRent(${rent.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 1500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Estimated monthly water/sewer/trash bill.">Water/Sewer ($/mo)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="r-water-${rent.id}" value="${rent.water}" oninput="calcRent(${rent.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 50">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Estimated monthly electricity/gas bill.">Electricity ($/mo)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="r-elec-${rent.id}" value="${rent.electricity}" oninput="calcRent(${rent.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 100">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Estimated monthly internet/cable bill.">Internet ($/mo)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="r-int-${rent.id}" value="${rent.internet}" oninput="calcRent(${rent.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 80">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Any other monthly fees like parking, pet fees, or renter's insurance.">Other Fees ($/mo)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="r-oth-${rent.id}" value="${rent.other}" oninput="calcRent(${rent.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 25">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-b-2xl p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 transition-colors">
+                        <div class="mb-4 bg-white dark:bg-gray-800 p-3 rounded-xl border border-brand-teal/20 flex justify-between items-center shadow-sm">
+                            <div>
+                                <span class="tooltip-help text-xs sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 block" title="Total estimated monthly cost of this apartment.">Total Monthly Cost</span>
+                            </div>
+                            <span class="text-2xl font-bold text-brand-teal dark:text-teal-400 value-update" id="r-mo-tot-${rent.id}">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-end border-t border-gray-200 dark:border-gray-600 pt-3">
+                            <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Total amount you will spend living here for 1 full year.">Estimated Yearly Total</p>
+                            <p class="text-lg font-bold text-gray-700 dark:text-gray-300 value-update" id="r-yr-tot-${rent.id}">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            appData.rents.forEach(rent => calcRent(rent.id));
+            lucide.createIcons();
+        }
+
+        function updateRentProp(id, prop, val) {
+            const r = appData.rents.find(x => x.id === id);
+            if(r) { 
+                r[prop] = val; 
+                saveData(); 
+                if (prop === 'name') renderDashboards(); 
+            }
+        }
+
+        function calcRent(id) {
+            const r = appData.rents.find(x => x.id === id);
+            if(!r) return;
+
+            r.baseRent = parseFloat(document.getElementById(`r-base-${id}`).value) || 0;
+            r.water = parseFloat(document.getElementById(`r-water-${id}`).value) || 0;
+            r.electricity = parseFloat(document.getElementById(`r-elec-${id}`).value) || 0;
+            r.internet = parseFloat(document.getElementById(`r-int-${id}`).value) || 0;
+            r.other = parseFloat(document.getElementById(`r-oth-${id}`).value) || 0;
+
+            r.calculatedTotal = r.baseRent + r.water + r.electricity + r.internet + r.other;
+
+            document.getElementById(`r-mo-tot-${id}`).innerText = fmt.format(r.calculatedTotal);
+            document.getElementById(`r-yr-tot-${id}`).innerText = fmt.format(r.calculatedTotal * 12);
+
+            saveData();
+            if (appData.dashboards.some(d => d.linkedRentId === id)) renderDashboards();
+        }
+
 
         // ==========================================
         // LOAN CALCULATORS
@@ -1453,6 +1631,32 @@
 
                     interestData.push(Math.max(0, Math.round(calc_interest)));
                     timeData.push(Math.max(0, Math.round(calc_n / 12 * 10) / 10)); // Years
+                }
+
+                // Calculate Mathematical "Elbow" (Diminishing Returns)
+                const ssResult = document.getElementById('sweetSpotResult');
+                if (interestData[0] === interestData[interestData.length - 1]) {
+                    ssResult.classList.add('hidden');
+                } else {
+                    let maxDist = -1;
+                    let bestIdx = 0;
+                    const yMax = interestData[0];
+                    const yMin = interestData[interestData.length - 1];
+
+                    for(let i=0; i<=20; i++) {
+                        const normX = i / 20;
+                        const normY = (interestData[i] - yMin) / (yMax - yMin);
+                        const dist = Math.abs(normX + normY - 1);
+                        if(dist > maxDist) {
+                            maxDist = dist;
+                            bestIdx = i;
+                        }
+                    }
+
+                    document.getElementById('ss-payment').innerText = labels[bestIdx] + ' Extra/mo';
+                    document.getElementById('ss-interest').innerText = fmt.format(interestData[bestIdx]);
+                    document.getElementById('ss-time').innerText = timeData[bestIdx] + ' yrs';
+                    ssResult.classList.remove('hidden');
                 }
 
                 // Render Chart
