@@ -271,6 +271,14 @@
                     <h3 class="text-xl font-bold flex items-center text-brand-teal" id="compareModalTitle">
                         <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> Scenario Comparison
                     </h3>
+                    <div class="flex items-center gap-2 mt-1.5">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Graph Type:</p>
+                        <select id="compareTypeToggle" onchange="showCompare(appData.lastCompareCategory, this.value)" class="text-xs p-1 rounded border border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 outline-none text-brand-teal font-bold cursor-pointer">
+                            <option value="bar">Bar Chart</option>
+                            <option value="line">Line Chart</option>
+                            <option value="radar">Radar Chart</option>
+                        </select>
+                    </div>
                 </div>
                 <button onclick="closeModal('compareModal', 'compareModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 self-start">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -407,7 +415,8 @@
             rents: [], 
             loans: [],
             investments: [],
-            sweetSpotId: null
+            sweetSpotId: null,
+            lastCompareCategory: null
         };
         
         let sweetSpotChartInstance = null; 
@@ -693,25 +702,26 @@
         }
 
         // --- Compare Charts Logic ---
-        function showCompare(type) {
+        function showCompare(type, forcedChartType = null) {
             try {
+                appData.lastCompareCategory = type;
                 const isDark = document.documentElement.classList.contains('dark');
                 const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
                 const textColor = isDark ? '#9ca3af' : '#6b7280';
                 
                 let labels = [];
                 let datasets = [];
-                let chartType = 'bar';
+                let defaultChartType = 'bar';
                 let titleText = 'Compare Scenarios';
                 let iconClass = 'text-brand-teal';
 
                 if (type === 'loan') {
                     titleText = 'Scenario Comparison (Interest & Time)';
                     iconClass = 'text-brand-teal';
+                    defaultChartType = 'bar';
                     const validLoans = appData.loans.filter(l => parseNum(l.amount) > 0 && parseNum(l.years) > 0);
                     if (validLoans.length === 0) return showToast("No valid loans to compare.", true);
                     
-                    chartType = 'bar';
                     labels = validLoans.map(l => l.name);
                     
                     const intData = [];
@@ -756,10 +766,10 @@
                 } else if (type === 'interest') {
                     titleText = 'Investment Growth (10 Years)';
                     iconClass = 'text-brand-blue';
+                    defaultChartType = 'line';
                     const validInvs = appData.investments;
                     if (validInvs.length === 0) return showToast("No investments to compare.", true);
                     
-                    chartType = 'line';
                     labels = Array.from({length: 11}, (_, i) => `Year ${i}`);
                     
                     datasets = validInvs.map(inv => {
@@ -784,6 +794,7 @@
                 } else if (type === 'dashboard') {
                     titleText = 'Budget Overview (Monthly)';
                     iconClass = 'text-brand-teal';
+                    defaultChartType = 'bar';
                     if (appData.dashboards.length === 0) return showToast("No budgets to compare.", true);
 
                     labels = appData.dashboards.map(d => d.name);
@@ -840,6 +851,7 @@
                 } else if (type === 'rent') {
                     titleText = 'Rent & Utilities (Monthly)';
                     iconClass = 'text-brand-teal';
+                    defaultChartType = 'bar';
                     if (appData.rents.length === 0) return showToast("No rents to compare.", true);
 
                     labels = appData.rents.map(r => r.name);
@@ -852,6 +864,11 @@
                         { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' }
                     ];
                 }
+
+                let chartType = forcedChartType || defaultChartType;
+
+                const toggle = document.getElementById('compareTypeToggle');
+                if (toggle) toggle.value = chartType;
 
                 document.getElementById('compareModalTitle').innerHTML = `<i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> ${titleText}`;
                 document.getElementById('compareModalTitle').className = `text-xl font-bold flex items-center ${iconClass}`;
@@ -874,19 +891,38 @@
                             borderColor: isDark ? '#374151' : '#e5e7eb',
                             borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true
                         }
-                    },
-                    scales: {
+                    }
+                };
+
+                if (chartType === 'radar') {
+                    chartOptions.scales = {
+                        r: {
+                            grid: { color: gridColor },
+                            pointLabels: { color: textColor, font: { weight: 'bold' } },
+                            ticks: { display: false } 
+                        }
+                    };
+                    datasets.forEach(ds => { 
+                        delete ds.yAxisID; 
+                        if (ds.backgroundColor && ds.backgroundColor.length === 7) {
+                            ds.backgroundColor = ds.backgroundColor + '33'; // Make solid colors 20% transparent for radar overlapping
+                            ds.borderColor = ds.backgroundColor.substring(0, 7);
+                            ds.borderWidth = 2;
+                        }
+                    });
+                } else {
+                    chartOptions.scales = {
                         x: {
-                            stacked: type === 'rent',
+                            stacked: type === 'rent' && chartType === 'bar',
                             grid: { color: gridColor, drawBorder: false },
                             ticks: { color: textColor }
                         },
                         y: {
-                            stacked: type === 'rent',
+                            stacked: type === 'rent' && chartType === 'bar',
                             grid: { color: gridColor, drawBorder: false },
                             ticks: { color: textColor, callback: function(value) { return '$' + value.toLocaleString(); } }
                         },
-                        ...(type === 'loan' ? {
+                        ...(type === 'loan' && (chartType === 'bar' || chartType === 'line') ? {
                             y1: {
                                 type: 'linear', display: true, position: 'right',
                                 grid: { drawOnChartArea: false },
@@ -894,8 +930,8 @@
                                 title: { display: true, text: 'Years', color: '#3b82f6', font: { weight: 'bold' } }
                             }
                         } : {})
-                    }
-                };
+                    };
+                }
 
                 compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions });
                 if(window.lucide) lucide.createIcons();
