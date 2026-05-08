@@ -138,9 +138,14 @@
         <div id="dashboard" class="tab-content active">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold tooltip-help" title="Create and compare different budget variations to see how much money you can save.">Budget Scenarios</h2>
-                <button onclick="addDashboard()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
-                </button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="showCompare('dashboard')" class="flex-1 sm:flex-none justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-teal px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow-sm transition-all duration-200 flex items-center">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Compare
+                    </button>
+                    <button onclick="addDashboard()" class="flex-1 sm:flex-none justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                    </button>
+                </div>
             </div>
             <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-8">
                 <!-- Injected via JS -->
@@ -151,9 +156,14 @@
         <div id="rent" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold tooltip-help" title="Calculate total monthly rent obligations including utilities.">Rent Scenarios</h2>
-                <button onclick="addRent()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
-                </button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="showCompare('rent')" class="flex-1 sm:flex-none justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-teal px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow-sm transition-all duration-200 flex items-center">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Compare
+                    </button>
+                    <button onclick="addRent()" class="flex-1 sm:flex-none justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                    </button>
+                </div>
             </div>
             <div id="rentsContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
@@ -164,9 +174,14 @@
         <div id="loan" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold tooltip-help" title="Calculate loan payments, interest, and how much you can save by paying extra.">Loan Scenarios</h2>
-                <button onclick="addLoan()" class="w-full sm:w-auto justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
-                </button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="showCompare('loan')" class="flex-1 sm:flex-none justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-teal px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow-sm transition-all duration-200 flex items-center">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Compare
+                    </button>
+                    <button onclick="addLoan()" class="flex-1 sm:flex-none justify-center bg-brand-teal hover:bg-teal-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                    </button>
+                </div>
             </div>
             <div id="loansContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
@@ -177,9 +192,14 @@
         <div id="interest" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold tooltip-help" title="Estimate how your money will grow over time with compound interest.">APY Scenarios</h2>
-                <button onclick="addInvestment()" class="w-full sm:w-auto justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
-                </button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="showCompare('interest')" class="flex-1 sm:flex-none justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-blue px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow-sm transition-all duration-200 flex items-center">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Compare
+                    </button>
+                    <button onclick="addInvestment()" class="flex-1 sm:flex-none justify-center bg-brand-blue hover:bg-blue-500 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Scenario
+                    </button>
+                </div>
             </div>
             <div id="interestContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
@@ -243,66 +263,22 @@
         </div>
     </div>
 
-    <!-- Amortization Modal -->
-    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="amortModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
-            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
-                <h3 class="text-xl font-bold flex items-center text-brand-teal">
-                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
-                </h3>
-                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
-                <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
-                    <thead class="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-sm z-10">
-                        <tr class="text-gray-600 dark:text-gray-300 border-b dark:border-gray-700/50">
-                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Month number in the payment term.">Month</span></th>
-                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Total amount paid this month (Base + Extra).">Payment</span></th>
-                            <th class="py-3 px-2 font-medium text-rose-500"><span class="tooltip-help" title="Portion of payment going towards bank interest.">Interest</span></th>
-                            <th class="py-3 px-2 font-medium text-brand-teal"><span class="tooltip-help" title="Portion of payment paying down your actual debt.">Principal</span></th>
-                            <th class="py-3 px-2 font-medium text-right"><span class="tooltip-help" title="Remaining loan balance after payment.">Balance</span></th>
-                        </tr>
-                    </thead>
-                    <tbody id="amortTableBody" class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
-                        <!-- Injected via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sweet Spot Chart Modal -->
-    <div id="chartModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
-        <div id="chartModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-4xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+    <!-- Compare All Chart Modal -->
+    <div id="compareModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="compareModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-5xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
             <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
                 <div>
-                    <h3 class="text-xl font-bold flex items-center text-indigo-500 dark:text-indigo-400">
-                        <i data-lucide="line-chart" class="w-5 h-5 mr-2"></i> The "Sweet Spot" Curve
+                    <h3 class="text-xl font-bold flex items-center text-brand-teal" id="compareModalTitle">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> Scenario Comparison
                     </h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visualize how extra payments affect your total interest and payoff time.</p>
                 </div>
-                <button onclick="closeModal('chartModal', 'chartModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 self-start">
+                <button onclick="closeModal('compareModal', 'compareModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 self-start">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            
-            <!-- Calculated Sweet Spot Banner -->
-            <div id="sweetSpotResult" class="mx-5 mt-5 sm:mx-6 sm:mt-6 bg-indigo-50/80 dark:bg-indigo-900/30 p-4 rounded-xl border border-indigo-200/50 dark:border-indigo-800/50 flex justify-between items-center hidden shrink-0 backdrop-blur-md shadow-sm">
-                <div>
-                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase mb-1 flex items-center tooltip-help" title="The mathematical 'elbow' of the curve where extra payments hit maximum diminishing returns.">Optimal Sweet Spot</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white" id="ss-payment">$0 Extra/mo</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total Interest: <span id="ss-interest" class="font-bold text-rose-500">$0</span></p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Payoff Time: <span id="ss-time" class="font-bold text-brand-blue">0 yrs</span></p>
-                </div>
-            </div>
-
             <div class="overflow-y-auto p-2 sm:p-6 custom-scrollbar flex-1 relative flex items-center justify-center">
                 <div class="w-full h-full min-h-[300px] relative">
-                    <canvas id="sweetSpotCanvas"></canvas>
+                    <canvas id="compareCanvas"></canvas>
                 </div>
             </div>
         </div>
@@ -338,10 +314,15 @@
         window.confirmLogout = () => showToast("Connecting to secure server...");
 
         // Colors Palette for flair
-        const cardColors = [
-            'bg-rose-500', 'bg-orange-500', 'bg-amber-500', 'bg-emerald-500', 'bg-teal-500', 
-            'bg-cyan-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-fuchsia-500'
-        ];
+        const colorMap = {
+            'bg-rose-500': '#f43f5e', 'bg-red-500': '#ef4444', 'bg-orange-500': '#f97316', 
+            'bg-amber-500': '#f59e0b', 'bg-yellow-400': '#facc15', 'bg-lime-500': '#84cc16', 
+            'bg-emerald-500': '#10b981', 'bg-teal-500': '#14b8a6', 'bg-cyan-500': '#06b6d4', 
+            'bg-sky-500': '#0ea5e9', 'bg-blue-500': '#3b82f6', 'bg-indigo-500': '#6366f1', 
+            'bg-violet-500': '#8b5cf6', 'bg-purple-500': '#a855f7', 'bg-fuchsia-500': '#d946ef', 
+            'bg-pink-500': '#ec4899'
+        };
+        const cardColors = Object.keys(colorMap);
 
         function getRandomColor(excludeColor = null) {
             let colors = cardColors.filter(c => c !== excludeColor);
@@ -352,12 +333,13 @@
         var appData = {
             theme: 'light',
             dashboards: [], 
-            rents: [], // New Rent Array
+            rents: [], 
             loans: [],
             investments: []
         };
         
         let sweetSpotChartInstance = null; 
+        let compareChartInstance = null; 
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
         const tabList = ['dashboard', 'rent', 'loan', 'interest']; // Updated with rent
@@ -503,6 +485,10 @@
                 const activeLoan = appData.loans.find(l => l.lastCharted);
                 if(activeLoan) showSweetSpot(activeLoan.id);
             }
+            if(compareChartInstance && !document.getElementById('compareModal').classList.contains('hidden')) {
+                // To redraw the compare chart colors safely, just close it.
+                closeModal('compareModal', 'compareModalContent');
+            }
         });
 
         function applyTheme(theme) {
@@ -625,6 +611,199 @@
             if(modalId === 'chartModal') {
                 appData.loans.forEach(l => l.lastCharted = false);
             }
+        }
+
+        // --- Compare Charts Logic ---
+        function showCompare(type) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            const textColor = isDark ? '#9ca3af' : '#6b7280';
+            
+            let labels = [];
+            let datasets = [];
+            let chartType = 'bar';
+            let titleText = 'Compare Scenarios';
+            let iconClass = 'text-brand-teal';
+
+            if (type === 'loan') {
+                titleText = 'Loan Balances Over Time';
+                iconClass = 'text-brand-teal';
+                const validLoans = appData.loans.filter(l => l.amount > 0 && l.years > 0);
+                if (validLoans.length === 0) return showToast("No valid loans to compare.", true);
+                
+                chartType = 'line';
+                let maxMonths = 0;
+                
+                const lineData = validLoans.map(l => {
+                    let balance = l.amount - (l.lumpSum || 0);
+                    if (balance < 0) balance = 0;
+                    
+                    const r = l.rate / 100 / 12;
+                    const n = l.years * 12;
+                    let base_payment = r === 0 ? (l.amount / n) : l.amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    let payment = base_payment + (l.extra || 0);
+                    
+                    const balances = [balance];
+                    let month = 1;
+                    
+                    if (payment > balance * r || r === 0) {
+                        while (balance > 0.01 && month <= 360) { // cap at 30 yrs
+                            let interest = balance * r;
+                            let principal = payment - interest;
+                            if (balance < principal) { principal = balance; balance = 0; } 
+                            else { balance -= principal; }
+                            balances.push(balance);
+                            month++;
+                        }
+                    }
+                    if (month > maxMonths) maxMonths = month;
+                    const hex = colorMap[l.color] || '#2dd4bf';
+                    return { label: l.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.1, fill: false };
+                });
+
+                labels = Array.from({length: maxMonths}, (_, i) => `Mo ${i}`);
+                datasets = lineData;
+
+            } else if (type === 'interest') {
+                titleText = 'Investment Growth (10 Years)';
+                iconClass = 'text-brand-blue';
+                const validInvs = appData.investments;
+                if (validInvs.length === 0) return showToast("No investments to compare.", true);
+                
+                chartType = 'line';
+                labels = Array.from({length: 11}, (_, i) => `Year ${i}`);
+                
+                datasets = validInvs.map(inv => {
+                    const P = inv.principal || 0;
+                    const PMT = inv.monthly || 0;
+                    const grossRate = (inv.rate || 0) / 100;
+                    const netRate = grossRate * (1 - ((inv.taxBracket || 0) / 100));
+                    const r_m = netRate / 12; 
+
+                    const balances = [];
+                    for(let y=0; y<=10; y++) {
+                        const n = y * 12;
+                        let bal = 0;
+                        if (r_m === 0) bal = P + (PMT * n);
+                        else bal = P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
+                        balances.push(bal);
+                    }
+                    const hex = colorMap[inv.color] || '#3b82f6';
+                    return { label: inv.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.4, fill: false };
+                });
+
+            } else if (type === 'dashboard') {
+                titleText = 'Budget Overview (Monthly)';
+                iconClass = 'text-brand-teal';
+                if (appData.dashboards.length === 0) return showToast("No budgets to compare.", true);
+
+                labels = appData.dashboards.map(d => d.name);
+                
+                const incData = [];
+                const expData = [];
+                const netData = [];
+
+                appData.dashboards.forEach(d => {
+                    const incInput = document.getElementById(`inc-${d.id}`);
+                    const wInc = parseFloat(incInput?.value || d.income || 0);
+                    let yearlyEarn = 0;
+                    if(d.earnings) d.earnings.forEach(e => {
+                        const amt = parseFloat(e.amount) || 0;
+                        if (e.freq === 'weekly') yearlyEarn += amt * 52;
+                        if (e.freq === 'monthly') yearlyEarn += amt * 12;
+                        if (e.freq === 'yearly') yearlyEarn += amt;
+                    });
+                    const mInc = ((wInc * 52) + yearlyEarn) / 12;
+                    
+                    let yearlyExp = 0;
+                    if(d.expenses) d.expenses.forEach(e => {
+                        const amt = parseFloat(e.amount) || 0;
+                        if (e.freq === 'weekly') yearlyExp += amt * 52;
+                        if (e.freq === 'monthly') yearlyExp += amt * 12;
+                        if (e.freq === 'yearly') yearlyExp += amt;
+                    });
+                    
+                    if (d.linkedRentId) {
+                        const linkedRent = appData.rents.find(r => r.id === d.linkedRentId);
+                        if (linkedRent && linkedRent.calculatedTotal) yearlyExp += linkedRent.calculatedTotal * 12;
+                    }
+                    if (d.linkedLoanId) {
+                        const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
+                        if (linkedLoan && linkedLoan.calculatedPayment) yearlyExp += linkedLoan.calculatedPayment * 12;
+                    }
+                    if (d.linkedInvestmentId) {
+                        const linkedInv = appData.investments.find(i => i.id === d.linkedInvestmentId);
+                        if (linkedInv && linkedInv.monthly) yearlyExp += linkedInv.monthly * 12;
+                    }
+                    const mExp = yearlyExp / 12;
+                    const mNet = mInc - mExp;
+
+                    incData.push(mInc);
+                    expData.push(mExp);
+                    netData.push(mNet);
+                });
+
+                datasets = [
+                    { label: 'Monthly Income', data: incData, backgroundColor: '#10b981' }, // emerald
+                    { label: 'Monthly Expenses', data: expData, backgroundColor: '#f43f5e' }, // rose
+                    { label: 'Wiggle Room', data: netData, backgroundColor: '#3b82f6' } // blue
+                ];
+
+            } else if (type === 'rent') {
+                titleText = 'Rent & Utilities (Monthly)';
+                iconClass = 'text-brand-teal';
+                if (appData.rents.length === 0) return showToast("No rents to compare.", true);
+
+                labels = appData.rents.map(r => r.name);
+                
+                const baseData = appData.rents.map(r => parseFloat(r.baseRent) || 0);
+                const utilData = appData.rents.map(r => (parseFloat(r.water)||0) + (parseFloat(r.electricity)||0) + (parseFloat(r.internet)||0) + (parseFloat(r.other)||0));
+
+                datasets = [
+                    { label: 'Base Rent', data: baseData, backgroundColor: '#3b82f6' }, // blue
+                    { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' } // amber
+                ];
+                // Make rents stacked
+            }
+
+            document.getElementById('compareModalTitle').innerHTML = `<i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> ${titleText}`;
+            document.getElementById('compareModalTitle').className = `text-xl font-bold flex items-center ${iconClass}`;
+            
+            openModal('compareModal', 'compareModalContent');
+            
+            const ctx = document.getElementById('compareCanvas').getContext('2d');
+            if (compareChartInstance) compareChartInstance.destroy();
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
+                    tooltip: {
+                        backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: isDark ? '#fff' : '#000',
+                        bodyColor: isDark ? '#d1d5db' : '#374151',
+                        borderColor: isDark ? '#374151' : '#e5e7eb',
+                        borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: type === 'rent',
+                        grid: { color: gridColor, drawBorder: false },
+                        ticks: { color: textColor }
+                    },
+                    y: {
+                        stacked: type === 'rent',
+                        grid: { color: gridColor, drawBorder: false },
+                        ticks: { color: textColor, callback: function(value) { return '$' + value.toLocaleString(); } }
+                    }
+                }
+            };
+
+            compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions });
+            if(window.lucide) lucide.createIcons();
         }
 
         function showToast(message, isError = false, customIcon = null) {
@@ -800,7 +979,7 @@
                             <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
                                 <i data-lucide="palette" class="w-5 h-5"></i>
                             </button>
-                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[180px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
                                 ${cardColors.map(c => `<button onclick="updateColor('dashboard', ${dash.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${dash.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
                             </div>
                         </div>
@@ -1203,7 +1382,7 @@
                             <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
                                 <i data-lucide="palette" class="w-5 h-5"></i>
                             </button>
-                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[180px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
                                 ${cardColors.map(c => `<button onclick="updateColor('rent', ${rent.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${rent.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
                             </div>
                         </div>
@@ -1343,7 +1522,7 @@
                             <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
                                 <i data-lucide="palette" class="w-5 h-5"></i>
                             </button>
-                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[180px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
                                 ${cardColors.map(c => `<button onclick="updateColor('loan', ${loan.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${loan.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
                             </div>
                         </div>
@@ -1864,7 +2043,7 @@
                             <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
                                 <i data-lucide="palette" class="w-5 h-5"></i>
                             </button>
-                            <div class="color-menu hidden absolute right-0 mt-2 w-[140px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[180px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
                                 ${cardColors.map(c => `<button onclick="updateColor('interest', ${inv.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${inv.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
                             </div>
                         </div>
