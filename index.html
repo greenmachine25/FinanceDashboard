@@ -108,7 +108,9 @@
                 </div>
                 
                 <div class="hidden sm:flex space-x-4" id="tabs-desktop">
-                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50/80 dark:bg-gray-700/80 transition-all duration-200 whitespace-nowrap">Dashboards</button>
+                    <button onclick="switchTab('overview')" class="tab-btn active px-3 py-2 rounded-md text-base sm:text-sm font-medium text-brand-blue dark:text-brand-teal bg-blue-50/80 dark:bg-gray-700/80 transition-all duration-200 whitespace-nowrap">Overview</button>
+                    <button onclick="switchTab('dashboard')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Budgets</button>
+                    <button onclick="switchTab('goals')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Goals</button>
                     <button onclick="switchTab('rent')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Rent</button>
                     <button onclick="switchTab('loan')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">Loans</button>
                     <button onclick="switchTab('interest')" class="tab-btn px-3 py-2 rounded-md text-base sm:text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-all duration-200 whitespace-nowrap">APY Savings</button>
@@ -134,8 +136,18 @@
 
     <main id="mainContainer" class="max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-28 sm:py-8 overflow-x-hidden min-h-[calc(100vh-64px)]">
         
+        <!-- Tab: Overview -->
+        <div id="overview" class="tab-content active">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+                <h2 class="text-2xl font-bold tooltip-help" title="Your master dashboard combining selected scenarios into one full financial picture.">Master Overview</h2>
+            </div>
+            <div id="overviewContainer">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
         <!-- Tab: Dashboards -->
-        <div id="dashboard" class="tab-content active">
+        <div id="dashboard" class="tab-content">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <h2 class="text-2xl font-bold tooltip-help" title="Create and compare different budget variations to see how much money you can save.">Budget Scenarios</h2>
                 <div class="flex gap-2 w-full sm:w-auto">
@@ -148,6 +160,21 @@
                 </div>
             </div>
             <div id="dashboardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-8">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Tab: Goals (Sinking Funds) -->
+        <div id="goals" class="tab-content">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+                <h2 class="text-2xl font-bold tooltip-help" title="Set savings goals and dedicate portions of your budget's wiggle room to fund them.">Sinking Funds & Goals</h2>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="addGoal()" class="w-full sm:w-auto justify-center bg-fuchsia-500 hover:bg-fuchsia-600 hover:-translate-y-0.5 hover:shadow-lg text-white px-4 py-2 rounded-lg text-base sm:text-sm font-bold shadow transition-all duration-200 flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> New Goal
+                    </button>
+                </div>
+            </div>
+            <div id="goalsContainer" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Injected via JS -->
             </div>
         </div>
@@ -209,20 +236,28 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
-        <button onclick="switchTab('dashboard')" class="mobile-nav-btn active flex flex-col items-center py-3 flex-1 text-brand-teal transition-colors">
+    <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-start items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors overflow-x-auto no-scrollbar" style="padding-bottom: env(safe-area-inset-bottom);">
+        <button onclick="switchTab('overview')" class="mobile-nav-btn active flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-brand-teal transition-colors">
+            <i data-lucide="globe" class="w-5 h-5 mb-1"></i>
+            <span class="text-[10px] font-bold">Overview</span>
+        </button>
+        <button onclick="switchTab('dashboard')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
             <span class="text-[10px] font-bold">Budget</span>
         </button>
-        <button onclick="switchTab('rent')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <button onclick="switchTab('goals')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="target" class="w-5 h-5 mb-1"></i>
+            <span class="text-[10px] font-bold">Goals</span>
+        </button>
+        <button onclick="switchTab('rent')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="home" class="w-5 h-5 mb-1"></i>
             <span class="text-[10px] font-bold">Rent</span>
         </button>
-        <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="landmark" class="w-5 h-5 mb-1"></i>
             <span class="text-[10px] font-bold">Loans</span>
         </button>
-        <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-3 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <i data-lucide="trending-up" class="w-5 h-5 mb-1"></i>
             <span class="text-[10px] font-bold">APY</span>
         </button>
@@ -411,10 +446,12 @@
         // State Management
         var appData = {
             theme: 'light',
+            masterPlan: { budgetId: '', rentId: '', loanId: '', invId: '' },
             dashboards: [], 
             rents: [], 
             loans: [],
             investments: [],
+            goals: [],
             sweetSpotId: null,
             lastCompareCategory: null
         };
@@ -423,7 +460,7 @@
         let compareChartInstance = null; 
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-        const tabList = ['dashboard', 'rent', 'loan', 'interest']; 
+        const tabList = ['overview', 'dashboard', 'goals', 'rent', 'loan', 'interest']; 
 
         // Universal safely parser: Prevents any NaN issues with commas, symbols, or blanks
         function parseNum(val) {
@@ -452,18 +489,23 @@
                 if (!parsed.dashboards) {
                     parsed = {
                         theme: parsed.theme || 'light',
+                        masterPlan: { budgetId: '', rentId: '', loanId: '', invId: '' },
                         dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [], earnings: [], color: getRandomColor() }],
                         rents: [],
+                        goals: [],
                         loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0, lumpSum: 0, color: getRandomColor() }],
                         investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0, rateCap: '', rateOverCap: '', color: getRandomColor() }]
                     };
                 }
                 // Back-compat upgrades
+                if(!parsed.masterPlan) parsed.masterPlan = { budgetId: '', rentId: '', loanId: '', invId: '' };
                 if(parsed.dashboards) parsed.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
                 if(!parsed.rents) parsed.rents = [];
+                if(!parsed.goals) parsed.goals = [];
                 if(parsed.rents) parsed.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                 if(parsed.loans) parsed.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); if(l.lumpSum === undefined) l.lumpSum = ''; });
                 if(parsed.investments) parsed.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); if(i.rateCap === undefined) i.rateCap = ''; if(i.rateOverCap === undefined) i.rateOverCap = ''; });
+                if(parsed.goals) parsed.goals.forEach(g => { if(!g.color) g.color = getRandomColor(); });
                 appData = parsed;
             } else {
                 addDashboard(false);
@@ -519,11 +561,14 @@
                             if (docSnap.exists() && docSnap.data().appData) {
                                 appData = docSnap.data().appData;
                                 // backward compat upgrades
+                                if(!appData.masterPlan) appData.masterPlan = { budgetId: '', rentId: '', loanId: '', invId: '' };
                                 appData.dashboards.forEach(d => { if(!d.earnings) d.earnings = []; if(!d.color) d.color = getRandomColor(); });
                                 if(!appData.rents) appData.rents = [];
+                                if(!appData.goals) appData.goals = [];
                                 appData.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                                 appData.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); if(l.lumpSum === undefined) l.lumpSum = ''; });
                                 appData.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); if(i.rateCap === undefined) i.rateCap = ''; if(i.rateOverCap === undefined) i.rateOverCap = ''; });
+                                appData.goals.forEach(g => { if(!g.color) g.color = getRandomColor(); });
                                 
                                 localStorage.setItem('financeHubData', JSON.stringify(appData));
                                 renderAll();
@@ -643,7 +688,7 @@
         }
 
         function updateColor(type, id, colorStr) {
-            const list = type === 'dashboard' ? appData.dashboards : (type === 'loan' ? appData.loans : (type === 'rent' ? appData.rents : appData.investments));
+            const list = type === 'dashboard' ? appData.dashboards : (type === 'loan' ? appData.loans : (type === 'rent' ? appData.rents : (type === 'goal' ? appData.goals : appData.investments)));
             const item = list.find(x => x.id === id);
             if (item) {
                 item.color = colorStr;
@@ -652,6 +697,7 @@
                 if (type === 'rent') renderRents();
                 if (type === 'loan') renderLoans();
                 if (type === 'interest') renderInvestments();
+                if (type === 'goal') renderGoals();
             }
         }
 
@@ -666,6 +712,8 @@
         });
 
         function renderAll() {
+            renderOverview();
+            renderGoals();
             renderRents();
             renderLoans(); 
             renderInvestments();
@@ -1411,9 +1459,12 @@
             const wInc = yInc / 52;
             const dInc = yInc / 365; // Daily estimation
 
-            document.getElementById(`d-day-${dashId}`).innerText = fmt.format(dInc);
-            document.getElementById(`d-mo-${dashId}`).innerText = fmt.format(mInc);
-            document.getElementById(`d-yr-${dashId}`).innerText = fmt.format(yInc);
+            const elDay = document.getElementById(`d-day-${dashId}`);
+            const elMo = document.getElementById(`d-mo-${dashId}`);
+            const elYr = document.getElementById(`d-yr-${dashId}`);
+            if(elDay) elDay.innerText = fmt.format(dInc);
+            if(elMo) elMo.innerText = fmt.format(mInc);
+            if(elYr) elYr.innerText = fmt.format(yInc);
 
             let yearlyExp = 0;
             d.expenses.forEach(e => {
@@ -1444,32 +1495,356 @@
             if (d.linkedInvestmentId) {
                 const linkedInv = appData.investments.find(i => i.id === d.linkedInvestmentId);
                 if (linkedInv && linkedInv.monthly) {
-                    linkedInvContribution = linkedInv.monthly * 12;
+                    linkedInvContribution = parseNum(linkedInv.monthly) * 12;
                     yearlyExp += linkedInvContribution;
                 }
+            }
+
+            // Deduct ALL Sinking Funds (Goals) linked to this dashboard
+            let linkedGoalContribution = 0;
+            if (appData.goals) {
+                appData.goals.filter(g => g.linkedDashboardId == dashId).forEach(g => {
+                    linkedGoalContribution += parseNum(g.monthlyContrib) * 12;
+                });
+                yearlyExp += linkedGoalContribution;
             }
 
             const netYr = yInc - yearlyExp;
             const netMo = netYr / 12;
             const netWk = netYr / 52;
             
-            document.getElementById(`net-wk-${dashId}`).innerText = fmt.format(netWk);
-            document.getElementById(`net-mo-${dashId}`).innerText = fmt.format(netMo);
-            document.getElementById(`net-yr-${dashId}`).innerText = fmt.format(netYr);
+            const elNetWk = document.getElementById(`net-wk-${dashId}`);
+            const elNetMo = document.getElementById(`net-mo-${dashId}`);
+            const elNetYr = document.getElementById(`net-yr-${dashId}`);
+            if(elNetWk) elNetWk.innerText = fmt.format(netWk);
+            if(elNetMo) elNetMo.innerText = fmt.format(netMo);
+            if(elNetYr) elNetYr.innerText = fmt.format(netYr);
 
             // Savings Rate = ((Wiggle Room + Inv Contributions) / Total Income) * 100
             let savingsRate = 0;
             if (yInc > 0) {
-                savingsRate = ((netYr + linkedInvContribution) / yInc) * 100;
+                savingsRate = ((netYr + linkedInvContribution + linkedGoalContribution) / yInc) * 100;
             }
-            document.getElementById(`sr-${dashId}`).innerText = `${savingsRate.toFixed(1)}%`;
+            const elSr = document.getElementById(`sr-${dashId}`);
+            if(elSr) elSr.innerText = `${savingsRate.toFixed(1)}%`;
 
-            // Emergency Fund (based on core expenses only, not wiggle room or investments)
-            const moExp = (yearlyExp - linkedInvContribution) / 12;
-            document.getElementById(`ef3-${dashId}`).innerText = fmt.format(moExp * 3);
-            document.getElementById(`ef6-${dashId}`).innerText = fmt.format(moExp * 6);
+            // Emergency Fund (based on core expenses only, not wiggle room or investments/goals)
+            const coreYearlyExp = yearlyExp - linkedInvContribution - linkedGoalContribution;
+            const moExp = coreYearlyExp / 12;
+            const elEf3 = document.getElementById(`ef3-${dashId}`);
+            const elEf6 = document.getElementById(`ef6-${dashId}`);
+            if(elEf3) elEf3.innerText = fmt.format(moExp * 3);
+            if(elEf6) elEf6.innerText = fmt.format(moExp * 6);
+
+            // Save values for Overview usage
+            d.calcNetMo = netMo;
+            d.calcExpMo = yearlyExp / 12;
+            d.calcIncMo = mInc;
 
             saveData();
+            if (appData.masterPlan.budgetId == dashId) renderOverview();
+        }
+
+        // ==========================================
+        // MASTER OVERVIEW
+        // ==========================================
+        function updateMasterPlan(prop, val) {
+            appData.masterPlan[prop] = val ? parseInt(val) : '';
+            saveData();
+            renderOverview();
+        }
+
+        function renderOverview() {
+            const container = document.getElementById('overviewContainer');
+            if(!container) return;
+
+            const mp = appData.masterPlan;
+            const activeBudget = appData.dashboards.find(d => d.id === mp.budgetId) || null;
+            
+            // Calculate Global Net Worth across ALL scenarios (Assets vs Liabilities)
+            let totalAssets = 0;
+            appData.investments.forEach(i => { totalAssets += parseNum(i.principal); });
+            appData.goals.forEach(g => { totalAssets += parseNum(g.savedAmount); }); // Sinking funds are cash assets
+            
+            let totalLiabilities = 0;
+            appData.loans.forEach(l => { 
+                let bal = parseNum(l.amount) - parseNum(l.lumpSum);
+                if (bal > 0) totalLiabilities += bal;
+            });
+
+            const netWorth = totalAssets - totalLiabilities;
+            const isNWPositive = netWorth >= 0;
+
+            container.innerHTML = `
+                <!-- Master Selectors -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <label class="text-xs font-bold text-brand-teal uppercase tracking-wider mb-2 block"><i data-lucide="layout-dashboard" class="w-3 h-3 inline mr-1"></i> Primary Budget</label>
+                        <select onchange="updateMasterPlan('budgetId', this.value)" class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal text-sm">
+                            <option value="">-- Select Scenario --</option>
+                            ${appData.dashboards.map(d => `<option value="${d.id}" ${mp.budgetId == d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <label class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-2 block"><i data-lucide="home" class="w-3 h-3 inline mr-1"></i> Primary Rent</label>
+                        <select onchange="updateMasterPlan('rentId', this.value)" class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                            <option value="">-- Select Scenario --</option>
+                            ${appData.rents.map(r => `<option value="${r.id}" ${mp.rentId == r.id ? 'selected' : ''}>${r.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <label class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 block"><i data-lucide="landmark" class="w-3 h-3 inline mr-1"></i> Focus Loan</label>
+                        <select onchange="updateMasterPlan('loanId', this.value)" class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-rose-500 text-sm">
+                            <option value="">-- Select Scenario --</option>
+                            ${appData.loans.map(l => `<option value="${l.id}" ${mp.loanId == l.id ? 'selected' : ''}>${l.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <label class="text-xs font-bold text-brand-blue uppercase tracking-wider mb-2 block"><i data-lucide="trending-up" class="w-3 h-3 inline mr-1"></i> Focus APY</label>
+                        <select onchange="updateMasterPlan('invId', this.value)" class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue text-sm">
+                            <option value="">-- Select Scenario --</option>
+                            ${appData.investments.map(i => `<option value="${i.id}" ${mp.invId == i.id ? 'selected' : ''}>${i.name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Hero Section: Net Worth -->
+                <div class="gradient-bg p-8 rounded-2xl shadow-lg text-white mb-6 flex flex-col sm:flex-row items-center justify-between relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+                        <i data-lucide="globe" class="w-64 h-64"></i>
+                    </div>
+                    <div class="relative z-10 text-center sm:text-left">
+                        <p class="text-sm font-bold text-white/80 uppercase tracking-widest mb-1 tooltip-help" title="Calculated from ALL your scenario starting balances (Investments + Goals - Loans).">Total Starting Net Worth</p>
+                        <h1 class="text-5xl sm:text-6xl font-extrabold tracking-tight ${!isNWPositive ? 'text-rose-200' : ''}">${fmt.format(netWorth)}</h1>
+                    </div>
+                    <div class="relative z-10 flex gap-4 mt-6 sm:mt-0 text-center">
+                        <div class="bg-white/20 backdrop-blur-md p-4 rounded-xl border border-white/20">
+                            <p class="text-xs font-bold text-white/80 uppercase">Total Assets</p>
+                            <p class="text-xl font-bold">${fmt.format(totalAssets)}</p>
+                        </div>
+                        <div class="bg-black/20 backdrop-blur-md p-4 rounded-xl border border-black/20">
+                            <p class="text-xs font-bold text-white/80 uppercase">Total Debt</p>
+                            <p class="text-xl font-bold text-rose-300">${fmt.format(totalLiabilities)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snapshot Row -->
+                ${activeBudget ? `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-gray-500 uppercase text-xs tracking-wider">Mo. Cash In</h3>
+                                <div class="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg"><i data-lucide="arrow-down-to-line" class="w-4 h-4 text-emerald-500"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">${fmt.format(activeBudget.calcIncMo || 0)}</p>
+                            <p class="text-xs text-gray-400 mt-2">From primary budget income</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-gray-500 uppercase text-xs tracking-wider">Mo. Cash Out</h3>
+                                <div class="p-2 bg-rose-50 dark:bg-rose-900/30 rounded-lg"><i data-lucide="arrow-up-from-line" class="w-4 h-4 text-rose-500"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">${fmt.format(activeBudget.calcExpMo || 0)}</p>
+                            <p class="text-xs text-gray-400 mt-2">Expenses, goals, & linked payments</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border-b-4 border-brand-teal">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-brand-teal uppercase text-xs tracking-wider">Mo. Net Wiggle Room</h3>
+                                <div class="p-2 bg-teal-50 dark:bg-teal-900/30 rounded-lg"><i data-lucide="wallet" class="w-4 h-4 text-brand-teal"></i></div>
+                            </div>
+                            <p class="text-3xl font-bold text-brand-teal">${fmt.format(activeBudget.calcNetMo || 0)}</p>
+                            <p class="text-xs text-gray-400 mt-2">Disposable cash after everything</p>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="bg-gray-100 dark:bg-gray-800 p-8 rounded-2xl text-center border border-dashed border-gray-300 dark:border-gray-600">
+                        <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto text-gray-400 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400 font-medium">Select a Primary Budget above to view your Monthly Cash Flow Snapshot.</p>
+                    </div>
+                `}
+            `;
+            if(window.lucide) lucide.createIcons();
+        }
+
+        // ==========================================
+        // SINKING FUNDS (GOALS)
+        // ==========================================
+        function addGoal(save = true) {
+            appData.goals.unshift({ id: Date.now(), name: `New Goal ${appData.goals.length + 1}`, targetAmount: '', savedAmount: '', monthlyContrib: '', linkedDashboardId: '', color: getRandomColor() });
+            if (save) { saveData(); renderGoals(); }
+        }
+
+        function duplicateGoal(id) {
+            const item = appData.goals.find(x => x.id === id);
+            if (item) {
+                const copy = JSON.parse(JSON.stringify(item));
+                copy.id = Date.now();
+                copy.name = copy.name + ' (Copy)';
+                copy.color = getRandomColor(item.color); 
+                appData.goals.unshift(copy);
+                saveData();
+                renderGoals();
+                showToast("Goal duplicated!");
+            }
+        }
+
+        function removeGoal(id) {
+            const el = document.getElementById(`goal-${id}`);
+            if(el) {
+                el.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    appData.goals = appData.goals.filter(g => g.id !== id);
+                    saveData();
+                    renderGoals();
+                    // Re-render dashboards since removing a goal might free up wiggle room
+                    appData.dashboards.forEach(d => calcDashboard(d.id));
+                    renderDashboards();
+                }, 200);
+            }
+        }
+
+        function renderGoals() {
+            const container = document.getElementById('goalsContainer');
+            if(!container) return;
+            
+            container.innerHTML = appData.goals.map(goal => `
+                <div id="goal-${goal.id}" class="animate-pop-in bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden relative group transition-all duration-300 flex flex-col h-full hover:shadow-xl">
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${goal.color || 'bg-fuchsia-500'} transition-colors duration-300 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 flex space-x-2 z-10 items-center color-picker-container">
+                        <div class="relative inline-block text-left">
+                            <button onclick="const menu = this.nextElementSibling; closeAllColorMenus(); menu.classList.toggle('hidden');" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200" title="Change Window Color">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                            </button>
+                            <div class="color-menu hidden absolute right-0 mt-2 w-[180px] p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-wrap gap-2 justify-center">
+                                ${cardColors.map(c => `<button onclick="updateColor('goal', ${goal.id}, '${c}')" class="w-5 h-5 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-sm ${goal.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''}"></button>`).join('')}
+                            </div>
+                        </div>
+                        <button onclick="duplicateGoal(${goal.id})" class="text-gray-400 hover:text-fuchsia-500 hover:scale-110 transition-all duration-200" title="Duplicate Goal"><i data-lucide="copy" class="w-5 h-5"></i></button>
+                        <button onclick="removeGoal(${goal.id})" class="text-gray-400 hover:text-rose-500 hover:rotate-90 transition-all duration-200" title="Delete Goal"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+                    
+                    <div class="p-4 sm:p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                        <input type="text" value="${goal.name}" oninput="updateGoalProp(${goal.id}, 'name', this.value)" class="text-xl font-bold bg-transparent outline-none text-gray-900 dark:text-white w-9/12 sm:w-8/12 placeholder-gray-400 focus:border-b border-fuchsia-500 transition-all" placeholder="Goal Name (e.g. New Car)">
+                    </div>
+
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="The total amount of money you need for this goal.">Target Amount ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="g-targ-${goal.id}" value="${goal.targetAmount}" oninput="calcGoal(${goal.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all text-base sm:text-sm font-bold text-gray-900 dark:text-white" placeholder="e.g. 5000">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="How much you currently have saved towards this goal.">Currently Saved ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="g-save-${goal.id}" value="${goal.savedAmount}" oninput="calcGoal(${goal.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all text-base sm:text-sm font-bold text-gray-900 dark:text-white" placeholder="e.g. 1000">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500" title="How much you will put towards this goal every month.">Monthly Contribution ($)</label>
+                            </div>
+                            <input type="text" inputmode="decimal" pattern="[0-9]*" id="g-mo-${goal.id}" value="${goal.monthlyContrib}" oninput="calcGoal(${goal.id})" class="w-full p-2.5 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-200 dark:border-fuchsia-800 outline-none focus:ring-2 focus:ring-fuchsia-500 transition-all text-base sm:text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 placeholder-fuchsia-300" placeholder="e.g. 200">
+                        </div>
+
+                        <div>
+                            <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-brand-teal mb-1 flex items-center" title="If linked, this monthly contribution will automatically be deducted from the selected Budget's Wiggle Room!"><i data-lucide="link" class="w-3 h-3 mr-1"></i> Deduct from Budget</label>
+                            <select onchange="updateGoalProp(${goal.id}, 'linkedDashboardId', this.value)" class="w-full p-2.5 rounded-lg bg-brand-teal/5 dark:bg-brand-teal/10 border border-brand-teal/30 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm cursor-pointer">
+                                <option value="" class="bg-white dark:bg-gray-800">-- None (Standalone) --</option>
+                                ${appData.dashboards.map(d => `<option value="${d.id}" class="bg-white dark:bg-gray-800" ${goal.linkedDashboardId == d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-b-2xl p-4 sm:p-6 mt-auto border-t border-gray-100 dark:border-gray-700 transition-colors">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="text-xs font-bold text-gray-500 uppercase">Progress</span>
+                            <span class="text-sm font-bold text-fuchsia-500" id="g-pct-${goal.id}">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3 flex overflow-hidden mb-4 shadow-inner">
+                            <div id="g-bar-${goal.id}" class="${goal.color || 'bg-fuchsia-500'} h-3 transition-all duration-700 ease-out" style="width: 0%"></div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200/50 dark:border-gray-600 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+                                <span class="text-sm font-medium">Time to Goal:</span>
+                            </div>
+                            <span class="text-lg font-bold text-gray-900 dark:text-white" id="g-time-${goal.id}">--</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            appData.goals.forEach(g => calcGoal(g.id));
+            if(window.lucide) lucide.createIcons();
+        }
+
+        function updateGoalProp(id, prop, val) {
+            const g = appData.goals.find(x => x.id === id);
+            if(g) { 
+                g[prop] = val; 
+                saveData(); 
+                if (prop === 'linkedDashboardId') {
+                    // Update all budgets since a goal link changed
+                    appData.dashboards.forEach(d => calcDashboard(d.id));
+                    renderDashboards();
+                }
+            }
+        }
+
+        function calcGoal(id) {
+            const g = appData.goals.find(x => x.id === id);
+            if(!g) return;
+
+            const targEl = document.getElementById(`g-targ-${id}`);
+            const saveEl = document.getElementById(`g-save-${id}`);
+            const moEl = document.getElementById(`g-mo-${id}`);
+
+            if(targEl) g.targetAmount = targEl.value;
+            if(saveEl) g.savedAmount = saveEl.value;
+            if(moEl) g.monthlyContrib = moEl.value;
+
+            const target = parseNum(g.targetAmount);
+            const saved = parseNum(g.savedAmount);
+            const mo = parseNum(g.monthlyContrib);
+
+            let pct = 0;
+            if (target > 0) {
+                pct = (saved / target) * 100;
+                if (pct > 100) pct = 100;
+            }
+
+            const barEl = document.getElementById(`g-bar-${id}`);
+            const pctEl = document.getElementById(`g-pct-${id}`);
+            const timeEl = document.getElementById(`g-time-${id}`);
+
+            if(barEl) barEl.style.width = `${pct}%`;
+            if(pctEl) pctEl.innerText = `${Math.floor(pct)}%`;
+
+            if (target <= saved && target > 0) {
+                if(timeEl) timeEl.innerText = 'Completed! 🎉';
+                if(timeEl) timeEl.className = 'text-lg font-bold text-emerald-500';
+            } else if (mo > 0 && target > 0) {
+                const moLeft = Math.ceil((target - saved) / mo);
+                let yrs = Math.floor(moLeft / 12);
+                let rMo = moLeft % 12;
+                let timeStr = '';
+                if(yrs > 0) timeStr += `${yrs}y `;
+                if(rMo > 0 || yrs === 0) timeStr += `${rMo}mo`;
+                if(timeEl) timeEl.innerText = timeStr;
+                if(timeEl) timeEl.className = 'text-lg font-bold text-gray-900 dark:text-white';
+            } else {
+                if(timeEl) timeEl.innerText = '--';
+                if(timeEl) timeEl.className = 'text-lg font-bold text-gray-900 dark:text-white';
+            }
+
+            saveData();
+            // Re-calculate budget if linked (to reflect changing monthly contrib instantly)
+            if (g.linkedDashboardId) {
+                calcDashboard(g.linkedDashboardId);
+                renderOverview(); // Update overview in case assets changed
+            }
         }
 
         // ==========================================
