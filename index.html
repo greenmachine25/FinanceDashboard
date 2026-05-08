@@ -284,6 +284,71 @@
         </div>
     </div>
 
+    <!-- Amortization Modal -->
+    <div id="amortModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="amortModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-3xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center text-brand-teal">
+                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i> Amortization Schedule
+                </h3>
+                <button onclick="closeModal('amortModal', 'amortModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-5 sm:p-6 custom-scrollbar flex-1 relative">
+                <table class="w-full text-left text-base sm:text-sm whitespace-nowrap">
+                    <thead class="sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-sm z-10">
+                        <tr class="text-gray-600 dark:text-gray-300 border-b dark:border-gray-700/50">
+                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Month number in the payment term.">Month</span></th>
+                            <th class="py-3 px-2 font-medium"><span class="tooltip-help" title="Total amount paid this month (Base + Extra).">Payment</span></th>
+                            <th class="py-3 px-2 font-medium text-rose-500"><span class="tooltip-help" title="Portion of payment going towards bank interest.">Interest</span></th>
+                            <th class="py-3 px-2 font-medium text-brand-teal"><span class="tooltip-help" title="Portion of payment paying down your actual debt.">Principal</span></th>
+                            <th class="py-3 px-2 font-medium text-right"><span class="tooltip-help" title="Remaining loan balance after payment.">Balance</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortTableBody" class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sweet Spot Chart Modal -->
+    <div id="chartModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
+        <div id="chartModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl w-full max-w-4xl mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300 flex flex-col h-[85vh]">
+            <div class="p-5 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 shrink-0 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold flex items-center text-indigo-500 dark:text-indigo-400">
+                        <i data-lucide="line-chart" class="w-5 h-5 mr-2"></i> The "Sweet Spot" Curve
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Visualize how extra payments affect your total interest and payoff time.</p>
+                </div>
+                <button onclick="closeModal('chartModal', 'chartModalContent')" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 self-start">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Calculated Sweet Spot Banner -->
+            <div id="sweetSpotResult" class="mx-5 mt-5 sm:mx-6 sm:mt-6 bg-indigo-50/80 dark:bg-indigo-900/30 p-4 rounded-xl border border-indigo-200/50 dark:border-indigo-800/50 flex justify-between items-center hidden shrink-0 backdrop-blur-md shadow-sm">
+                <div>
+                    <p class="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase mb-1 flex items-center tooltip-help" title="The mathematical 'elbow' of the curve where extra payments hit maximum diminishing returns.">Optimal Sweet Spot</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white" id="ss-payment">$0 Extra/mo</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total Interest: <span id="ss-interest" class="font-bold text-rose-500">$0</span></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Payoff Time: <span id="ss-time" class="font-bold text-brand-blue">0 yrs</span></p>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto p-2 sm:p-6 custom-scrollbar flex-1 relative flex items-center justify-center">
+                <div class="w-full h-full min-h-[300px] relative">
+                    <canvas id="sweetSpotCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0 p-4 sm:p-0">
         <div id="logoutModalContent" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-sm mx-auto border border-white/20 dark:border-gray-700/50 relative scale-95 transition-transform duration-300">
@@ -342,8 +407,9 @@
         let compareChartInstance = null; 
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-        const tabList = ['dashboard', 'rent', 'loan', 'interest']; // Updated with rent
+        const tabList = ['dashboard', 'rent', 'loan', 'interest']; 
 
+        // Universal safely parser: Prevents any NaN issues with commas, symbols, or blanks
         function parseNum(val) {
             if (val === undefined || val === null || val === '') return 0;
             if (typeof val === 'number') return isNaN(val) ? 0 : val;
@@ -493,7 +559,6 @@
                 if(activeLoan) showSweetSpot(activeLoan.id);
             }
             if(compareChartInstance && !document.getElementById('compareModal').classList.contains('hidden')) {
-                // To redraw the compare chart colors safely, just close it.
                 closeModal('compareModal', 'compareModalContent');
             }
         });
@@ -622,193 +687,200 @@
 
         // --- Compare Charts Logic ---
         function showCompare(type) {
-            const isDark = document.documentElement.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-            const textColor = isDark ? '#9ca3af' : '#6b7280';
-            
-            let labels = [];
-            let datasets = [];
-            let chartType = 'bar';
-            let titleText = 'Compare Scenarios';
-            let iconClass = 'text-brand-teal';
+            try {
+                const isDark = document.documentElement.classList.contains('dark');
+                const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                const textColor = isDark ? '#9ca3af' : '#6b7280';
+                
+                let labels = [];
+                let datasets = [];
+                let chartType = 'bar';
+                let titleText = 'Compare Scenarios';
+                let iconClass = 'text-brand-teal';
 
-            if (type === 'loan') {
-                titleText = 'Loan Balances Over Time';
-                iconClass = 'text-brand-teal';
-                const validLoans = appData.loans.filter(l => parseNum(l.amount) > 0 && parseNum(l.years) > 0);
-                if (validLoans.length === 0) return showToast("No valid loans to compare.", true);
+                if (type === 'loan') {
+                    titleText = 'Loan Balances Over Time';
+                    iconClass = 'text-brand-teal';
+                    const validLoans = appData.loans.filter(l => parseNum(l.amount) > 0 && parseNum(l.years) > 0);
+                    if (validLoans.length === 0) return showToast("No valid loans to compare.", true);
+                    
+                    chartType = 'line';
+                    let maxMonths = 0;
+                    
+                    const lineData = validLoans.map(l => {
+                        let balance = parseNum(l.amount) - parseNum(l.lumpSum);
+                        if (balance < 0) balance = 0;
+                        
+                        const r = parseNum(l.rate) / 100 / 12;
+                        const n = parseNum(l.years) * 12;
+                        let base_payment = r === 0 ? (parseNum(l.amount) / n) : parseNum(l.amount) * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                        if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = parseNum(l.amount) / n; // Failsafe
+                        
+                        let payment = base_payment + parseNum(l.extra);
+                        
+                        const balances = [balance];
+                        let month = 1;
+                        
+                        if (payment > balance * r || r === 0) {
+                            while (balance > 0.01 && month <= 600) { // cap at 50 yrs to prevent freezing
+                                let interest = balance * r;
+                                let principal = payment - interest;
+                                if (balance < principal) { principal = balance; balance = 0; } 
+                                else { balance -= principal; }
+                                balances.push(balance);
+                                month++;
+                            }
+                        }
+                        if (month > maxMonths) maxMonths = month;
+                        const hex = colorMap[l.color] || '#2dd4bf';
+                        return { label: l.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.1, fill: false };
+                    });
+
+                    labels = Array.from({length: maxMonths}, (_, i) => `Mo ${i}`);
+                    datasets = lineData;
+
+                } else if (type === 'interest') {
+                    titleText = 'Investment Growth (10 Years)';
+                    iconClass = 'text-brand-blue';
+                    const validInvs = appData.investments;
+                    if (validInvs.length === 0) return showToast("No investments to compare.", true);
+                    
+                    chartType = 'line';
+                    labels = Array.from({length: 11}, (_, i) => `Year ${i}`);
+                    
+                    datasets = validInvs.map(inv => {
+                        const P = parseNum(inv.principal);
+                        const PMT = parseNum(inv.monthly);
+                        const grossRate = parseNum(inv.rate) / 100;
+                        const netRate = grossRate * (1 - (parseNum(inv.taxBracket) / 100));
+                        const r_m = netRate / 12; 
+
+                        const balances = [];
+                        for(let y=0; y<=10; y++) {
+                            const n = y * 12;
+                            let bal = 0;
+                            if (r_m === 0) bal = P + (PMT * n);
+                            else bal = P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
+                            balances.push(bal);
+                        }
+                        const hex = colorMap[inv.color] || '#3b82f6';
+                        return { label: inv.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.4, fill: false };
+                    });
+
+                } else if (type === 'dashboard') {
+                    titleText = 'Budget Overview (Monthly)';
+                    iconClass = 'text-brand-teal';
+                    if (appData.dashboards.length === 0) return showToast("No budgets to compare.", true);
+
+                    labels = appData.dashboards.map(d => d.name);
+                    
+                    const incData = [];
+                    const expData = [];
+                    const netData = [];
+
+                    appData.dashboards.forEach(d => {
+                        const wInc = parseNum(d.income);
+                        let yearlyEarn = 0;
+                        if(d.earnings) d.earnings.forEach(e => {
+                            const amt = parseNum(e.amount);
+                            if (e.freq === 'weekly') yearlyEarn += amt * 52;
+                            if (e.freq === 'monthly') yearlyEarn += amt * 12;
+                            if (e.freq === 'yearly') yearlyEarn += amt;
+                        });
+                        const mInc = ((wInc * 52) + yearlyEarn) / 12;
+                        
+                        let yearlyExp = 0;
+                        if(d.expenses) d.expenses.forEach(e => {
+                            const amt = parseNum(e.amount);
+                            if (e.freq === 'weekly') yearlyExp += amt * 52;
+                            if (e.freq === 'monthly') yearlyExp += amt * 12;
+                            if (e.freq === 'yearly') yearlyExp += amt;
+                        });
+                        
+                        if (d.linkedRentId) {
+                            const linkedRent = appData.rents.find(r => r.id === d.linkedRentId);
+                            if (linkedRent && linkedRent.calculatedTotal) yearlyExp += linkedRent.calculatedTotal * 12;
+                        }
+                        if (d.linkedLoanId) {
+                            const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
+                            if (linkedLoan && linkedLoan.calculatedPayment) yearlyExp += linkedLoan.calculatedPayment * 12;
+                        }
+                        if (d.linkedInvestmentId) {
+                            const linkedInv = appData.investments.find(i => i.id === d.linkedInvestmentId);
+                            if (linkedInv && linkedInv.monthly) yearlyExp += linkedInv.monthly * 12;
+                        }
+                        const mExp = yearlyExp / 12;
+                        const mNet = mInc - mExp;
+
+                        incData.push(mInc);
+                        expData.push(mExp);
+                        netData.push(mNet);
+                    });
+
+                    datasets = [
+                        { label: 'Monthly Income', data: incData, backgroundColor: '#10b981' }, 
+                        { label: 'Monthly Expenses', data: expData, backgroundColor: '#f43f5e' }, 
+                        { label: 'Wiggle Room', data: netData, backgroundColor: '#3b82f6' } 
+                    ];
+
+                } else if (type === 'rent') {
+                    titleText = 'Rent & Utilities (Monthly)';
+                    iconClass = 'text-brand-teal';
+                    if (appData.rents.length === 0) return showToast("No rents to compare.", true);
+
+                    labels = appData.rents.map(r => r.name);
+                    
+                    const baseData = appData.rents.map(r => parseNum(r.baseRent));
+                    const utilData = appData.rents.map(r => parseNum(r.water) + parseNum(r.electricity) + parseNum(r.internet) + parseNum(r.other));
+
+                    datasets = [
+                        { label: 'Base Rent', data: baseData, backgroundColor: '#3b82f6' },
+                        { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' }
+                    ];
+                }
+
+                document.getElementById('compareModalTitle').innerHTML = `<i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> ${titleText}`;
+                document.getElementById('compareModalTitle').className = `text-xl font-bold flex items-center ${iconClass}`;
                 
-                chartType = 'line';
-                let maxMonths = 0;
+                openModal('compareModal', 'compareModalContent');
                 
-                const lineData = validLoans.map(l => {
-                    let balance = parseNum(l.amount) - parseNum(l.lumpSum);
-                    if (balance < 0) balance = 0;
-                    
-                    const r = parseNum(l.rate) / 100 / 12;
-                    const n = parseNum(l.years) * 12;
-                    let base_payment = r === 0 ? (parseNum(l.amount) / n) : parseNum(l.amount) * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    let payment = base_payment + parseNum(l.extra);
-                    
-                    const balances = [balance];
-                    let month = 1;
-                    
-                    if (payment > balance * r || r === 0) {
-                        while (balance > 0.01 && month <= 360) { // cap at 30 yrs
-                            let interest = balance * r;
-                            let principal = payment - interest;
-                            if (balance < principal) { principal = balance; balance = 0; } 
-                            else { balance -= principal; }
-                            balances.push(balance);
-                            month++;
+                const ctx = document.getElementById('compareCanvas').getContext('2d');
+                if (compareChartInstance) compareChartInstance.destroy();
+
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
+                        tooltip: {
+                            backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDark ? '#fff' : '#000',
+                            bodyColor: isDark ? '#d1d5db' : '#374151',
+                            borderColor: isDark ? '#374151' : '#e5e7eb',
+                            borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: type === 'rent',
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { color: textColor }
+                        },
+                        y: {
+                            stacked: type === 'rent',
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { color: textColor, callback: function(value) { return '$' + value.toLocaleString(); } }
                         }
                     }
-                    if (month > maxMonths) maxMonths = month;
-                    const hex = colorMap[l.color] || '#2dd4bf';
-                    return { label: l.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.1, fill: false };
-                });
+                };
 
-                labels = Array.from({length: maxMonths}, (_, i) => `Mo ${i}`);
-                datasets = lineData;
-
-            } else if (type === 'interest') {
-                titleText = 'Investment Growth (10 Years)';
-                iconClass = 'text-brand-blue';
-                const validInvs = appData.investments;
-                if (validInvs.length === 0) return showToast("No investments to compare.", true);
-                
-                chartType = 'line';
-                labels = Array.from({length: 11}, (_, i) => `Year ${i}`);
-                
-                datasets = validInvs.map(inv => {
-                    const P = parseNum(inv.principal);
-                    const PMT = parseNum(inv.monthly);
-                    const grossRate = parseNum(inv.rate) / 100;
-                    const netRate = grossRate * (1 - (parseNum(inv.taxBracket) / 100));
-                    const r_m = netRate / 12; 
-
-                    const balances = [];
-                    for(let y=0; y<=10; y++) {
-                        const n = y * 12;
-                        let bal = 0;
-                        if (r_m === 0) bal = P + (PMT * n);
-                        else bal = P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
-                        balances.push(bal);
-                    }
-                    const hex = colorMap[inv.color] || '#3b82f6';
-                    return { label: inv.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.4, fill: false };
-                });
-
-            } else if (type === 'dashboard') {
-                titleText = 'Budget Overview (Monthly)';
-                iconClass = 'text-brand-teal';
-                if (appData.dashboards.length === 0) return showToast("No budgets to compare.", true);
-
-                labels = appData.dashboards.map(d => d.name);
-                
-                const incData = [];
-                const expData = [];
-                const netData = [];
-
-                appData.dashboards.forEach(d => {
-                    const wInc = parseNum(d.income);
-                    let yearlyEarn = 0;
-                    if(d.earnings) d.earnings.forEach(e => {
-                        const amt = parseNum(e.amount);
-                        if (e.freq === 'weekly') yearlyEarn += amt * 52;
-                        if (e.freq === 'monthly') yearlyEarn += amt * 12;
-                        if (e.freq === 'yearly') yearlyEarn += amt;
-                    });
-                    const mInc = ((wInc * 52) + yearlyEarn) / 12;
-                    
-                    let yearlyExp = 0;
-                    if(d.expenses) d.expenses.forEach(e => {
-                        const amt = parseNum(e.amount);
-                        if (e.freq === 'weekly') yearlyExp += amt * 52;
-                        if (e.freq === 'monthly') yearlyExp += amt * 12;
-                        if (e.freq === 'yearly') yearlyExp += amt;
-                    });
-                    
-                    if (d.linkedRentId) {
-                        const linkedRent = appData.rents.find(r => r.id === d.linkedRentId);
-                        if (linkedRent && linkedRent.calculatedTotal) yearlyExp += linkedRent.calculatedTotal * 12;
-                    }
-                    if (d.linkedLoanId) {
-                        const linkedLoan = appData.loans.find(l => l.id === d.linkedLoanId);
-                        if (linkedLoan && linkedLoan.calculatedPayment) yearlyExp += linkedLoan.calculatedPayment * 12;
-                    }
-                    if (d.linkedInvestmentId) {
-                        const linkedInv = appData.investments.find(i => i.id === d.linkedInvestmentId);
-                        if (linkedInv && linkedInv.monthly) yearlyExp += linkedInv.monthly * 12;
-                    }
-                    const mExp = yearlyExp / 12;
-                    const mNet = mInc - mExp;
-
-                    incData.push(mInc);
-                    expData.push(mExp);
-                    netData.push(mNet);
-                });
-
-                datasets = [
-                    { label: 'Monthly Income', data: incData, backgroundColor: '#10b981' }, 
-                    { label: 'Monthly Expenses', data: expData, backgroundColor: '#f43f5e' }, 
-                    { label: 'Wiggle Room', data: netData, backgroundColor: '#3b82f6' } 
-                ];
-
-            } else if (type === 'rent') {
-                titleText = 'Rent & Utilities (Monthly)';
-                iconClass = 'text-brand-teal';
-                if (appData.rents.length === 0) return showToast("No rents to compare.", true);
-
-                labels = appData.rents.map(r => r.name);
-                
-                const baseData = appData.rents.map(r => parseNum(r.baseRent));
-                const utilData = appData.rents.map(r => parseNum(r.water) + parseNum(r.electricity) + parseNum(r.internet) + parseNum(r.other));
-
-                datasets = [
-                    { label: 'Base Rent', data: baseData, backgroundColor: '#3b82f6' },
-                    { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' }
-                ];
+                compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions });
+                if(window.lucide) lucide.createIcons();
+            } catch (err) {
+                console.error("Comparison Chart Error:", err);
+                showToast("Chart Error: " + err.message, true);
             }
-
-            document.getElementById('compareModalTitle').innerHTML = `<i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> ${titleText}`;
-            document.getElementById('compareModalTitle').className = `text-xl font-bold flex items-center ${iconClass}`;
-            
-            openModal('compareModal', 'compareModalContent');
-            
-            const ctx = document.getElementById('compareCanvas').getContext('2d');
-            if (compareChartInstance) compareChartInstance.destroy();
-
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
-                    tooltip: {
-                        backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                        titleColor: isDark ? '#fff' : '#000',
-                        bodyColor: isDark ? '#d1d5db' : '#374151',
-                        borderColor: isDark ? '#374151' : '#e5e7eb',
-                        borderWidth: 1, padding: 12, boxPadding: 6, usePointStyle: true
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: type === 'rent',
-                        grid: { color: gridColor, drawBorder: false },
-                        ticks: { color: textColor }
-                    },
-                    y: {
-                        stacked: type === 'rent',
-                        grid: { color: gridColor, drawBorder: false },
-                        ticks: { color: textColor, callback: function(value) { return '$' + value.toLocaleString(); } }
-                    }
-                }
-            };
-
-            compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions });
-            if(window.lucide) lucide.createIcons();
         }
 
         function showToast(message, isError = false, customIcon = null) {
@@ -1678,27 +1750,28 @@
                 if (r === 0) {
                     base_payment = P / n;
                     base_interest = 0;
-                    
-                    actual_payment = base_payment + extra;
-                    new_n = actual_payment > 0 ? P_new / actual_payment : n;
-                    new_interest = 0;
                 } else {
                     base_payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    base_interest = (base_payment * n) - P;
-                    
-                    actual_payment = base_payment + extra;
-                    
-                    if (P_new <= 0) {
-                        new_n = 0;
-                        new_interest = 0;
-                    } else if (actual_payment > P_new * r) {
-                        new_n = Math.log(actual_payment / (actual_payment - P_new * r)) / Math.log(1 + r);
-                        new_interest = (new_n * actual_payment) - P_new;
-                    } else {
-                        new_n = n;
-                        new_interest = base_interest;
-                    }
+                    if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n; // Failsafe
+                    base_interest = Math.max(0, (base_payment * n) - P);
                 }
+                
+                actual_payment = base_payment + extra;
+                
+                if (P_new <= 0) {
+                    new_n = 0;
+                    new_interest = 0;
+                } else if (r === 0) {
+                    new_n = P_new / actual_payment;
+                    new_interest = 0;
+                } else if (actual_payment > P_new * r) {
+                    new_n = Math.log(actual_payment / (actual_payment - P_new * r)) / Math.log(1 + r);
+                    new_interest = Math.max(0, (new_n * actual_payment) - P_new);
+                } else {
+                    new_n = n;
+                    new_interest = base_interest;
+                }
+                
                 interest_saved = Math.max(0, base_interest - new_interest);
                 months_saved = Math.max(0, n - new_n);
             }
@@ -1761,6 +1834,8 @@
                 
                 const r = parseNum(l.rate) / 100 / 12;
                 let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n;
+
                 let payment = base_payment + parseNum(l.extra);
                 
                 // Failsafe for mathematically unpayable loans
@@ -1769,7 +1844,7 @@
                 let tableHTML = '';
                 let month = 1;
 
-                while (balance > 0.01 && month <= 360) { // Limit to 30 years to avoid DOM lag
+                while (balance > 0.01 && month <= 600) { // Limit to 50 years to avoid DOM lag
                     let interest = balance * r;
                     let principal = payment - interest;
 
@@ -1782,7 +1857,7 @@
                     }
 
                     tableHTML += `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <tr class="hover:bg-gray-50 dark:bg-gray-700/50 transition-colors">
                             <td class="py-2 px-2 font-medium">${month}</td>
                             <td class="py-2 px-2">${fmt.format(payment)}</td>
                             <td class="py-2 px-2 text-rose-500">${fmt.format(interest)}</td>
@@ -1815,6 +1890,8 @@
                 const P_new = P - effectiveLump;
                 
                 let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n;
+
                 if (base_payment <= 0) return showToast("Invalid loan base payment.", true);
 
                 // Prepare Chart Data
@@ -1878,28 +1955,30 @@
 
                 // Calculate Mathematical "Elbow" (Diminishing Returns)
                 const ssResult = document.getElementById('sweetSpotResult');
-                if (interestData[0] === interestData[interestData.length - 1]) {
-                    ssResult.classList.add('hidden');
-                } else {
-                    let maxDist = -1;
-                    let bestIdx = 0;
-                    const yMax = interestData[0];
-                    const yMin = interestData[interestData.length - 1];
+                if (ssResult) {
+                    if (interestData[0] === interestData[interestData.length - 1]) {
+                        ssResult.classList.add('hidden');
+                    } else {
+                        let maxDist = -1;
+                        let bestIdx = 0;
+                        const yMax = interestData[0];
+                        const yMin = interestData[interestData.length - 1];
 
-                    for(let i=0; i<=20; i++) {
-                        const normX = i / 20;
-                        const normY = (interestData[i] - yMin) / (yMax - yMin);
-                        const dist = Math.abs(normX + normY - 1);
-                        if(dist > maxDist && !isNaN(dist)) {
-                            maxDist = dist;
-                            bestIdx = i;
+                        for(let i=0; i<=20; i++) {
+                            const normX = i / 20;
+                            const normY = (interestData[i] - yMin) / (yMax - yMin);
+                            const dist = Math.abs(normX + normY - 1);
+                            if(dist > maxDist && !isNaN(dist)) {
+                                maxDist = dist;
+                                bestIdx = i;
+                            }
                         }
-                    }
 
-                    document.getElementById('ss-payment').innerText = labels[bestIdx] + ' Extra/mo';
-                    document.getElementById('ss-interest').innerText = fmt.format(interestData[bestIdx]);
-                    document.getElementById('ss-time').innerText = timeData[bestIdx] + ' yrs';
-                    ssResult.classList.remove('hidden');
+                        document.getElementById('ss-payment').innerText = labels[bestIdx] + ' Extra/mo';
+                        document.getElementById('ss-interest').innerText = fmt.format(interestData[bestIdx]);
+                        document.getElementById('ss-time').innerText = timeData[bestIdx] + ' yrs';
+                        ssResult.classList.remove('hidden');
+                    }
                 }
 
                 // Render Chart
@@ -2008,7 +2087,8 @@
                 });
 
             } catch (err) {
-                showToast("Error generating chart. Please check your numbers.", true);
+                console.error("Sweet Spot Chart Error:", err);
+                showToast("Chart Error: " + err.message, true);
             }
         }
 
