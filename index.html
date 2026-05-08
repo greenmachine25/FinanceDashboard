@@ -455,7 +455,7 @@
                         dashboards: [{ id: Date.now(), name: 'Primary Scenario', income: parsed.income?.weekly || 0, expenses: parsed.expenses || [], earnings: [], color: getRandomColor() }],
                         rents: [],
                         loans: [{ id: Date.now()+1, name: 'Loan Scenario 1', amount: parsed.loan?.amount || 0, rate: parsed.loan?.rate || 0, years: parsed.loan?.years || 0, extra: 0, lumpSum: 0, color: getRandomColor() }],
-                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0, color: getRandomColor() }]
+                        investments: [{ id: Date.now()+2, name: 'Bank APY 1', principal: parsed.investment?.principal || 0, rate: parsed.investment?.rate || 0, monthly: 0, taxBracket: 0, rateCap: '', rateOverCap: '', color: getRandomColor() }]
                     };
                 }
                 // Back-compat upgrades
@@ -463,7 +463,7 @@
                 if(!parsed.rents) parsed.rents = [];
                 if(parsed.rents) parsed.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                 if(parsed.loans) parsed.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); if(l.lumpSum === undefined) l.lumpSum = ''; });
-                if(parsed.investments) parsed.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
+                if(parsed.investments) parsed.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); if(i.rateCap === undefined) i.rateCap = ''; if(i.rateOverCap === undefined) i.rateOverCap = ''; });
                 appData = parsed;
             } else {
                 addDashboard(false);
@@ -523,7 +523,7 @@
                                 if(!appData.rents) appData.rents = [];
                                 appData.rents.forEach(r => { if(!r.color) r.color = getRandomColor(); });
                                 appData.loans.forEach(l => { if(!l.color) l.color = getRandomColor(); if(l.lumpSum === undefined) l.lumpSum = ''; });
-                                appData.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); });
+                                appData.investments.forEach(i => { if(!i.color) i.color = getRandomColor(); if(i.rateCap === undefined) i.rateCap = ''; if(i.rateOverCap === undefined) i.rateOverCap = ''; });
                                 
                                 localStorage.setItem('financeHubData', JSON.stringify(appData));
                                 renderAll();
@@ -775,18 +775,30 @@
                     datasets = validInvs.map(inv => {
                         const P = parseNum(inv.principal);
                         const PMT = parseNum(inv.monthly);
-                        const grossRate = parseNum(inv.rate) / 100;
-                        const netRate = grossRate * (1 - (parseNum(inv.taxBracket) / 100));
-                        const r_m = netRate / 12; 
+                        const grossRate1 = parseNum(inv.rate) / 100;
+                        const grossRate2 = parseNum(inv.rateOverCap) / 100;
+                        const cap = parseNum(inv.rateCap);
+                        const taxMult = 1 - (parseNum(inv.taxBracket) / 100);
+                        
+                        const r_m1 = grossRate1 * taxMult / 12;
+                        const r_m2 = grossRate2 * taxMult / 12;
 
-                        const balances = [];
-                        for(let y=0; y<=10; y++) {
-                            const n = y * 12;
-                            let bal = 0;
-                            if (r_m === 0) bal = P + (PMT * n);
-                            else bal = P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
-                            balances.push(bal);
+                        const balances = [P];
+                        let currentBal = P;
+                        
+                        for(let y=1; y<=10; y++) {
+                            for(let m=1; m<=12; m++) {
+                                let interest = 0;
+                                if (cap > 0) {
+                                    interest = (Math.min(currentBal, cap) * r_m1) + (Math.max(0, currentBal - cap) * r_m2);
+                                } else {
+                                    interest = currentBal * r_m1;
+                                }
+                                currentBal += interest + PMT;
+                            }
+                            balances.push(currentBal);
                         }
+                        
                         const hex = colorMap[inv.color] || '#3b82f6';
                         return { label: inv.name, data: balances, borderColor: hex, backgroundColor: hex + '33', borderWidth: 3, tension: 0.4, fill: false };
                     });
@@ -1708,8 +1720,8 @@
 
                         <!-- Initial Payment Break Down -->
                         <div class="bg-rose-50 dark:bg-rose-900/10 p-3 rounded-lg border border-rose-100 dark:border-rose-900/30">
-                            <div class="flex justify-between text-sm sm:text-xs mb-1.5 tooltip-help" title="Shows how much of your first payment goes straight to the bank vs paying down your debt.">
-                                <span class="text-rose-600 dark:text-rose-400 font-bold">1st Month: Interest</span>
+                            <div class="flex justify-between text-sm sm:text-xs mb-1.5 tooltip-help" title="Shows how much of your current payment goes to the bank vs paying down debt. Watch this change as you add extra payments!">
+                                <span class="text-rose-600 dark:text-rose-400 font-bold">Payment: Interest</span>
                                 <span class="text-brand-teal font-bold">Principal</span>
                             </div>
                             <div class="w-full bg-brand-teal/20 dark:bg-brand-teal/30 rounded-full h-2 flex overflow-hidden mt-1">
@@ -1834,10 +1846,13 @@
                 months_saved = Math.max(0, n - new_n);
             }
 
-            // First Month Break Down (Based on standard payment logic)
+            // Payment Break Down (Now dynamically factors in Extra Payments!)
             let first_mo_int = (P_new > 0 && r > 0) ? P_new * r : 0;
-            let first_mo_prin = base_payment > 0 ? base_payment - first_mo_int : 0;
-            let int_pct = base_payment > 0 ? (first_mo_int / base_payment) * 100 : 0;
+            let first_mo_prin = actual_payment > 0 ? actual_payment - first_mo_int : 0;
+            if (first_mo_prin < 0) first_mo_prin = 0;
+            
+            let int_pct = actual_payment > 0 ? (first_mo_int / actual_payment) * 100 : 0;
+            if (int_pct > 100) int_pct = 100;
 
             const intBar = document.getElementById(`l-int-bar-${id}`);
             if(intBar) intBar.style.width = `${Math.min(100, Math.max(0, int_pct))}%`;
@@ -1957,6 +1972,8 @@
                 const labels = [];
                 const interestData = [];
                 const timeData = [];
+                const interestDataBaseline = [];
+                const timeDataBaseline = [];
                 
                 appData.loans.forEach(loan => loan.lastCharted = false);
                 l.lastCharted = true;
@@ -1966,6 +1983,8 @@
                 for (let i = 0; i <= maxSteps; i++) {
                     let calc_n = 0;
                     let calc_interest = 0;
+                    let base_n = 0;
+                    let base_int = 0;
 
                     if (mode === 'monthly') {
                         const maxExtra = Math.max(base_payment * 2, 500);
@@ -1978,6 +1997,7 @@
                         
                         labels.push('$' + Math.round(extra_i).toLocaleString());
 
+                        // With Lump Sum
                         if (r === 0) {
                             calc_n = P_new / payment; calc_interest = 0;
                         } else if (P_new <= 0) {
@@ -1988,17 +2008,29 @@
                         } else {
                             calc_n = n; calc_interest = (base_payment * n) - P_new;
                         }
+
+                        // Without Lump Sum (Baseline)
+                        if (r === 0) {
+                            base_n = P / payment; base_int = 0;
+                        } else if (payment > P * r) {
+                            base_n = Math.log(payment / (payment - P * r)) / Math.log(1 + r);
+                            base_int = (base_n * payment) - P;
+                        } else {
+                            base_n = n; base_int = (base_payment * n) - P;
+                        }
+
                     } else {
                         // Lump Sum Mode
-                        const maxLump = P * 0.75; // Calculate elbow for up to 75% of loan
+                        const maxLump = P * 0.75; 
                         const step = maxLump / maxSteps;
                         const lump_i = i * step;
                         
                         const P_new = P - lump_i;
-                        const payment = base_payment + parseNum(l.extra); // Keep their extra monthly constant
+                        const payment = base_payment + parseNum(l.extra); 
                         
                         labels.push('$' + Math.round(lump_i).toLocaleString());
 
+                        // With varying Lump Sum
                         if (r === 0) {
                             calc_n = P_new / payment; calc_interest = 0;
                         } else if (P_new <= 0) {
@@ -2008,11 +2040,23 @@
                             calc_interest = (calc_n * payment) - P_new;
                         } else {
                             calc_n = n; calc_interest = (base_payment * n) - P_new;
+                        }
+
+                        // Without ANY Lump Sum (Baseline for comparison)
+                        if (r === 0) {
+                            base_n = P / payment; base_int = 0;
+                        } else if (payment > P * r) {
+                            base_n = Math.log(payment / (payment - P * r)) / Math.log(1 + r);
+                            base_int = (base_n * payment) - P;
+                        } else {
+                            base_n = n; base_int = (base_payment * n) - P;
                         }
                     }
 
                     interestData.push(Math.max(0, Math.round(calc_interest)));
                     timeData.push(Math.max(0, Math.round(calc_n / 12 * 10) / 10)); // Years
+                    interestDataBaseline.push(Math.max(0, Math.round(base_int)));
+                    timeDataBaseline.push(Math.max(0, Math.round(base_n / 12 * 10) / 10));
                 }
 
                 // Calculate Mathematical "Elbow" (Diminishing Returns)
@@ -2055,32 +2099,56 @@
                 const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
                 const textColor = isDark ? '#9ca3af' : '#6b7280';
 
+                const datasets = [
+                    {
+                        label: (mode === 'monthly' && parseNum(l.lumpSum) > 0) ? 'Interest (With Lump Sum)' : 'Total Interest Paid ($)',
+                        data: interestData,
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                        borderWidth: 3,
+                        fill: (mode === 'monthly' && parseNum(l.lumpSum) === 0),
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: (mode === 'monthly' && parseNum(l.lumpSum) > 0) ? 'Years (With Lump Sum)' : 'Years to Payoff',
+                        data: timeData,
+                        borderColor: '#3b82f6', 
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ];
+
+                if (mode === 'monthly' && parseNum(l.lumpSum) > 0) {
+                    datasets.push({
+                        label: 'Baseline Interest (No Lump Sum)',
+                        data: interestDataBaseline,
+                        borderColor: isDark ? 'rgba(244, 63, 94, 0.4)' : 'rgba(244, 63, 94, 0.3)',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: 'rgba(244, 63, 94, 0.05)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    });
+                    datasets.push({
+                        label: 'Baseline Years (No Lump Sum)',
+                        data: timeDataBaseline,
+                        borderColor: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    });
+                }
+
                 sweetSpotChartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: labels,
-                        datasets: [
-                            {
-                                label: 'Total Interest Paid ($)',
-                                data: interestData,
-                                borderColor: '#f43f5e',
-                                backgroundColor: 'rgba(244, 63, 94, 0.1)',
-                                borderWidth: 3,
-                                fill: true,
-                                tension: 0.4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Years to Payoff',
-                                data: timeData,
-                                borderColor: '#3b82f6', 
-                                backgroundColor: 'transparent',
-                                borderWidth: 3,
-                                borderDash: [5, 5],
-                                tension: 0.4,
-                                yAxisID: 'y1'
-                            }
-                        ]
+                        datasets: datasets
                     },
                     options: {
                         responsive: true,
@@ -2131,7 +2199,7 @@
         // APY SAVINGS CALCULATORS
         // ==========================================
         function addInvestment(save = true) {
-            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', monthly: '', rate: '', taxBracket: '', color: getRandomColor() });
+            appData.investments.unshift({ id: Date.now(), name: `Bank APY ${appData.investments.length + 1}`, principal: '', monthly: '', rate: '', taxBracket: '', rateCap: '', rateOverCap: '', color: getRandomColor() });
             if(save) { 
                 saveData(); 
                 renderInvestments();
@@ -2207,10 +2275,18 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Yield (expected yearly growth).">APY Rate (%)</label>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Yield (expected yearly growth).">Base APY Rate (%)</label>
                                 <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rate-${inv.id}" value="${inv.rate}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 4.5">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="If your bank has a balance cap for the Base APY, enter it here.">APY Balance Cap ($)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-ratecap-${inv.id}" value="${inv.rateCap || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="Blank if none">
+                            </div>
+                            <div>
+                                <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="The APY rate applied to money exceeding the cap amount.">Over-Cap APY (%)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]*" id="i-rateover-${inv.id}" value="${inv.rateOverCap || ''}" oninput="calcInvestment(${inv.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-blue transition-all text-base sm:text-sm" placeholder="e.g. 0.5">
                             </div>
                             <div>
                                 <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Your estimated income tax rate. Interest earned is usually taxed!">Tax Bracket (%)</label>
@@ -2257,34 +2333,50 @@
             const moEl = document.getElementById(`i-mo-contrib-${id}`);
             const rateEl = document.getElementById(`i-rate-${id}`);
             const taxEl = document.getElementById(`i-tax-${id}`);
+            const rateCapEl = document.getElementById(`i-ratecap-${id}`);
+            const rateOverEl = document.getElementById(`i-rateover-${id}`);
 
             if(prinEl) i.principal = prinEl.value;
             if(moEl) i.monthly = moEl.value;
             if(rateEl) i.rate = rateEl.value;
             if(taxEl) i.taxBracket = taxEl.value;
+            if(rateCapEl) i.rateCap = rateCapEl.value;
+            if(rateOverEl) i.rateOverCap = rateOverEl.value;
 
             const P = parseNum(i.principal);
             const PMT = parseNum(i.monthly);
+            const cap = parseNum(i.rateCap);
+            const taxMult = 1 - (parseNum(i.taxBracket) / 100);
             
-            // Calculate Effective After-Tax Rate
-            const grossRate = parseNum(i.rate) / 100;
-            const netRate = grossRate * (1 - (parseNum(i.taxBracket) / 100));
-            const r_m = netRate / 12; 
+            const r_m1 = (parseNum(i.rate) / 100) * taxMult / 12;
+            const r_m2 = (parseNum(i.rateOverCap) / 100) * taxMult / 12; 
 
-            // FV Formula with monthly contributions
-            const calcFV = (years) => {
-                const n = years * 12;
-                if (r_m === 0) return P + (PMT * n);
-                return P * Math.pow(1 + r_m, n) + PMT * ((Math.pow(1 + r_m, n) - 1) / r_m);
+            const calcFutureValue = (years) => {
+                let currentBal = P;
+                for(let m = 1; m <= years * 12; m++) {
+                    let interest = 0;
+                    if (cap > 0) {
+                        interest = (Math.min(currentBal, cap) * r_m1) + (Math.max(0, currentBal - cap) * r_m2);
+                    } else {
+                        interest = currentBal * r_m1;
+                    }
+                    currentBal += interest + PMT;
+                }
+                return currentBal;
             };
 
-            const estMonthlyYield = (P * r_m); // First month yield
+            let estMonthlyYield = 0;
+            if (cap > 0) {
+                estMonthlyYield = (Math.min(P, cap) * r_m1) + (Math.max(0, P - cap) * r_m2);
+            } else {
+                estMonthlyYield = P * r_m1;
+            }
 
             document.getElementById(`i-mo-${id}`).innerText = fmt.format(estMonthlyYield);
-            document.getElementById(`i-1-${id}`).innerText = fmt.format(calcFV(1));
-            document.getElementById(`i-2-${id}`).innerText = fmt.format(calcFV(2));
-            document.getElementById(`i-5-${id}`).innerText = fmt.format(calcFV(5));
-            document.getElementById(`i-10-${id}`).innerText = fmt.format(calcFV(10));
+            document.getElementById(`i-1-${id}`).innerText = fmt.format(calcFutureValue(1));
+            document.getElementById(`i-2-${id}`).innerText = fmt.format(calcFutureValue(2));
+            document.getElementById(`i-5-${id}`).innerText = fmt.format(calcFutureValue(5));
+            document.getElementById(`i-10-${id}`).innerText = fmt.format(calcFutureValue(10));
             
             saveData();
             
