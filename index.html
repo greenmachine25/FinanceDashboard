@@ -91,7 +91,7 @@
         }
 
         /* Fix for mobile bottom nav overlap */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
         }
     </style>
@@ -675,7 +675,7 @@
         }, { passive: true });
 
         function handleSwipe() {
-            if (window.innerWidth >= 640) return; 
+            if (window.innerWidth >= 768) return; 
             const swipeDistance = touchEndX - touchStartX;
             const currentTab = document.querySelector('.tab-content.active').id;
             const currentIndex = tabList.indexOf(currentTab);
@@ -1020,7 +1020,7 @@
 
         document.addEventListener('click', function(e) {
             const tooltipEl = e.target.closest('.tooltip-help');
-            if (tooltipEl && window.innerWidth < 640) {
+            if (tooltipEl && window.innerWidth < 768) {
                 const message = tooltipEl.getAttribute('title');
                 if (message) {
                     showToast(message, false, 'info');
@@ -1036,7 +1036,7 @@
 
         document.addEventListener('focusin', (e) => {
             const mobileDoneBtn = document.getElementById('mobileDoneBtn');
-            if (mobileDoneBtn && window.innerWidth < 640 && e.target.tagName === 'INPUT') {
+            if (mobileDoneBtn && window.innerWidth < 768 && e.target.tagName === 'INPUT') {
                 mobileDoneBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-8');
             }
         });
