@@ -236,30 +236,30 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-start items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors overflow-x-auto no-scrollbar" style="padding-bottom: env(safe-area-inset-bottom);">
-        <button onclick="switchTab('overview')" class="mobile-nav-btn active flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-brand-teal transition-colors">
-            <i data-lucide="globe" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Overview</span>
+    <nav class="sm:hidden fixed bottom-0 w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-700/50 flex justify-around items-center z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-colors" style="padding-bottom: env(safe-area-inset-bottom);">
+        <button onclick="switchTab('overview')" class="mobile-nav-btn active flex flex-col items-center py-2 flex-1 text-brand-teal transition-colors">
+            <i data-lucide="globe" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">Overview</span>
         </button>
-        <button onclick="switchTab('dashboard')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Budget</span>
+        <button onclick="switchTab('dashboard')" class="mobile-nav-btn flex flex-col items-center py-2 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">Budget</span>
         </button>
-        <button onclick="switchTab('goals')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i data-lucide="target" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Goals</span>
+        <button onclick="switchTab('goals')" class="mobile-nav-btn flex flex-col items-center py-2 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="target" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">Goals</span>
         </button>
-        <button onclick="switchTab('rent')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i data-lucide="home" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Rent</span>
+        <button onclick="switchTab('rent')" class="mobile-nav-btn flex flex-col items-center py-2 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">Rent</span>
         </button>
-        <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i data-lucide="landmark" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">Loans</span>
+        <button onclick="switchTab('loan')" class="mobile-nav-btn flex flex-col items-center py-2 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="landmark" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">Loans</span>
         </button>
-        <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-3 min-w-[72px] flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i data-lucide="trending-up" class="w-5 h-5 mb-1"></i>
-            <span class="text-[10px] font-bold">APY</span>
+        <button onclick="switchTab('interest')" class="mobile-nav-btn flex flex-col items-center py-2 flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <i data-lucide="trending-up" class="w-5 h-5 mb-0.5"></i>
+            <span class="text-[10px] font-bold truncate w-full text-center px-1">APY</span>
         </button>
     </nav>
 
