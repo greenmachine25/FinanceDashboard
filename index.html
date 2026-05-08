@@ -344,6 +344,13 @@
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
         const tabList = ['dashboard', 'rent', 'loan', 'interest']; // Updated with rent
 
+        function parseNum(val) {
+            if (val === undefined || val === null || val === '') return 0;
+            if (typeof val === 'number') return isNaN(val) ? 0 : val;
+            const parsed = parseFloat(val.toString().replace(/[^0-9.-]+/g, ''));
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCwnnNS-Xsfs8WbcIuGWiGaA6rIOQs0EgE",
@@ -628,20 +635,20 @@
             if (type === 'loan') {
                 titleText = 'Loan Balances Over Time';
                 iconClass = 'text-brand-teal';
-                const validLoans = appData.loans.filter(l => l.amount > 0 && l.years > 0);
+                const validLoans = appData.loans.filter(l => parseNum(l.amount) > 0 && parseNum(l.years) > 0);
                 if (validLoans.length === 0) return showToast("No valid loans to compare.", true);
                 
                 chartType = 'line';
                 let maxMonths = 0;
                 
                 const lineData = validLoans.map(l => {
-                    let balance = l.amount - (l.lumpSum || 0);
+                    let balance = parseNum(l.amount) - parseNum(l.lumpSum);
                     if (balance < 0) balance = 0;
                     
-                    const r = l.rate / 100 / 12;
-                    const n = l.years * 12;
-                    let base_payment = r === 0 ? (l.amount / n) : l.amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    let payment = base_payment + (l.extra || 0);
+                    const r = parseNum(l.rate) / 100 / 12;
+                    const n = parseNum(l.years) * 12;
+                    let base_payment = r === 0 ? (parseNum(l.amount) / n) : parseNum(l.amount) * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    let payment = base_payment + parseNum(l.extra);
                     
                     const balances = [balance];
                     let month = 1;
@@ -674,10 +681,10 @@
                 labels = Array.from({length: 11}, (_, i) => `Year ${i}`);
                 
                 datasets = validInvs.map(inv => {
-                    const P = inv.principal || 0;
-                    const PMT = inv.monthly || 0;
-                    const grossRate = (inv.rate || 0) / 100;
-                    const netRate = grossRate * (1 - ((inv.taxBracket || 0) / 100));
+                    const P = parseNum(inv.principal);
+                    const PMT = parseNum(inv.monthly);
+                    const grossRate = parseNum(inv.rate) / 100;
+                    const netRate = grossRate * (1 - (parseNum(inv.taxBracket) / 100));
                     const r_m = netRate / 12; 
 
                     const balances = [];
@@ -704,11 +711,10 @@
                 const netData = [];
 
                 appData.dashboards.forEach(d => {
-                    const incInput = document.getElementById(`inc-${d.id}`);
-                    const wInc = parseFloat(incInput?.value || d.income || 0);
+                    const wInc = parseNum(d.income);
                     let yearlyEarn = 0;
                     if(d.earnings) d.earnings.forEach(e => {
-                        const amt = parseFloat(e.amount) || 0;
+                        const amt = parseNum(e.amount);
                         if (e.freq === 'weekly') yearlyEarn += amt * 52;
                         if (e.freq === 'monthly') yearlyEarn += amt * 12;
                         if (e.freq === 'yearly') yearlyEarn += amt;
@@ -717,7 +723,7 @@
                     
                     let yearlyExp = 0;
                     if(d.expenses) d.expenses.forEach(e => {
-                        const amt = parseFloat(e.amount) || 0;
+                        const amt = parseNum(e.amount);
                         if (e.freq === 'weekly') yearlyExp += amt * 52;
                         if (e.freq === 'monthly') yearlyExp += amt * 12;
                         if (e.freq === 'yearly') yearlyExp += amt;
@@ -744,9 +750,9 @@
                 });
 
                 datasets = [
-                    { label: 'Monthly Income', data: incData, backgroundColor: '#10b981' }, // emerald
-                    { label: 'Monthly Expenses', data: expData, backgroundColor: '#f43f5e' }, // rose
-                    { label: 'Wiggle Room', data: netData, backgroundColor: '#3b82f6' } // blue
+                    { label: 'Monthly Income', data: incData, backgroundColor: '#10b981' }, 
+                    { label: 'Monthly Expenses', data: expData, backgroundColor: '#f43f5e' }, 
+                    { label: 'Wiggle Room', data: netData, backgroundColor: '#3b82f6' } 
                 ];
 
             } else if (type === 'rent') {
@@ -756,14 +762,13 @@
 
                 labels = appData.rents.map(r => r.name);
                 
-                const baseData = appData.rents.map(r => parseFloat(r.baseRent) || 0);
-                const utilData = appData.rents.map(r => (parseFloat(r.water)||0) + (parseFloat(r.electricity)||0) + (parseFloat(r.internet)||0) + (parseFloat(r.other)||0));
+                const baseData = appData.rents.map(r => parseNum(r.baseRent));
+                const utilData = appData.rents.map(r => parseNum(r.water) + parseNum(r.electricity) + parseNum(r.internet) + parseNum(r.other));
 
                 datasets = [
-                    { label: 'Base Rent', data: baseData, backgroundColor: '#3b82f6' }, // blue
-                    { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' } // amber
+                    { label: 'Base Rent', data: baseData, backgroundColor: '#3b82f6' },
+                    { label: 'Utilities & Fees', data: utilData, backgroundColor: '#f59e0b' }
                 ];
-                // Make rents stacked
             }
 
             document.getElementById('compareModalTitle').innerHTML = `<i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i> ${titleText}`;
@@ -1159,10 +1164,10 @@
             if(d) {
                 const e = d.expenses.find(x => x.id === expId);
                 if(e) {
-                    e[field] = field === 'amount' ? (parseFloat(val) || 0) : val;
+                    e[field] = val;
                     saveData();
                     calcDashboard(dashId);
-                    if(field === 'freq') renderExpenses(dashId); // Resort and update colors on frequency change
+                    if(field === 'freq') renderExpenses(dashId);
                 }
             }
         }
@@ -1233,7 +1238,7 @@
             if(d) {
                 const e = d.earnings.find(x => x.id === earnId);
                 if(e) {
-                    e[field] = field === 'amount' ? (parseFloat(val) || 0) : val;
+                    e[field] = val;
                     saveData();
                     calcDashboard(dashId);
                     if(field === 'freq') renderEarnings(dashId);
@@ -1246,12 +1251,13 @@
             if(!d) return;
 
             const incInput = document.getElementById(`inc-${dashId}`);
-            const baseWeeklyInc = parseFloat(incInput.value) || 0;
+            if(incInput) d.income = incInput.value;
+            const baseWeeklyInc = parseNum(d.income);
 
             let yearlyEarn = 0;
             if(d.earnings) {
                 d.earnings.forEach(e => {
-                    const amt = parseFloat(e.amount) || 0;
+                    const amt = parseNum(e.amount);
                     if (e.freq === 'weekly') yearlyEarn += amt * 52;
                     if (e.freq === 'monthly') yearlyEarn += amt * 12;
                     if (e.freq === 'yearly') yearlyEarn += amt;
@@ -1269,7 +1275,7 @@
 
             let yearlyExp = 0;
             d.expenses.forEach(e => {
-                const amt = parseFloat(e.amount) || 0;
+                const amt = parseNum(e.amount);
                 if (e.freq === 'weekly') yearlyExp += amt * 52;
                 if (e.freq === 'monthly') yearlyExp += amt * 12;
                 if (e.freq === 'yearly') yearlyExp += amt;
@@ -1451,13 +1457,19 @@
             const r = appData.rents.find(x => x.id === id);
             if(!r) return;
 
-            r.baseRent = parseFloat(document.getElementById(`r-base-${id}`).value) || 0;
-            r.water = parseFloat(document.getElementById(`r-water-${id}`).value) || 0;
-            r.electricity = parseFloat(document.getElementById(`r-elec-${id}`).value) || 0;
-            r.internet = parseFloat(document.getElementById(`r-int-${id}`).value) || 0;
-            r.other = parseFloat(document.getElementById(`r-oth-${id}`).value) || 0;
+            const baseEl = document.getElementById(`r-base-${id}`);
+            const waterEl = document.getElementById(`r-water-${id}`);
+            const elecEl = document.getElementById(`r-elec-${id}`);
+            const intEl = document.getElementById(`r-int-${id}`);
+            const othEl = document.getElementById(`r-oth-${id}`);
 
-            r.calculatedTotal = r.baseRent + r.water + r.electricity + r.internet + r.other;
+            if (baseEl) r.baseRent = baseEl.value;
+            if (waterEl) r.water = waterEl.value;
+            if (elecEl) r.electricity = elecEl.value;
+            if (intEl) r.internet = intEl.value;
+            if (othEl) r.other = othEl.value;
+
+            r.calculatedTotal = parseNum(r.baseRent) + parseNum(r.water) + parseNum(r.electricity) + parseNum(r.internet) + parseNum(r.other);
 
             document.getElementById(`r-mo-tot-${id}`).innerText = fmt.format(r.calculatedTotal);
             document.getElementById(`r-yr-tot-${id}`).innerText = fmt.format(r.calculatedTotal * 12);
@@ -1638,17 +1650,24 @@
             const l = appData.loans.find(x => x.id === id);
             if(!l) return;
 
-            l.amount = parseFloat(document.getElementById(`l-amt-${id}`).value) || 0;
-            l.rate = parseFloat(document.getElementById(`l-rate-${id}`).value) || 0;
-            l.years = parseFloat(document.getElementById(`l-yrs-${id}`).value) || 0;
-            l.extra = parseFloat(document.getElementById(`l-extra-${id}`).value) || 0;
-            l.lumpSum = parseFloat(document.getElementById(`l-lump-${id}`).value) || 0;
+            const amtEl = document.getElementById(`l-amt-${id}`);
+            const rateEl = document.getElementById(`l-rate-${id}`);
+            const yrsEl = document.getElementById(`l-yrs-${id}`);
+            const extraEl = document.getElementById(`l-extra-${id}`);
+            const lumpEl = document.getElementById(`l-lump-${id}`);
 
-            const P = l.amount;
-            const r = l.rate / 100 / 12;
-            const n = l.years * 12;
+            if(amtEl) l.amount = amtEl.value;
+            if(rateEl) l.rate = rateEl.value;
+            if(yrsEl) l.years = yrsEl.value;
+            if(extraEl) l.extra = extraEl.value;
+            if(lumpEl) l.lumpSum = lumpEl.value;
+
+            const P = parseNum(l.amount);
+            const r = parseNum(l.rate) / 100 / 12;
+            const n = parseNum(l.years) * 12;
+            const extra = parseNum(l.extra);
             
-            const effectiveLump = Math.min(l.lumpSum, P);
+            const effectiveLump = Math.max(0, Math.min(parseNum(l.lumpSum), P));
             const P_new = P - effectiveLump;
             
             let base_payment = 0, base_interest = 0;
@@ -1660,14 +1679,14 @@
                     base_payment = P / n;
                     base_interest = 0;
                     
-                    actual_payment = base_payment + l.extra;
+                    actual_payment = base_payment + extra;
                     new_n = actual_payment > 0 ? P_new / actual_payment : n;
                     new_interest = 0;
                 } else {
                     base_payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
                     base_interest = (base_payment * n) - P;
                     
-                    actual_payment = base_payment + l.extra;
+                    actual_payment = base_payment + extra;
                     
                     if (P_new <= 0) {
                         new_n = 0;
@@ -1710,7 +1729,7 @@
             const savedEl = document.getElementById(`l-saved-${id}`);
             const timeSavedEl = document.getElementById(`l-time-saved-${id}`);
             
-            if ((l.extra > 0 || l.lumpSum > 0) && months_saved > 0.5) {
+            if ((extra > 0 || effectiveLump > 0) && months_saved > 0.5) {
                 savedEl.innerText = fmt.format(interest_saved);
                 savedContainer.classList.remove('hidden');
                 
@@ -1731,15 +1750,18 @@
         function showAmortization(id) {
             try {
                 const l = appData.loans.find(x => x.id === id);
-                if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
+                
+                const P = parseNum(l?.amount);
+                const n = parseNum(l?.years) * 12;
+                
+                if(!l || P <= 0 || n <= 0) return showToast("Please enter valid loan details first.", true);
 
-                let balance = l.amount - (l.lumpSum || 0);
+                let balance = P - parseNum(l.lumpSum);
                 if (balance < 0) balance = 0;
                 
-                const r = l.rate / 100 / 12;
-                const n = l.years * 12;
-                let base_payment = r === 0 ? (l.amount / n) : l.amount * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                let payment = base_payment + (l.extra || 0);
+                const r = parseNum(l.rate) / 100 / 12;
+                let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                let payment = base_payment + parseNum(l.extra);
                 
                 // Failsafe for mathematically unpayable loans
                 if (payment <= balance * r && balance > 0) return showToast("Payment is too low to cover interest.", true);
@@ -1774,6 +1796,7 @@
                 document.getElementById('amortTableBody').innerHTML = tableHTML;
                 openModal('amortModal', 'amortModalContent');
             } catch (err) {
+                console.error(err);
                 showToast("Error generating schedule. Please check your numbers.", true);
             }
         }
@@ -1781,17 +1804,18 @@
         function showSweetSpot(id) {
             try {
                 const l = appData.loans.find(x => x.id === id);
-                if(!l || l.amount <= 0 || l.years <= 0) return showToast("Please enter valid loan details first.", true);
-
-                const P = l.amount;
-                const r = l.rate / 100 / 12;
-                const n = l.years * 12;
                 
-                const effectiveLump = Math.min(l.lumpSum || 0, P);
+                const P = parseNum(l?.amount);
+                const n = parseNum(l?.years) * 12;
+                
+                if(!l || P <= 0 || n <= 0) return showToast("Please enter valid loan details first.", true);
+
+                const r = parseNum(l.rate) / 100 / 12;
+                const effectiveLump = Math.max(0, Math.min(parseNum(l.lumpSum), P));
                 const P_new = P - effectiveLump;
                 
                 let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                if (base_payment <= 0) return;
+                if (base_payment <= 0) return showToast("Invalid loan base payment.", true);
 
                 // Prepare Chart Data
                 const labels = [];
@@ -1811,7 +1835,7 @@
                 for (let i = 0; i <= 20; i++) {
                     const extra = i * step;
                     const payment = base_payment + extra;
-                    labels.push('$' + Math.round(extra));
+                    labels.push('$' + Math.round(extra).toLocaleString());
 
                     let calc_n = 0;
                     let calc_interest = 0;
@@ -1866,7 +1890,7 @@
                         const normX = i / 20;
                         const normY = (interestData[i] - yMin) / (yMax - yMin);
                         const dist = Math.abs(normX + normY - 1);
-                        if(dist > maxDist) {
+                        if(dist > maxDist && !isNaN(dist)) {
                             maxDist = dist;
                             bestIdx = i;
                         }
@@ -2114,17 +2138,22 @@
             const i = appData.investments.find(x => x.id === id);
             if(!i) return;
 
-            i.principal = parseFloat(document.getElementById(`i-prin-${id}`).value) || 0;
-            i.monthly = parseFloat(document.getElementById(`i-mo-contrib-${id}`).value) || 0;
-            i.rate = parseFloat(document.getElementById(`i-rate-${id}`).value) || 0;
-            i.taxBracket = parseFloat(document.getElementById(`i-tax-${id}`).value) || 0;
+            const prinEl = document.getElementById(`i-prin-${id}`);
+            const moEl = document.getElementById(`i-mo-contrib-${id}`);
+            const rateEl = document.getElementById(`i-rate-${id}`);
+            const taxEl = document.getElementById(`i-tax-${id}`);
 
-            const P = i.principal;
-            const PMT = i.monthly;
+            if(prinEl) i.principal = prinEl.value;
+            if(moEl) i.monthly = moEl.value;
+            if(rateEl) i.rate = rateEl.value;
+            if(taxEl) i.taxBracket = taxEl.value;
+
+            const P = parseNum(i.principal);
+            const PMT = parseNum(i.monthly);
             
             // Calculate Effective After-Tax Rate
-            const grossRate = i.rate / 100;
-            const netRate = grossRate * (1 - (i.taxBracket / 100));
+            const grossRate = parseNum(i.rate) / 100;
+            const netRate = grossRate * (1 - (parseNum(i.taxBracket) / 100));
             const r_m = netRate / 12; 
 
             // FV Formula with monthly contributions
