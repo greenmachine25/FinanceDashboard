@@ -485,7 +485,7 @@
     </button>
 
     <!-- Toast Notifications Container -->
-    <div id="toastContainer" class="fixed z-[100] flex flex-col gap-3 pointer-events-none top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] sm:w-auto sm:top-4 sm:right-4 sm:left-auto sm:bottom-auto sm:translate-x-0 sm:translate-y-0"></div>
+    <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
         // Placeholder Auth function before Firebase loads
@@ -508,31 +508,6 @@
             let colors = cardColors.filter(c => c !== excludeColor);
             return colors[Math.floor(Math.random() * colors.length)];
         }
-
-        // Global Crosshair Plugin for Charts
-        const verticalCrosshairPlugin = {
-            id: 'verticalCrosshair',
-            beforeDraw: (chart) => {
-                if (chart.config.type === 'radar') return;
-                if (chart.tooltip._active && chart.tooltip._active.length) {
-                    const activePoint = chart.tooltip._active[0];
-                    const ctx = chart.ctx;
-                    const x = activePoint.element.x;
-                    const topY = chart.chartArea.top;
-                    const bottomY = chart.chartArea.bottom;
-
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(x, topY);
-                    ctx.lineTo(x, bottomY);
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeStyle = document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.2)';
-                    ctx.setLineDash([5, 5]);
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            }
-        };
 
         // State Management
         var appData = {
@@ -967,8 +942,6 @@
                         plugins: {
                             legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
                             tooltip: {
-                                yAlign: 'bottom', // Keeps tooltip above finger
-                                caretPadding: 15,
                                 backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                                 titleColor: isDark ? '#fff' : '#000',
                                 bodyColor: isDark ? '#d1d5db' : '#374151',
@@ -991,8 +964,7 @@
                                 title: { display: true, text: 'Total Balance ($)', color: textColor, font: { weight: 'bold' } }
                             }
                         }
-                    },
-                    plugins: [verticalCrosshairPlugin]
+                    }
                 });
 
             } catch (err) {
@@ -1213,8 +1185,6 @@
                     plugins: {
                         legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
                         tooltip: {
-                            yAlign: 'bottom',
-                            caretPadding: 15,
                             backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                             titleColor: isDark ? '#fff' : '#000',
                             bodyColor: isDark ? '#d1d5db' : '#374151',
@@ -1263,7 +1233,7 @@
                     };
                 }
 
-                compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions, plugins: [verticalCrosshairPlugin] });
+                compareChartInstance = new Chart(ctx, { type: chartType, data: { labels, datasets }, options: chartOptions });
                 if(window.lucide) lucide.createIcons();
             } catch (err) {
                 console.error("Comparison Chart Error:", err);
@@ -1275,20 +1245,15 @@
             const container = document.getElementById('toastContainer');
             if (!container) return;
             const toast = document.createElement('div');
-            
-            const bgClass = isError ? 'bg-rose-500/90' : 'bg-gray-800/90 dark:bg-black/70';
-            const textClass = 'text-white';
-            const borderClass = isError ? 'border-rose-400/50' : 'border-white/10 dark:border-white/20';
+            const bgClass = isError ? 'bg-rose-500/90' : 'bg-gray-800/90 dark:bg-white/90';
+            const textClass = isError ? 'text-white' : 'text-white dark:text-gray-900';
             const icon = customIcon || (isError ? 'alert-circle' : 'check-circle');
-            
-            toast.className = `${bgClass} backdrop-blur-xl ${textClass} ${borderClass} px-5 py-3.5 rounded-2xl shadow-2xl border text-sm font-bold animate-pop-in flex items-center pointer-events-auto text-center sm:text-left`;
+            toast.className = `${bgClass} backdrop-blur-md ${textClass} px-5 py-3.5 rounded-2xl shadow-xl border border-white/20 text-sm font-bold animate-slide-down flex items-center pointer-events-auto`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 mr-3 shrink-0"></i> <span>${message}</span>`;
-            
             container.appendChild(toast);
             if(window.lucide) lucide.createIcons();
-            
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300', 'scale-95');
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
             }, 4000); 
         }
@@ -2906,8 +2871,6 @@
                         plugins: {
                             legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", weight: 'bold' } } },
                             tooltip: {
-                                yAlign: 'bottom', // Keeps tooltip above finger
-                                caretPadding: 15,
                                 backgroundColor: isDark ? 'rgba(17, 24, 39, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                                 titleColor: isDark ? '#fff' : '#000',
                                 bodyColor: isDark ? '#d1d5db' : '#374151',
@@ -2937,8 +2900,7 @@
                                 ticks: { color: textColor }
                             }
                         }
-                    },
-                    plugins: [verticalCrosshairPlugin]
+                    }
                 });
 
             } catch (err) {
@@ -3006,9 +2968,9 @@
                                 ${cardColors.map(c => `<button onclick="updateColor('interest', ${inv.id}, '${c}')" class="w-6 h-6 rounded-full ${c} border border-black/10 dark:border-white/10 hover:scale-125 transition-transform shadow-inner ${inv.color === c ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-300 dark:ring-offset-gray-800' : ''} outline-none"></button>`).join('')}
                             </div>
                         </div>
-                        <button onclick="toggleMinimize('interest', ${inv.id})" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="${inv.isMinimized ? 'Expand' : 'Minimize'} Scenario"><i data-lucide="${inv.isMinimized ? 'chevron-down' : 'chevron-up'}" class="w-5 h-5"></i></button>
-                        <button onclick="duplicateInvestment(${inv.id})" class="text-gray-500 hover:text-brand-blue hover:scale-110 transition-all duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="Duplicate Scenario"><i data-lucide="copy" class="w-5 h-5"></i></button>
-                        <button onclick="removeInvestment(${inv.id})" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="Delete Scenario"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        <button onclick="toggleMinimize('interest', ${inv.id})" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="${inv.isMinimized ? 'Expand' : 'Minimize'} Scenario"><i data-lucide="${inv.isMinimized ? 'chevron-down' : 'chevron-up'}" class="w-4 h-4"></i></button>
+                        <button onclick="duplicateInvestment(${inv.id})" class="text-gray-500 hover:text-brand-blue hover:scale-110 transition-all duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="Duplicate Scenario"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                        <button onclick="removeInvestment(${inv.id})" class="text-gray-500 hover:text-rose-500 hover:rotate-90 transition-all duration-200 bg-white/40 dark:bg-gray-900/40 p-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm outline-none" title="Delete Scenario"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>
                     
                     <!-- Title -->
