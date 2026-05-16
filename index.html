@@ -503,7 +503,7 @@
         
         let sweetSpotChartInstance = null; 
         let compareChartInstance = null; 
-        let apyChartInstance = null; // New APY specific chart
+        let apyChartInstance = null; 
 
         const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
         const tabList = ['overview', 'dashboard', 'goals', 'rent', 'loan', 'interest']; 
@@ -1992,7 +1992,7 @@
                                     <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
                                     <span class="text-sm font-medium">Time to Goal:</span>
                                 </div>
-                                <span class="text-lg font-bold text-gray-900 dark:text-white" id="g-time-${goal.id}">--</span>
+                                <span class="text-lg font-bold text-right text-gray-900 dark:text-white leading-tight" id="g-time-${goal.id}">--</span>
                             </div>
                         </div>
                     </div>
@@ -2050,7 +2050,7 @@
 
             if (target <= saved && target > 0) {
                 if(timeEl) timeEl.innerText = 'Completed! 🎉';
-                if(timeEl) timeEl.className = 'text-lg font-bold text-emerald-500';
+                if(timeEl) timeEl.className = 'text-lg font-bold text-emerald-500 text-right leading-tight';
             } else if (mo > 0 && target > 0) {
                 const moLeft = Math.ceil((target - saved) / mo);
                 let yrs = Math.floor(moLeft / 12);
@@ -2058,11 +2058,17 @@
                 let timeStr = '';
                 if(yrs > 0) timeStr += `${yrs}y `;
                 if(rMo > 0 || yrs === 0) timeStr += `${rMo}mo`;
-                if(timeEl) timeEl.innerText = timeStr;
-                if(timeEl) timeEl.className = 'text-lg font-bold text-gray-900 dark:text-white';
+                
+                // Calculate Actual Target Date
+                const goalDate = new Date();
+                goalDate.setMonth(goalDate.getMonth() + moLeft);
+                timeStr += ` <span class="text-xs text-gray-500 font-normal block">${goalDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>`;
+                
+                if(timeEl) timeEl.innerHTML = timeStr;
+                if(timeEl) timeEl.className = 'text-lg font-bold text-right text-gray-900 dark:text-white leading-tight';
             } else {
                 if(timeEl) timeEl.innerText = '--';
-                if(timeEl) timeEl.className = 'text-lg font-bold text-gray-900 dark:text-white';
+                if(timeEl) timeEl.className = 'text-lg font-bold text-right text-gray-900 dark:text-white leading-tight';
             }
 
             saveData();
@@ -2233,7 +2239,7 @@
         // LOAN CALCULATORS
         // ==========================================
         function addLoan(save = true) {
-            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, amount: '', rate: '', years: '', extra: '', lumpSum: '', color: getRandomColor(), isMinimized: false });
+            appData.loans.unshift({ id: Date.now(), name: `Loan Option ${appData.loans.length + 1}`, origAmount: '', amount: '', rate: '', years: '', minPaymentOverride: '', extra: '', lumpSum: '', color: getRandomColor(), isMinimized: false });
             if(save) { 
                 saveData(); 
                 renderLoans(); 
@@ -2302,18 +2308,26 @@
                     <div class="${loan.isMinimized ? 'hidden' : ''}">
                         <!-- Core Inputs -->
                         <div class="p-4 sm:p-6 space-y-4 sm:space-y-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div>
-                                    <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Total principal amount of the loan.">Amount ($)</label>
-                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 10000">
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                <div class="col-span-1">
+                                    <label class="tooltip-help block text-[11px] sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="The starting principal of the loan (helps calculate standard payment).">Orig. Amount</label>
+                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-orig-${loan.id}" value="${loan.origAmount || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-medium" placeholder="e.g. 55000">
                                 </div>
-                                <div>
-                                    <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Rate (APR).">Rate (%)</label>
-                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5.5">
+                                <div class="col-span-1">
+                                    <label class="tooltip-help block text-[11px] sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="What you still owe today. All payoffs calculate from this number.">Curr. Balance</label>
+                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-amt-${loan.id}" value="${loan.amount}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-medium" placeholder="e.g. 43000">
                                 </div>
-                                <div>
-                                    <label class="tooltip-help block text-xs sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Duration of the loan in years.">Term (Yrs)</label>
-                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm" placeholder="e.g. 5">
+                                <div class="col-span-1">
+                                    <label class="tooltip-help block text-[11px] sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Annual Percentage Rate (APR).">Rate (%)</label>
+                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-rate-${loan.id}" value="${loan.rate}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-medium" placeholder="e.g. 5.5">
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="tooltip-help block text-[11px] sm:text-[10px] uppercase font-bold text-gray-500 mb-1" title="Original duration of the loan in years.">Orig. Term (Yrs)</label>
+                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-yrs-${loan.id}" value="${loan.years}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm font-medium" placeholder="e.g. 5">
+                                </div>
+                                <div class="col-span-2 sm:col-span-1">
+                                    <label class="tooltip-help block text-[11px] sm:text-[10px] uppercase font-bold text-brand-teal mb-1" title="Overrides auto-calculated payment. Leave blank to auto-calculate.">Manual Min. Pay</label>
+                                    <input type="text" inputmode="decimal" pattern="[0-9]*" id="l-minpay-${loan.id}" value="${loan.minPaymentOverride || ''}" oninput="calcLoan(${loan.id})" class="w-full p-2.5 rounded-lg bg-brand-teal/5 border border-brand-teal/30 text-brand-teal font-bold outline-none focus:ring-2 focus:ring-brand-teal transition-all text-base sm:text-sm placeholder-brand-teal/40" placeholder="Auto-Calc">
                                 </div>
                             </div>
 
@@ -2324,7 +2338,7 @@
                                     <p class="text-2xl font-bold text-brand-blue value-update mt-1" id="l-base-pay-${loan.id}">$0.00</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Total amount of interest paid over the entire life of the loan.">Total Interest</p>
+                                    <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Total amount of interest remaining to be paid over the life of the loan.">Remaining Interest</p>
                                     <p class="text-xl font-bold text-rose-500 value-update mt-1" id="l-int-${loan.id}">$0.00</p>
                                 </div>
                             </div>
@@ -2367,11 +2381,13 @@
                                     <p class="tooltip-help text-xs sm:text-[10px] font-bold text-brand-teal uppercase" title="Base Payment + Extra Payment">Actual Payment</p>
                                     <p class="text-2xl font-bold gradient-text value-update mt-1" id="l-pay-${loan.id}">$0.00</p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="tooltip-help text-xs sm:text-[11px] font-bold text-brand-teal value-update hidden" id="l-saved-container-${loan.id}" title="Total interest saved over the life of the loan.">
-                                        Saved: <span id="l-saved-${loan.id}">$0.00</span>
-                                    </p>
-                                    <p class="tooltip-help text-xs sm:text-[11px] font-bold text-brand-blue value-update hidden mt-1" id="l-time-saved-${loan.id}" title="How much earlier you will be debt free.">0 mo earlier</p>
+                                <div class="text-right flex flex-col items-end">
+                                    <p class="tooltip-help text-xs sm:text-[10px] font-bold text-gray-500 uppercase" title="Estimated date this loan will be fully paid off.">Est. Payoff</p>
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white value-update mt-0.5 leading-none" id="l-payoff-date-${loan.id}">--</p>
+                                    <div id="l-saved-container-${loan.id}" class="hidden flex flex-col items-end mt-1.5">
+                                        <p class="tooltip-help text-[10px] font-bold text-brand-teal value-update leading-tight" title="Total interest saved.">Saved: <span id="l-saved-${loan.id}">$0.00</span></p>
+                                        <p class="tooltip-help text-[10px] font-bold text-brand-blue value-update leading-tight" id="l-time-saved-${loan.id}" title="How much earlier you will be debt free.">0 mo earlier</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex space-x-2 w-full">
@@ -2407,42 +2423,65 @@
             const l = appData.loans.find(x => x.id === id);
             if(!l) return;
 
+            const origEl = document.getElementById(`l-orig-${id}`);
             const amtEl = document.getElementById(`l-amt-${id}`);
             const rateEl = document.getElementById(`l-rate-${id}`);
             const yrsEl = document.getElementById(`l-yrs-${id}`);
+            const minPayEl = document.getElementById(`l-minpay-${id}`);
             const extraEl = document.getElementById(`l-extra-${id}`);
             const lumpEl = document.getElementById(`l-lump-${id}`);
 
+            if(origEl) l.origAmount = origEl.value;
             if(amtEl) l.amount = amtEl.value;
             if(rateEl) l.rate = rateEl.value;
             if(yrsEl) l.years = yrsEl.value;
+            if(minPayEl) l.minPaymentOverride = minPayEl.value;
             if(extraEl) l.extra = extraEl.value;
             if(lumpEl) l.lumpSum = lumpEl.value;
 
-            const P = parseNum(l.amount);
+            const P_curr = parseNum(l.amount);
+            const P_orig = parseNum(l.origAmount) > 0 ? parseNum(l.origAmount) : P_curr;
             const r = parseNum(l.rate) / 100 / 12;
-            const n = parseNum(l.years) * 12;
+            const n_orig = parseNum(l.years) * 12;
+            const override = parseNum(l.minPaymentOverride);
             const extra = parseNum(l.extra);
+            const lump = parseNum(l.lumpSum);
             
-            const effectiveLump = Math.max(0, Math.min(parseNum(l.lumpSum), P));
-            const P_new = P - effectiveLump;
+            // Calculate Base Minimum Payment
+            let base_payment = 0;
+            if (override > 0) {
+                base_payment = override;
+            } else if (P_orig > 0 && n_orig > 0) {
+                if (r === 0) {
+                    base_payment = P_orig / n_orig;
+                } else {
+                    base_payment = P_orig * (r * Math.pow(1 + r, n_orig)) / (Math.pow(1 + r, n_orig) - 1);
+                    if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P_orig / n_orig; 
+                }
+            }
+
+            // Calculate Payoffs from CURRENT Balance
+            const effectiveLump = Math.max(0, Math.min(lump, P_curr));
+            const P_new = P_curr - effectiveLump;
+            const actual_payment = base_payment + extra;
             
-            let base_payment = 0, base_interest = 0;
-            let actual_payment = 0, new_n = 0, new_interest = 0;
+            let base_n = 0, base_interest = 0;
+            let new_n = 0, new_interest = 0;
             let interest_saved = 0, months_saved = 0;
             
-            if (P > 0 && n > 0) {
+            if (P_curr > 0 && base_payment > 0) {
+                // Baseline Math (No lump, no extra)
                 if (r === 0) {
-                    base_payment = P / n;
+                    base_n = P_curr / base_payment;
                     base_interest = 0;
+                } else if (base_payment > P_curr * r) {
+                    base_n = Math.log(base_payment / (base_payment - P_curr * r)) / Math.log(1 + r);
+                    base_interest = (base_n * base_payment) - P_curr;
                 } else {
-                    base_payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n; // Failsafe
-                    base_interest = Math.max(0, (base_payment * n) - P);
+                    base_n = 0; base_interest = 0; // Failsafe for unpayable logic
                 }
                 
-                actual_payment = base_payment + extra;
-                
+                // Accelerated Math (With extra/lump sum)
                 if (P_new <= 0) {
                     new_n = 0;
                     new_interest = 0;
@@ -2453,15 +2492,15 @@
                     new_n = Math.log(actual_payment / (actual_payment - P_new * r)) / Math.log(1 + r);
                     new_interest = Math.max(0, (new_n * actual_payment) - P_new);
                 } else {
-                    new_n = n;
-                    new_interest = base_interest;
+                    new_n = 0;
+                    new_interest = 0; // Failsafe
                 }
                 
                 interest_saved = Math.max(0, base_interest - new_interest);
-                months_saved = Math.max(0, n - new_n);
+                months_saved = Math.max(0, base_n - new_n);
             }
 
-            // Payment Break Down (Now dynamically factors in Extra Payments!)
+            // Payment Break Down
             let first_mo_int = (P_new > 0 && r > 0) ? P_new * r : 0;
             let first_mo_prin = actual_payment > 0 ? actual_payment - first_mo_int : 0;
             if (first_mo_prin < 0) first_mo_prin = 0;
@@ -2486,11 +2525,30 @@
             document.getElementById(`l-pay-${id}`).innerText = fmt.format(actual_payment > 0 ? actual_payment : base_payment);
             document.getElementById(`l-int-${id}`).innerText = fmt.format(Math.max(0, base_interest));
             
+            // Actual Payoff Date Math
+            const payoffEl = document.getElementById(`l-payoff-date-${id}`);
+            if (P_new <= 0 && P_curr > 0) {
+                if(payoffEl) payoffEl.innerText = "Paid Off! 🎉";
+                if(payoffEl) payoffEl.classList.add("text-emerald-500");
+                if(payoffEl) payoffEl.classList.remove("text-gray-900", "dark:text-white");
+            } else if (new_n > 0 && isFinite(new_n)) {
+                const payoffDate = new Date();
+                payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(new_n));
+                if(payoffEl) payoffEl.innerText = payoffDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                if(payoffEl) payoffEl.classList.remove("text-emerald-500");
+                if(payoffEl) payoffEl.classList.add("text-gray-900", "dark:text-white");
+            } else {
+                if(payoffEl) payoffEl.innerText = "--";
+                if(payoffEl) payoffEl.classList.remove("text-emerald-500");
+                if(payoffEl) payoffEl.classList.add("text-gray-900", "dark:text-white");
+            }
+            
+            // Saved Info Logic
             const savedContainer = document.getElementById(`l-saved-container-${id}`);
             const savedEl = document.getElementById(`l-saved-${id}`);
             const timeSavedEl = document.getElementById(`l-time-saved-${id}`);
             
-            if ((extra > 0 || effectiveLump > 0) && months_saved > 0.5) {
+            if ((extra > 0 || effectiveLump > 0) && months_saved > 0.5 && isFinite(base_interest)) {
                 savedEl.innerText = fmt.format(interest_saved);
                 savedContainer.classList.remove('hidden');
                 
@@ -2498,10 +2556,8 @@
                 let mos = Math.ceil(months_saved % 12);
                 let timeStr = yrs > 0 ? `${yrs}y ${mos}mo earlier` : `${mos}mo earlier`;
                 timeSavedEl.innerText = timeStr;
-                timeSavedEl.classList.remove('hidden');
             } else {
                 savedContainer.classList.add('hidden');
-                timeSavedEl.classList.add('hidden');
             }
             
             saveData();
@@ -2511,19 +2567,27 @@
         function showAmortization(id) {
             try {
                 const l = appData.loans.find(x => x.id === id);
+                if(!l) return;
                 
-                const P = parseNum(l?.amount);
-                const n = parseNum(l?.years) * 12;
-                
-                if(!l || P <= 0 || n <= 0) return showToast("Please enter valid loan details first.", true);
+                const P_curr = parseNum(l.amount);
+                const P_orig = parseNum(l.origAmount) > 0 ? parseNum(l.origAmount) : P_curr;
+                const n_orig = parseNum(l.years) * 12;
+                const override = parseNum(l.minPaymentOverride);
+                const r = parseNum(l.rate) / 100 / 12;
 
-                let balance = P - parseNum(l.lumpSum);
+                if(P_curr <= 0) return showToast("Please enter valid loan details first.", true);
+
+                let base_payment = 0;
+                if (override > 0) {
+                    base_payment = override;
+                } else if (n_orig > 0) {
+                    base_payment = r === 0 ? (P_orig / n_orig) : P_orig * (r * Math.pow(1 + r, n_orig)) / (Math.pow(1 + r, n_orig) - 1);
+                    if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P_orig / n_orig;
+                }
+
+                let balance = P_curr - parseNum(l.lumpSum);
                 if (balance < 0) balance = 0;
                 
-                const r = parseNum(l.rate) / 100 / 12;
-                let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n;
-
                 let payment = base_payment + parseNum(l.extra);
                 
                 // Failsafe for mathematically unpayable loans
@@ -2571,16 +2635,23 @@
                 if (toggle) toggle.value = mode;
 
                 const l = appData.loans.find(x => x.id === id);
+                if(!l) return;
                 
-                const P = parseNum(l?.amount);
-                const n = parseNum(l?.years) * 12;
-                
-                if(!l || P <= 0 || n <= 0) return showToast("Please enter valid loan details first.", true);
-
+                const P_curr = parseNum(l.amount);
+                const P_orig = parseNum(l.origAmount) > 0 ? parseNum(l.origAmount) : P_curr;
+                const n_orig = parseNum(l.years) * 12;
+                const override = parseNum(l.minPaymentOverride);
                 const r = parseNum(l.rate) / 100 / 12;
-                
-                let base_payment = r === 0 ? (P / n) : P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P / n;
+
+                if(P_curr <= 0) return showToast("Please enter valid loan details first.", true);
+
+                let base_payment = 0;
+                if (override > 0) {
+                    base_payment = override;
+                } else if (n_orig > 0) {
+                    base_payment = r === 0 ? (P_orig / n_orig) : P_orig * (r * Math.pow(1 + r, n_orig)) / (Math.pow(1 + r, n_orig) - 1);
+                    if (!isFinite(base_payment) || isNaN(base_payment)) base_payment = P_orig / n_orig;
+                }
 
                 if (base_payment <= 0) return showToast("Invalid loan base payment.", true);
 
@@ -2606,8 +2677,8 @@
                         const step = maxExtra / maxSteps;
                         const extra_i = i * step;
                         
-                        const effectiveLump = Math.max(0, Math.min(parseNum(l.lumpSum), P));
-                        const P_new = P - effectiveLump;
+                        const effectiveLump = Math.max(0, Math.min(parseNum(l.lumpSum), P_curr));
+                        const P_new = P_curr - effectiveLump;
                         const payment = base_payment + extra_i;
                         
                         labels.push('$' + Math.round(extra_i).toLocaleString());
@@ -2621,26 +2692,26 @@
                             calc_n = Math.log(payment / (payment - P_new * r)) / Math.log(1 + r);
                             calc_interest = (calc_n * payment) - P_new;
                         } else {
-                            calc_n = n; calc_interest = (base_payment * n) - P_new;
+                            calc_n = n_orig; calc_interest = (base_payment * n_orig) - P_new;
                         }
 
                         // Without Lump Sum (Baseline)
                         if (r === 0) {
-                            base_n = P / payment; base_int = 0;
-                        } else if (payment > P * r) {
-                            base_n = Math.log(payment / (payment - P * r)) / Math.log(1 + r);
-                            base_int = (base_n * payment) - P;
+                            base_n = P_curr / payment; base_int = 0;
+                        } else if (payment > P_curr * r) {
+                            base_n = Math.log(payment / (payment - P_curr * r)) / Math.log(1 + r);
+                            base_int = (base_n * payment) - P_curr;
                         } else {
-                            base_n = n; base_int = (base_payment * n) - P;
+                            base_n = n_orig; base_int = (base_payment * n_orig) - P_curr;
                         }
 
                     } else {
                         // Lump Sum Mode
-                        const maxLump = P * 0.75; 
+                        const maxLump = P_curr * 0.75; 
                         const step = maxLump / maxSteps;
                         const lump_i = i * step;
                         
-                        const P_new = P - lump_i;
+                        const P_new = P_curr - lump_i;
                         const payment = base_payment + parseNum(l.extra); 
                         
                         labels.push('$' + Math.round(lump_i).toLocaleString());
@@ -2654,17 +2725,17 @@
                             calc_n = Math.log(payment / (payment - P_new * r)) / Math.log(1 + r);
                             calc_interest = (calc_n * payment) - P_new;
                         } else {
-                            calc_n = n; calc_interest = (base_payment * n) - P_new;
+                            calc_n = n_orig; calc_interest = (base_payment * n_orig) - P_new;
                         }
 
                         // Without ANY Lump Sum (Baseline for comparison)
                         if (r === 0) {
-                            base_n = P / payment; base_int = 0;
-                        } else if (payment > P * r) {
-                            base_n = Math.log(payment / (payment - P * r)) / Math.log(1 + r);
-                            base_int = (base_n * payment) - P;
+                            base_n = P_curr / payment; base_int = 0;
+                        } else if (payment > P_curr * r) {
+                            base_n = Math.log(payment / (payment - P_curr * r)) / Math.log(1 + r);
+                            base_int = (base_n * payment) - P_curr;
                         } else {
-                            base_n = n; base_int = (base_payment * n) - P;
+                            base_n = n_orig; base_int = (base_payment * n_orig) - P_curr;
                         }
                     }
 
