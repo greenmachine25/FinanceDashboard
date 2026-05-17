@@ -582,10 +582,12 @@
             applyTheme(appData.theme);
             renderAll();
             initFirebase(); 
+            if (window.lucide) lucide.createIcons();
         }
 
         // --- SortableJS Integration ---
         function initSortable(containerId, type) {
+            if (typeof Sortable === 'undefined') return;
             const el = document.getElementById(containerId);
             if (!el) return;
             if(el._sortable) el._sortable.destroy();
@@ -782,7 +784,9 @@
         function handleSwipe() {
             if (window.innerWidth >= 960) return; 
             const swipeDistance = touchEndX - touchStartX;
-            const currentTab = document.querySelector('.tab-content.active').id;
+            const activeTab = document.querySelector('.tab-content.active');
+            if (!activeTab) return;
+            const currentTab = activeTab.id;
             const currentIndex = tabList.indexOf(currentTab);
 
             if (swipeDistance < -75 && currentIndex < tabList.length - 1) {
@@ -856,6 +860,7 @@
 
         // --- APY Chart Logic ---
         function showApyChart(id) {
+            if (typeof Chart === 'undefined') return showToast("Chart library is still loading.", true);
             try {
                 const inv = appData.investments.find(x => x.id === id);
                 if (!inv) return;
@@ -975,6 +980,7 @@
 
         // --- Compare Charts Logic ---
         function showCompare(type, forcedChartType = null) {
+            if (typeof Chart === 'undefined') return showToast("Chart library is still loading.", true);
             try {
                 appData.lastCompareCategory = type;
                 const isDark = document.documentElement.classList.contains('dark');
@@ -1204,7 +1210,11 @@
                     };
                     datasets.forEach(ds => { 
                         delete ds.yAxisID; 
-                        if (ds.backgroundColor && ds.backgroundColor.length === 7) {
+                        if (Array.isArray(ds.backgroundColor)) {
+                            ds.backgroundColor = ds.backgroundColor.map(c => c.length === 7 ? c + '33' : c);
+                            ds.borderColor = ds.backgroundColor.map(c => c.substring(0, 7));
+                            ds.borderWidth = 2;
+                        } else if (ds.backgroundColor && ds.backgroundColor.length === 7) {
                             ds.backgroundColor = ds.backgroundColor + '33'; // Make solid colors 20% transparent for radar overlapping
                             ds.borderColor = ds.backgroundColor.substring(0, 7);
                             ds.borderWidth = 2;
@@ -1397,8 +1407,10 @@
                 el.classList.add('opacity-0', 'scale-95');
                 setTimeout(() => {
                     appData.dashboards = appData.dashboards.filter(d => d.id !== id);
+                    if (appData.masterPlan.budgetId == id) appData.masterPlan.budgetId = '';
                     saveData();
                     renderDashboards();
+                    renderOverview();
                 }, 200);
             }
         }
@@ -2147,9 +2159,11 @@
                     appData.dashboards.forEach(d => {
                         if (d.linkedRentId === id) d.linkedRentId = null;
                     });
+                    if (appData.masterPlan.rentId == id) appData.masterPlan.rentId = '';
                     saveData();
                     renderRents();
                     renderDashboards();
+                    renderOverview();
                 }, 200);
             }
         }
@@ -2298,9 +2312,11 @@
                     appData.dashboards.forEach(d => {
                         if (d.linkedLoanId === id) d.linkedLoanId = null;
                     });
+                    if (appData.masterPlan.loanId == id) appData.masterPlan.loanId = '';
                     saveData();
                     renderLoans();
                     renderDashboards();
+                    renderOverview();
                 }, 200);
             }
         }
@@ -2657,6 +2673,7 @@
         }
 
         function showSweetSpot(id, mode = 'monthly') {
+            if (typeof Chart === 'undefined') return showToast("Chart library is still loading.", true);
             try {
                 appData.sweetSpotId = id;
                 const toggle = document.getElementById('ssModeToggle');
@@ -2944,9 +2961,11 @@
                     appData.dashboards.forEach(d => {
                         if (d.linkedInvestmentId === id) d.linkedInvestmentId = null;
                     });
+                    if (appData.masterPlan.invId == id) appData.masterPlan.invId = '';
                     saveData();
                     renderInvestments();
                     renderDashboards();
+                    renderOverview();
                 }, 200);
             }
         }
