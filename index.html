@@ -2440,6 +2440,18 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Efficiency Rating Badge -->
+                            <div id="l-eff-container-${loan.id}" class="hidden w-full pt-3 border-t border-white/30 dark:border-white/5 mt-2">
+                                <div class="flex justify-between items-end mb-1.5">
+                                    <span class="tooltip-help text-[11px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-wide" title="Measures how much of the original interest you are avoiding. 100% means 0 interest paid.">Efficiency Rating</span>
+                                    <span class="text-sm font-bold" id="l-eff-pct-${loan.id}">0%</span>
+                                </div>
+                                <div class="w-full bg-white/50 dark:bg-gray-800/50 rounded-full h-1.5 flex overflow-hidden shadow-inner border border-white/40 dark:border-white/5">
+                                    <div id="l-eff-bar-${loan.id}" class="h-1.5 transition-all duration-700 ease-out" style="width: 0%"></div>
+                                </div>
+                            </div>
+
                             <div class="flex space-x-3 w-full pt-2">
                                 <button onclick="showAmortization(${loan.id})" class="flex-1 py-2.5 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/50 dark:border-white/10 text-sm font-bold rounded-xl hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-sm text-gray-800 dark:text-gray-200 flex items-center justify-center outline-none">
                                     <i data-lucide="list" class="w-4 h-4 mr-2 text-brand-teal"></i> Schedule
@@ -2598,16 +2610,51 @@
             const savedEl = document.getElementById(`l-saved-${id}`);
             const timeSavedEl = document.getElementById(`l-time-saved-${id}`);
             
-            if ((extra > 0 || effectiveLump > 0) && months_saved > 0.5 && isFinite(base_interest)) {
-                savedEl.innerText = fmt.format(interest_saved);
-                savedContainer.classList.remove('hidden');
+            // Efficiency Rating Logic
+            const effContainer = document.getElementById(`l-eff-container-${id}`);
+            const effBar = document.getElementById(`l-eff-bar-${id}`);
+            const effPct = document.getElementById(`l-eff-pct-${id}`);
+            
+            if ((extra > 0 || effectiveLump > 0) && (months_saved > 0.5 || interest_saved > 0)) {
+                if(savedContainer) {
+                    savedEl.innerText = fmt.format(interest_saved);
+                    savedContainer.classList.remove('hidden');
+                }
                 
                 let yrs = Math.floor(months_saved / 12);
                 let mos = Math.ceil(months_saved % 12);
                 let timeStr = yrs > 0 ? `${yrs}y ${mos}mo earlier` : `${mos}mo earlier`;
-                timeSavedEl.innerText = timeStr;
+                if(timeSavedEl) timeSavedEl.innerText = timeStr;
+
+                // Calculate Efficiency Percentage
+                let efficiency = 0;
+                if (base_interest > 0) {
+                    efficiency = (interest_saved / base_interest) * 100;
+                } else if (base_n > 0) {
+                    efficiency = (months_saved / base_n) * 100; // Fallback for 0% APR loans
+                }
+                efficiency = Math.max(0, Math.min(100, efficiency || 0));
+
+                if(effContainer && effBar && effPct) {
+                    effContainer.classList.remove('hidden');
+                    effBar.style.width = `${efficiency}%`;
+                    effPct.innerText = `${efficiency.toFixed(1)}%`;
+                    
+                    let textClass = "text-emerald-500"; 
+                    let bgClass = "bg-emerald-500";
+                    
+                    if (efficiency < 15) {
+                        textClass = "text-amber-500"; bgClass = "bg-amber-500";
+                    } else if (efficiency < 50) {
+                        textClass = "text-brand-teal"; bgClass = "bg-brand-teal";
+                    }
+                    
+                    effPct.className = `text-sm font-bold ${textClass}`;
+                    effBar.className = `${bgClass} h-1.5 transition-all duration-700 ease-out`;
+                }
             } else {
-                savedContainer.classList.add('hidden');
+                if(savedContainer) savedContainer.classList.add('hidden');
+                if(effContainer) effContainer.classList.add('hidden');
             }
             
             saveData();
