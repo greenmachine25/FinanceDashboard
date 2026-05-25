@@ -2998,7 +2998,7 @@
                                         <div id="l-eff-container-${loan.id}" class="hidden flex-col items-center justify-center pt-1">
                                             <div class="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/50 dark:bg-gray-800/50 shadow-inner border border-white/40 dark:border-white/5 overflow-hidden flex items-center justify-center tooltip-help" title="Efficiency Rating: Measures how much of the original interest you are avoiding. 100% means 0 interest paid.">
                                                 <div id="l-eff-bar-${loan.id}" class="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out bg-emerald-500" style="height: 0%"></div>
-                                                <span id="l-eff-pct-${loan.id}" class="relative z-10 text-xs font-bold text-white drop-shadow-md [-webkit-text-stroke:0.5px_black]">0%</span>
+                                                <span id="l-eff-pct-${loan.id}" class="relative z-10 text-xl sm:text-2xl leading-none tracking-tighter font-bold text-white drop-shadow-md [-webkit-text-stroke:0.5px_black]">0%</span>
                                             </div>
                                         </div>
                                         <div>
@@ -3226,7 +3226,7 @@
                         bgClass = "bg-brand-teal";
                     }
 
-                    effPct.className = `relative z-10 text-[10px] sm:text-xs font-bold text-white drop-shadow-md [-webkit-text-stroke:0.5px_black]`;
+                    effPct.className = `relative z-10 text-xl sm:text-2xl leading-none tracking-tighter font-bold text-white drop-shadow-md [-webkit-text-stroke:0.5px_black]`;
                     effBar.className = `absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out ${bgClass}`;
                 }
             } else {
