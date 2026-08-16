@@ -576,7 +576,7 @@ html.dark .card-footer {
 .input-field, .select-field {
   width: 100%;
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 1rem; /* 16px to prevent iOS Safari auto-zoom */
   font-weight: 600;
   padding: 0.55rem 0.85rem;
   border-radius: var(--radius-md);
@@ -585,6 +585,12 @@ html.dark .card-footer {
   color: var(--text-main);
   outline: none;
   transition: all var(--transition-fast);
+}
+
+@media (min-width: 768px) {
+  .input-field, .select-field {
+    font-size: 0.9rem;
+  }
 }
 
 .input-field:focus, .select-field:focus {
@@ -611,6 +617,33 @@ html.dark .card-footer {
 
 .currency-input-wrapper input {
   padding-left: 1.65rem;
+}
+
+/* Budget Item Rows (Responsive on narrow devices) */
+.budget-item-row {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  background: var(--bg-surface-input);
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 520px) {
+  .budget-item-row {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .budget-item-row .exp-name-input,
+  .budget-item-row .earn-name-input {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  .budget-item-row .currency-input-wrapper {
+    flex: 1 !important;
+    width: auto !important;
+  }
 }
 
 /* Metric Display Boxes */

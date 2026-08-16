@@ -205,7 +205,7 @@ export function renderBudgets(container, state, handlers) {
                     : dash.expenses
                         .map(
                           (exp) => `
-                    <div style="display: flex; gap: 0.45rem; align-items: center; background: var(--bg-surface-input); padding: 0.4rem 0.6rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                    <div class="budget-item-row">
                       <input type="text" placeholder="Expense description" value="${escapeHtml(exp.name)}"
                         class="input-field exp-name-input" data-dash-id="${dash.id}" data-exp-id="${exp.id}"
                         style="padding: 0.35rem 0.6rem; font-size: 0.825rem; flex: 1;">
@@ -247,7 +247,7 @@ export function renderBudgets(container, state, handlers) {
                     : dash.earnings
                         .map(
                           (earn) => `
-                    <div style="display: flex; gap: 0.45rem; align-items: center; background: var(--bg-surface-input); padding: 0.4rem 0.6rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                    <div class="budget-item-row">
                       <input type="text" placeholder="Side-gig / dividend" value="${escapeHtml(earn.name)}"
                         class="input-field earn-name-input" data-dash-id="${dash.id}" data-earn-id="${earn.id}"
                         style="padding: 0.35rem 0.6rem; font-size: 0.825rem; flex: 1;">
