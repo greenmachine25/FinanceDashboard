@@ -2,7 +2,7 @@
  * Utility functions, formatters, sanitizers, and data export/import helpers
  */
 
-export const APP_VERSION = "0.16";
+export const APP_VERSION = "0.17";
 
 export const colorMap = {
   "bg-emerald-500": "#10b981",
