@@ -45,6 +45,28 @@ export function renderGoals(container, state, handlers) {
     onFastUpdate,
   } = handlers;
 
+  if (state.goals.length === 0) {
+    container.innerHTML = `
+      <div class="glass-card" style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; text-align: center;">
+        <i data-lucide="target" style="width: 2.5rem; height: 2.5rem; margin: 0 auto 0.75rem; color: var(--brand-fuchsia);"></i>
+        <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+          No Sinking Funds or Goals Created Yet
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; max-width: 28rem; margin-left: auto; margin-right: auto;">
+          Track savings for upcoming vacations, vehicle purchases, emergency funds, or down payments with monthly progress projections.
+        </p>
+        <button id="emptyAddGoalBtn" class="btn btn-accent-fuchsia" style="margin: 0 auto;">
+          <i data-lucide="plus" style="width: 1rem; height: 1rem;"></i> Create First Goal
+        </button>
+      </div>
+    `;
+    container.querySelector("#emptyAddGoalBtn")?.addEventListener("click", () => {
+      document.getElementById("addGoalBtn")?.click();
+    });
+    refreshIcons();
+    return;
+  }
+
   container.innerHTML = state.goals
     .map((goal) => {
       const metrics = calcGoalMetrics(goal);

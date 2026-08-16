@@ -58,7 +58,7 @@
         <div class="nav-logo-icon">
           <i data-lucide="wallet" style="width: 1.25rem; height: 1.25rem;"></i>
         </div>
-        <span class="nav-brand-text">Finance<span class="gradient-text">Hub</span> <span class="version-badge">v0.13</span></span>
+        <span class="nav-brand-text">Finance<span class="gradient-text">Hub</span> <span class="version-badge">v0.14</span></span>
       </a>
 
       <!-- Desktop Nav Tabs -->
@@ -366,12 +366,48 @@
         <h3 class="modal-title" style="color: var(--brand-teal);">
           <i data-lucide="calendar"></i> Amortization Schedule
         </h3>
-        <button class="icon-btn btn-sm" data-close-modal="amortModal">
-          <i data-lucide="x" style="width: 1.1rem; height: 1.1rem;"></i>
-        </button>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button id="exportAmortCsvBtn" class="btn btn-secondary btn-sm" title="Download schedule as CSV spreadsheet">
+            <i data-lucide="file-spreadsheet" style="width: 0.85rem; height: 0.85rem; color: var(--brand-teal);"></i> Export CSV
+          </button>
+          <button class="icon-btn btn-sm" data-close-modal="amortModal">
+            <i data-lucide="x" style="width: 1.1rem; height: 1.1rem;"></i>
+          </button>
+        </div>
       </div>
-      <div class="modal-body" style="padding: 0;">
-        <div style="overflow-x: auto; max-height: calc(85vh - 5rem);">
+
+      <!-- Amortization Highlights Top Box -->
+      <div style="padding: 1rem 1.5rem 0;">
+        <div class="cards-grid cards-grid-4" style="gap: 0.5rem;">
+          <div class="metric-box" style="padding: 0.5rem 0.75rem;">
+            <div>
+              <p class="metric-label" style="font-size: 0.675rem;">Payoff Timeline</p>
+              <p id="amort-stat-time" class="font-mono" style="font-size: 0.95rem; font-weight: 700; color: var(--brand-teal);">--</p>
+            </div>
+          </div>
+          <div class="metric-box" style="padding: 0.5rem 0.75rem;">
+            <div>
+              <p class="metric-label" style="font-size: 0.675rem;">Total Months</p>
+              <p id="amort-stat-months" class="font-mono" style="font-size: 0.95rem; font-weight: 700;">--</p>
+            </div>
+          </div>
+          <div class="metric-box" style="padding: 0.5rem 0.75rem; border-color: rgba(244, 63, 94, 0.3);">
+            <div>
+              <p class="metric-label" style="font-size: 0.675rem; color: var(--brand-rose);">Lifetime Interest</p>
+              <p id="amort-stat-int" class="font-mono" style="font-size: 0.95rem; font-weight: 800; color: var(--brand-rose);">$0</p>
+            </div>
+          </div>
+          <div class="metric-box" style="padding: 0.5rem 0.75rem; border-color: rgba(14, 165, 233, 0.3);">
+            <div>
+              <p class="metric-label" style="font-size: 0.675rem; color: var(--brand-teal);">Total Paid</p>
+              <p id="amort-stat-total" class="font-mono" style="font-size: 0.95rem; font-weight: 800; color: var(--brand-teal);">$0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding: 1rem 1.5rem;">
+        <div style="overflow-x: auto; max-height: calc(75vh - 7rem); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
           <table class="data-table">
             <thead>
               <tr>
@@ -379,7 +415,7 @@
                 <th>Payment</th>
                 <th style="color: var(--brand-rose);">Interest</th>
                 <th style="color: var(--brand-teal);">Principal</th>
-                <th style="text-align: right;">Balance</th>
+                <th style="text-align: right;">Remaining Balance</th>
               </tr>
             </thead>
             <tbody id="amortTableBody"></tbody>
@@ -412,18 +448,23 @@
 
       <!-- Optimal Sweet Spot Banner -->
       <div id="sweetSpotResult" style="margin: 1.25rem 1.5rem 0;" class="hidden">
-        <div class="metric-box" style="background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.3);">
+        <div class="metric-box" style="background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.3);">
           <div>
-            <p class="metric-label" style="color: var(--brand-purple);">Optimal Sweet Spot (Elbow)</p>
+            <p class="metric-label" style="color: var(--brand-purple);">Optimal Sweet Spot Recommendation</p>
             <p id="ss-payment" class="font-mono" style="font-size: 1.35rem; font-weight: 800; color: var(--text-main);">$0</p>
           </div>
-          <div style="text-align: right;">
-            <p style="font-size: 0.8rem; color: var(--text-muted);">
-              Total Interest: <span id="ss-interest" class="font-mono" style="font-weight: 700; color: var(--brand-rose);">$0</span>
-            </p>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-              Payoff Time: <span id="ss-time" class="font-mono" style="font-weight: 700; color: var(--brand-blue);">0 yrs</span>
-            </p>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="text-align: right;">
+              <p style="font-size: 0.775rem; color: var(--text-muted);">
+                Total Interest: <span id="ss-interest" class="font-mono" style="font-weight: 700; color: var(--brand-rose);">$0</span>
+              </p>
+              <p style="font-size: 0.775rem; color: var(--text-muted); margin-top: 0.15rem;">
+                Payoff Time: <span id="ss-time" class="font-mono" style="font-weight: 700; color: var(--brand-blue);">0 yrs</span>
+              </p>
+            </div>
+            <button id="applySweetSpotModalBtn" class="btn btn-sm btn-primary" title="Apply this optimal accelerator directly to your loan scenario">
+              <i data-lucide="sparkles" style="width: 0.8rem; height: 0.8rem;"></i> Apply Value
+            </button>
           </div>
         </div>
       </div>

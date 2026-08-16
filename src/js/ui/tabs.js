@@ -35,9 +35,18 @@ export function switchTab(tabId, onTabSwitched) {
   document.body.style.overflow = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
 
+  try {
+    history.replaceState(null, "", `#${tabId}`);
+  } catch (e) {}
+
   if (typeof onTabSwitched === "function") {
     onTabSwitched(tabId);
   }
+}
+
+export function getInitialTabFromHash() {
+  const hash = window.location.hash.replace("#", "");
+  return tabList.includes(hash) ? hash : "overview";
 }
 
 export function initSwipeNavigation(containerEl, onSwipe) {

@@ -31,7 +31,7 @@ import {
 import { initFirebase } from "./firebase.js";
 import { showToast } from "./ui/toast.js";
 import { openModal, closeModal, initModalListeners } from "./ui/modals.js";
-import { switchTab, initSwipeNavigation } from "./ui/tabs.js";
+import { switchTab, initSwipeNavigation, getInitialTabFromHash } from "./ui/tabs.js";
 import { renderOverview, updateOverviewDOM } from "./ui/renderOverview.js";
 import { renderBudgets } from "./ui/renderBudgets.js";
 import { renderGoals } from "./ui/renderGoals.js";
@@ -258,6 +258,9 @@ function deleteItem(type, id) {
   }, type);
 }
 
+let currentAmortLoan = null;
+let currentAmortSchedule = [];
+
 /**
  * Modal Chart Triggers
  */
@@ -266,21 +269,39 @@ function showAmortizationModal(loanId) {
   const loan = state.loans.find((l) => l.id === loanId);
   if (!loan) return;
 
+  currentAmortLoan = loan;
   const schedule = calcAmortizationSchedule(loan);
+  currentAmortSchedule = schedule;
+
   const tbody = document.getElementById("amortTableBody");
+  const timeEl = document.getElementById("amort-stat-time");
+  const monthsEl = document.getElementById("amort-stat-months");
+  const intEl = document.getElementById("amort-stat-int");
+  const totalEl = document.getElementById("amort-stat-total");
+
+  const totalInt = schedule.reduce((acc, curr) => acc + curr.interest, 0);
+  const totalPaid = schedule.reduce((acc, curr) => acc + curr.payment, 0);
+
+  const loanMetrics = calcLoanMetrics(loan);
+
+  if (timeEl) timeEl.innerText = loanMetrics.payoffDateString;
+  if (monthsEl) monthsEl.innerText = `${schedule.length} mo (${(schedule.length / 12).toFixed(1)} yrs)`;
+  if (intEl) intEl.innerText = fmt.format(totalInt);
+  if (totalEl) totalEl.innerText = fmt.format(totalPaid);
+
   if (!tbody) return;
 
   if (schedule.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Please enter valid loan balance, rate, and term to view amortization schedule.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">Please enter a valid loan balance, rate, and term to view amortization schedule.</td></tr>`;
   } else {
     tbody.innerHTML = schedule
       .map(
         (row) => `
       <tr>
         <td style="font-weight: 700;">#${row.month}</td>
-        <td class="font-mono font-bold">${fmt.format(row.payment)}</td>
-        <td class="font-mono font-bold" style="color: var(--brand-rose);">${fmt.format(row.interest)}</td>
-        <td class="font-mono font-bold" style="color: var(--brand-teal);">${fmt.format(row.principal)}</td>
+        <td class="font-mono" style="font-weight: 700;">${fmt.format(row.payment)}</td>
+        <td class="font-mono" style="font-weight: 700; color: var(--brand-rose);">${fmt.format(row.interest)}</td>
+        <td class="font-mono" style="font-weight: 700; color: var(--brand-teal);">${fmt.format(row.principal)}</td>
         <td class="font-mono" style="text-align: right; font-weight: 600;">${fmt.format(row.balance)}</td>
       </tr>
     `
@@ -289,6 +310,29 @@ function showAmortizationModal(loanId) {
   }
 
   openModal("amortModal");
+}
+
+function exportAmortizationCSV() {
+  if (!currentAmortSchedule || currentAmortSchedule.length === 0) {
+    return showToast("No schedule data available to export.", true);
+  }
+
+  const loanName = currentAmortLoan ? currentAmortLoan.name.replace(/[^a-zA-Z0-9_-]/g, "_") : "Loan";
+  let csv = "Month,Payment,Interest,Principal,Remaining Balance\n";
+  currentAmortSchedule.forEach((r) => {
+    csv += `${r.month},${r.payment.toFixed(2)},${r.interest.toFixed(2)},${r.principal.toFixed(2)},${r.balance.toFixed(2)}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${loanName}_Amortization_Schedule.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast("Amortization schedule downloaded as CSV!");
 }
 
 function showSweetSpotModal(loanId) {
@@ -342,7 +386,7 @@ function applyOptimalAccelerator(loanId, mode) {
     return s;
   }, "loan");
 
-  showToast("Optimal value applied to accelerator!", false, "sparkles");
+  showToast(`Applied optimal ${sweetSpotData.optimalLabel}!`, false);
 }
 
 function showApyChartModal(invId) {
@@ -518,6 +562,20 @@ function initGlobalListeners() {
     showCompareModal(currentCompareType, e.target.value);
   });
 
+  // Amortization CSV Export
+  document.getElementById("exportAmortCsvBtn")?.addEventListener("click", () => {
+    exportAmortizationCSV();
+  });
+
+  // Sweet Spot Modal Direct Apply
+  document.getElementById("applySweetSpotModalBtn")?.addEventListener("click", () => {
+    const state = getState();
+    if (state.sweetSpotId) {
+      applyOptimalAccelerator(state.sweetSpotId, currentSweetSpotMode);
+      closeModal("chartModal");
+    }
+  });
+
   // Sweet Spot Mode Toggle
   document.getElementById("ssModeToggle")?.addEventListener("change", (e) => {
     currentSweetSpotMode = e.target.value;
@@ -631,6 +689,7 @@ async function bootstrap() {
   const state = loadSavedState();
   applyTheme(state.theme);
   renderAll(state);
+  switchTab(getInitialTabFromHash());
 
   // Subscribe to state updates
   subscribe((newState, options) => {

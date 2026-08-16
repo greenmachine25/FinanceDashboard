@@ -37,6 +37,28 @@ export function renderInvestments(container, state, handlers) {
     onFastUpdate,
   } = handlers;
 
+  if (state.investments.length === 0) {
+    container.innerHTML = `
+      <div class="glass-card" style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; text-align: center;">
+        <i data-lucide="trending-up" style="width: 2.5rem; height: 2.5rem; margin: 0 auto 0.75rem; color: var(--brand-blue);"></i>
+        <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+          No APY Savings Accounts Created Yet
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; max-width: 28rem; margin-left: auto; margin-right: auto;">
+          Forecast high-yield savings growth, tiered rate caps, after-tax interest yields, and compound balances over 30 years.
+        </p>
+        <button id="emptyAddInvBtn" class="btn btn-primary" style="margin: 0 auto;">
+          <i data-lucide="plus" style="width: 1rem; height: 1rem;"></i> Create First APY Scenario
+        </button>
+      </div>
+    `;
+    container.querySelector("#emptyAddInvBtn")?.addEventListener("click", () => {
+      document.getElementById("addInvestmentBtn")?.click();
+    });
+    refreshIcons();
+    return;
+  }
+
   container.innerHTML = state.investments
     .map((inv) => {
       const metrics = calcInvestmentMetrics(inv);

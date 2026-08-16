@@ -30,6 +30,28 @@ export function renderRents(container, state, handlers) {
     onFastUpdate,
   } = handlers;
 
+  if (state.rents.length === 0) {
+    container.innerHTML = `
+      <div class="glass-card" style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; text-align: center;">
+        <i data-lucide="home" style="width: 2.5rem; height: 2.5rem; margin: 0 auto 0.75rem; color: var(--brand-emerald);"></i>
+        <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+          No Rent Scenarios Created Yet
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; max-width: 28rem; margin-left: auto; margin-right: auto;">
+          Compare apartment options by tallying base lease prices with estimated electric, water, trash, and parking fees.
+        </p>
+        <button id="emptyAddRentBtn" class="btn btn-primary" style="margin: 0 auto;">
+          <i data-lucide="plus" style="width: 1rem; height: 1rem;"></i> Create First Rent Scenario
+        </button>
+      </div>
+    `;
+    container.querySelector("#emptyAddRentBtn")?.addEventListener("click", () => {
+      document.getElementById("addRentBtn")?.click();
+    });
+    refreshIcons();
+    return;
+  }
+
   container.innerHTML = state.rents
     .map((rent) => {
       const metrics = calcRentMetrics(rent);
