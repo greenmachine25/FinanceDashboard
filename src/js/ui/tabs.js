@@ -32,6 +32,7 @@ export function switchTab(tabId, onTabSwitched) {
     btn.classList.toggle("active", btn.dataset.tab === tabId);
   });
 
+  document.body.style.overflow = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   if (typeof onTabSwitched === "function") {

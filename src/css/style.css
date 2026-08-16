@@ -90,18 +90,21 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  height: 100%;
 }
 
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-base);
   color: var(--text-main);
-  min-height: 100vh;
+  min-height: 100%;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.25s ease, color 0.25s ease;
   overflow-x: hidden;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -458,20 +461,36 @@ html.dark .nav-tab-btn:hover {
   display: grid;
   gap: 1.25rem;
   grid-template-columns: 1fr;
+  width: 100%;
 }
 
-@media (min-width: 680px) {
+@media (min-width: 768px) {
   .cards-grid-2 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 960px) {
+@media (min-width: 640px) {
   .cards-grid-3 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+@media (min-width: 1100px) {
+  .cards-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 640px) {
   .cards-grid-4 {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .cards-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -792,6 +811,7 @@ html.dark .card-footer {
   animation: modalFadeIn 0.2s ease-out;
 }
 
+.modal-backdrop.active,
 .modal-backdrop.open {
   display: flex;
 }
