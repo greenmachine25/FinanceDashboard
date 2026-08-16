@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -9,7 +9,30 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="icon.png" />
-  <meta name="theme-color" content="#0ea5e9" />
+  <meta name="theme-color" content="#090d14" />
+
+  <!-- Immediate Theme Initializer to prevent light/dark flash -->
+  <script>
+    (function() {
+      try {
+        var raw = localStorage.getItem("financeHubData");
+        var isDark = true;
+        if (raw) {
+          var data = JSON.parse(raw);
+          if (data && data.theme === "light") {
+            isDark = false;
+          }
+        }
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
@@ -35,7 +58,7 @@
         <div class="nav-logo-icon">
           <i data-lucide="wallet" style="width: 1.25rem; height: 1.25rem;"></i>
         </div>
-        <span class="nav-brand-text">Finance<span class="gradient-text">Hub</span> <span class="version-badge">v0.12</span></span>
+        <span class="nav-brand-text">Finance<span class="gradient-text">Hub</span> <span class="version-badge">v0.13</span></span>
       </a>
 
       <!-- Desktop Nav Tabs -->
