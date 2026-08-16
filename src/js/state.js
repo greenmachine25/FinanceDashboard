@@ -7,7 +7,7 @@ import { getRandomColor, debounce } from "./utils.js";
 const STORAGE_KEY = "financeHubData";
 
 export const defaultState = {
-  theme: "light",
+  theme: "dark",
   masterPlan: {
     budgetId: "",
     rentId: "",
@@ -59,7 +59,7 @@ const debouncedSave = debounce(() => {
   } catch (err) {
     console.error("Failed to save state to localStorage:", err);
   }
-}, 800);
+}, 600);
 
 export function setState(newState, changedCategory = null) {
   state = migrateState(newState);
@@ -77,13 +77,13 @@ export function updateState(updaterFn, changedCategory = null) {
 }
 
 /**
- * Migration & backward compatibility normalizer
+ * Migration & backward compatibility normalizer with schema sanitization
  */
 export function migrateState(raw) {
   if (!raw || typeof raw !== "object") return createInitialState();
 
   const clean = {
-    theme: raw.theme || "light",
+    theme: raw.theme === "light" ? "light" : "dark",
     masterPlan: {
       budgetId: raw.masterPlan?.budgetId ?? "",
       rentId: raw.masterPlan?.rentId ?? "",
@@ -99,36 +99,87 @@ export function migrateState(raw) {
     lastCompareCategory: raw.lastCompareCategory || null,
   };
 
-  // Ensure individual items have all expected properties
-  clean.dashboards.forEach((d) => {
-    if (!Array.isArray(d.expenses)) d.expenses = [];
-    if (!Array.isArray(d.earnings)) d.earnings = [];
-    if (!d.color) d.color = getRandomColor();
-    if (d.isMinimized === undefined) d.isMinimized = false;
-  });
+  // Ensure individual items have all expected properties sanitized
+  clean.dashboards = clean.dashboards.map((d) => ({
+    id: d.id || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(d.name || "Budget Scenario"),
+    income: String(d.income || "0"),
+    expenses: Array.isArray(d.expenses)
+      ? d.expenses.map((e) => ({
+          id: e.id || Date.now() + Math.floor(Math.random() * 1000),
+          name: String(e.name || ""),
+          amount: String(e.amount || "0"),
+          freq: ["weekly", "monthly", "yearly"].includes(e.freq) ? e.freq : "monthly",
+        }))
+      : [],
+    earnings: Array.isArray(d.earnings)
+      ? d.earnings.map((e) => ({
+          id: e.id || Date.now() + Math.floor(Math.random() * 1000),
+          name: String(e.name || ""),
+          amount: String(e.amount || "0"),
+          freq: ["weekly", "monthly", "yearly"].includes(e.freq) ? e.freq : "monthly",
+        }))
+      : [],
+    color: d.color || getRandomColor(),
+    isMinimized: !!d.isMinimized,
+    linkedRentId: d.linkedRentId ? Number(d.linkedRentId) : null,
+    linkedLoanId: d.linkedLoanId ? Number(d.linkedLoanId) : null,
+    linkedInvestmentId: d.linkedInvestmentId ? Number(d.linkedInvestmentId) : null,
+  }));
 
-  clean.rents.forEach((r) => {
-    if (!r.color) r.color = getRandomColor();
-    if (r.isMinimized === undefined) r.isMinimized = false;
-  });
+  clean.rents = clean.rents.map((r) => ({
+    id: r.id || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(r.name || "Apartment"),
+    baseRent: String(r.baseRent || "0"),
+    water: String(r.water || "0"),
+    electricity: String(r.electricity || "0"),
+    internet: String(r.internet || "0"),
+    other: String(r.other || "0"),
+    color: r.color || getRandomColor(),
+    isMinimized: !!r.isMinimized,
+  }));
 
-  clean.loans.forEach((l) => {
-    if (!l.color) l.color = getRandomColor();
-    if (l.lumpSum === undefined) l.lumpSum = "";
-    if (l.isMinimized === undefined) l.isMinimized = false;
-  });
+  clean.loans = clean.loans.map((l) => ({
+    id: l.id || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(l.name || "Loan"),
+    origAmount: String(l.origAmount || "0"),
+    amount: String(l.amount || "0"),
+    rate: String(l.rate || "0"),
+    years: String(l.years || "5"),
+    minPaymentOverride: String(l.minPaymentOverride || ""),
+    extra: String(l.extra || "0"),
+    lumpSum: String(l.lumpSum || "0"),
+    color: l.color || getRandomColor(),
+    isMinimized: !!l.isMinimized,
+  }));
 
-  clean.investments.forEach((i) => {
-    if (!i.color) i.color = getRandomColor();
-    if (i.rateCap === undefined) i.rateCap = "";
-    if (i.rateOverCap === undefined) i.rateOverCap = "";
-    if (i.isMinimized === undefined) i.isMinimized = false;
-  });
+  clean.investments = clean.investments.map((i) => ({
+    id: i.id || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(i.name || "Savings Account"),
+    principal: String(i.principal || "0"),
+    monthly: String(i.monthly || "0"),
+    rate: String(i.rate || "0"),
+    taxBracket: String(i.taxBracket || "0"),
+    rateCap: String(i.rateCap || ""),
+    rateOverCap: String(i.rateOverCap || ""),
+    color: i.color || getRandomColor(),
+    isMinimized: !!i.isMinimized,
+  }));
 
-  clean.goals.forEach((g) => {
-    if (!g.color) g.color = getRandomColor();
-    if (g.isMinimized === undefined) g.isMinimized = false;
-  });
+  clean.goals = clean.goals.map((g) => ({
+    id: g.id || Date.now() + Math.floor(Math.random() * 1000),
+    name: String(g.name || "Savings Goal"),
+    targetAmount: String(g.targetAmount || "0"),
+    savedAmount: String(g.savedAmount || "0"),
+    monthlyContrib: String(g.monthlyContrib || "0"),
+    linkedDashboardId: g.linkedDashboardId ? Number(g.linkedDashboardId) : null,
+    color: g.color || getRandomColor(),
+    isMinimized: !!g.isMinimized,
+  }));
+
+  if (clean.dashboards.length === 0 && clean.rents.length === 0 && clean.loans.length === 0) {
+    return createInitialState();
+  }
 
   return clean;
 }
@@ -136,7 +187,7 @@ export function migrateState(raw) {
 export function createInitialState() {
   const now = Date.now();
   return {
-    theme: "light",
+    theme: "dark",
     masterPlan: {
       budgetId: now,
       rentId: now + 1,
@@ -147,10 +198,11 @@ export function createInitialState() {
       {
         id: now,
         name: "Primary Budget",
-        income: "1200",
+        income: "1350",
         expenses: [
-          { id: now + 10, name: "Groceries", amount: "400", freq: "monthly" },
-          { id: now + 11, name: "Subscriptions", amount: "50", freq: "monthly" },
+          { id: now + 10, name: "Groceries & Essentials", amount: "450", freq: "monthly" },
+          { id: now + 11, name: "Subscriptions & Media", amount: "65", freq: "monthly" },
+          { id: now + 12, name: "Transport & Fuel", amount: "180", freq: "monthly" },
         ],
         earnings: [],
         color: "bg-teal-500",
@@ -163,12 +215,12 @@ export function createInitialState() {
     rents: [
       {
         id: now + 1,
-        name: "Apartment Downtown",
-        baseRent: "1400",
-        water: "40",
-        electricity: "85",
-        internet: "60",
-        other: "25",
+        name: "Metro Apartment",
+        baseRent: "1450",
+        water: "45",
+        electricity: "90",
+        internet: "65",
+        other: "30",
         color: "bg-cyan-500",
         isMinimized: false,
       },
@@ -177,12 +229,12 @@ export function createInitialState() {
       {
         id: now + 2,
         name: "Auto Loan",
-        origAmount: "25000",
-        amount: "18500",
-        rate: "4.5",
+        origAmount: "28000",
+        amount: "19500",
+        rate: "4.75",
         years: "5",
         minPaymentOverride: "",
-        extra: "100",
+        extra: "150",
         lumpSum: "",
         color: "bg-blue-500",
         isMinimized: false,
@@ -191,46 +243,45 @@ export function createInitialState() {
     investments: [
       {
         id: now + 3,
-        name: "High-Yield Savings",
-        principal: "5000",
-        monthly: "250",
-        rate: "4.75",
+        name: "High-Yield Savings (HYSA)",
+        principal: "7500",
+        monthly: "350",
+        rate: "4.85",
         taxBracket: "22",
-        rateCap: "",
-        rateOverCap: "",
-        color: "bg-indigo-500",
+        rateCap: "25000",
+        rateOverCap: "1.25",
+        color: "bg-emerald-500",
         isMinimized: false,
       },
     ],
     goals: [
       {
         id: now + 4,
-        name: "Emergency Reserve",
-        targetAmount: "10000",
-        savedAmount: "3500",
-        monthlyContrib: "200",
+        name: "Emergency Fund (6 Mo)",
+        targetAmount: "12000",
+        savedAmount: "6500",
+        monthlyContrib: "300",
         linkedDashboardId: now,
         color: "bg-fuchsia-500",
         isMinimized: false,
       },
     ],
-    sweetSpotId: null,
+    sweetSpotId: now + 2,
     lastCompareCategory: null,
   };
 }
 
 export function loadSavedState() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
       state = migrateState(parsed);
     } else {
       state = createInitialState();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
   } catch (err) {
-    console.error("Error reading saved state:", err);
+    console.error("Failed to load state from localStorage:", err);
     state = createInitialState();
   }
   return state;

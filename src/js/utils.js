@@ -1,14 +1,8 @@
 /**
- * Utility functions, formatters, color palettes, and data export/import helpers
+ * Utility functions, formatters, sanitizers, and data export/import helpers
  */
 
 export const colorMap = {
-  "bg-rose-500": "#f43f5e",
-  "bg-red-500": "#ef4444",
-  "bg-orange-500": "#f97316",
-  "bg-amber-500": "#f59e0b",
-  "bg-yellow-400": "#facc15",
-  "bg-lime-500": "#84cc16",
   "bg-emerald-500": "#10b981",
   "bg-teal-500": "#14b8a6",
   "bg-cyan-500": "#06b6d4",
@@ -19,6 +13,8 @@ export const colorMap = {
   "bg-purple-500": "#a855f7",
   "bg-fuchsia-500": "#d946ef",
   "bg-pink-500": "#ec4899",
+  "bg-rose-500": "#f43f5e",
+  "bg-amber-500": "#f59e0b",
 };
 
 export const cardColors = Object.keys(colorMap);
@@ -42,11 +38,40 @@ export const fmtInt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+export const fmtCompact = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+export const fmtPct = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 2,
+});
+
+/**
+ * Robust numeric parser that handles string currency symbols, commas, and whitespace
+ */
 export function parseNum(val) {
   if (val === undefined || val === null || val === "") return 0;
   if (typeof val === "number") return isNaN(val) ? 0 : val;
   const parsed = parseFloat(val.toString().replace(/[^0-9.-]+/g, ""));
   return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Strict HTML escaping to prevent XSS injection via user-supplied text
+ */
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 export function debounce(fn, delay = 300) {
@@ -77,13 +102,19 @@ export function exportDataAsJSON(data, filename = `financehub_backup_${Date.now(
 }
 
 export function exportDataAsSyncCode(data) {
-  return btoa(encodeURIComponent(JSON.stringify(data)));
+  try {
+    return btoa(encodeURIComponent(JSON.stringify(data)));
+  } catch (err) {
+    console.error("Failed to generate sync code:", err);
+    return "";
+  }
 }
 
 export function parseSyncCode(code) {
   if (!code || typeof code !== "string") return null;
   try {
-    return JSON.parse(decodeURIComponent(atob(code.trim())));
+    const jsonStr = decodeURIComponent(atob(code.trim()));
+    return JSON.parse(jsonStr);
   } catch (err) {
     console.error("Failed to decode sync code:", err);
     return null;

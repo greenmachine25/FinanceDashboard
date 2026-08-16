@@ -38,9 +38,9 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
       data: sweetSpotData.interestData,
       borderColor: "#f43f5e",
       backgroundColor: "rgba(244, 63, 94, 0.12)",
-      borderWidth: 3,
+      borderWidth: 2.5,
       fill: mode === "monthly" && !hasLumpSum,
-      tension: 0.35,
+      tension: 0.3,
       pointRadius: 3,
       pointHoverRadius: 6,
       pointBackgroundColor: "#f43f5e",
@@ -51,9 +51,9 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
       data: sweetSpotData.timeData,
       borderColor: "#3b82f6",
       backgroundColor: "transparent",
-      borderWidth: 3,
+      borderWidth: 2.5,
       borderDash: [5, 5],
-      tension: 0.35,
+      tension: 0.3,
       pointRadius: 3,
       pointHoverRadius: 6,
       pointBackgroundColor: "#3b82f6",
@@ -69,7 +69,7 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
       borderWidth: 2,
       fill: true,
       backgroundColor: "rgba(244, 63, 94, 0.04)",
-      tension: 0.35,
+      tension: 0.3,
       pointRadius: 0,
       yAxisID: "y",
     });
@@ -79,7 +79,7 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
       borderColor: isDark ? "rgba(59, 130, 246, 0.4)" : "rgba(59, 130, 246, 0.3)",
       borderWidth: 2,
       borderDash: [4, 4],
-      tension: 0.35,
+      tension: 0.3,
       pointRadius: 0,
       yAxisID: "y1",
     });
@@ -119,8 +119,8 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
           bodyColor: tooltipText,
           borderColor: tooltipBorder,
           borderWidth: 1,
-          padding: 12,
-          boxPadding: 6,
+          padding: 10,
+          boxPadding: 4,
           usePointStyle: true,
           callbacks: {
             title: (items) => `${mode === "monthly" ? "Extra Monthly: " : "Lump Sum: "}${items[0].label}`,
@@ -139,7 +139,7 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
             display: true,
             text: mode === "monthly" ? "Extra Monthly Payment" : "One-Time Lump Sum",
             color: textColor,
-            font: { weight: "700", size: 12 },
+            font: { weight: "700", size: 11 },
           },
           grid: { color: gridColor, drawBorder: false },
           ticks: { color: textColor, maxTicksLimit: 8 },
@@ -152,7 +152,7 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
             display: true,
             text: "Total Interest ($)",
             color: "#f43f5e",
-            font: { weight: "700", size: 12 },
+            font: { weight: "700", size: 11 },
           },
           grid: { color: gridColor, drawBorder: false },
           ticks: {
@@ -168,7 +168,7 @@ export function renderSweetSpotChart(canvasEl, sweetSpotData, isDark, hasLumpSum
             display: true,
             text: "Years Remaining",
             color: "#3b82f6",
-            font: { weight: "700", size: 12 },
+            font: { weight: "700", size: 11 },
           },
           grid: { drawOnChartArea: false },
           ticks: { color: textColor },
@@ -200,24 +200,26 @@ export function renderApyChart(canvasEl, apySeries, isDark) {
       labels: apySeries.labels,
       datasets: [
         {
-          label: "Total Principal (Your Money)",
+          label: "Total Contributions (Principal)",
           data: apySeries.principalData,
           borderColor: "#3b82f6",
-          backgroundColor: isDark ? "rgba(59, 130, 246, 0.45)" : "rgba(59, 130, 246, 0.35)",
+          backgroundColor: "rgba(59, 130, 246, 0.25)",
+          borderWidth: 2.5,
           fill: true,
-          borderWidth: 2,
-          tension: 0.15,
-          pointRadius: 0,
+          tension: 0.3,
+          pointRadius: 2,
+          pointHoverRadius: 5,
         },
         {
-          label: "Compound Interest (Bank Money)",
+          label: "Compound Interest Earned",
           data: apySeries.interestData,
           borderColor: "#10b981",
-          backgroundColor: isDark ? "rgba(16, 185, 129, 0.45)" : "rgba(16, 185, 129, 0.35)",
+          backgroundColor: "rgba(16, 185, 129, 0.35)",
+          borderWidth: 2.5,
           fill: true,
-          borderWidth: 2,
-          tension: 0.15,
-          pointRadius: 0,
+          tension: 0.3,
+          pointRadius: 2,
+          pointHoverRadius: 5,
         },
       ],
     },
@@ -248,11 +250,15 @@ export function renderApyChart(canvasEl, apySeries, isDark) {
           bodyColor: tooltipText,
           borderColor: tooltipBorder,
           borderWidth: 1,
-          padding: 12,
-          boxPadding: 6,
+          padding: 10,
+          boxPadding: 4,
           usePointStyle: true,
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${fmt.format(ctx.raw)}`,
+            label: (context) => `${context.dataset.label}: ${fmt.format(context.raw)}`,
+            footer: (items) => {
+              const total = items.reduce((acc, curr) => acc + curr.raw, 0);
+              return `Total Balance: ${fmt.format(total)}`;
+            },
           },
         },
       },
@@ -268,12 +274,6 @@ export function renderApyChart(canvasEl, apySeries, isDark) {
             color: textColor,
             callback: (v) => "$" + v.toLocaleString(),
           },
-          title: {
-            display: true,
-            text: "Total Balance ($)",
-            color: textColor,
-            font: { weight: "700" },
-          },
         },
       },
     },
@@ -283,10 +283,10 @@ export function renderApyChart(canvasEl, apySeries, isDark) {
 }
 
 /**
- * Render Scenario Comparison Chart (Bar, Line, Radar)
+ * Render Multi-Scenario Comparison Chart (Bar, Line, Radar)
  */
-export function renderCompareChart(canvasEl, type, chartType, appData, isDark) {
-  if (!canvasEl || typeof Chart === "undefined" || !appData) return null;
+export function renderCompareChart(canvasEl, category = "loan", chartType = "bar", state = null, isDark = false) {
+  if (!canvasEl || typeof Chart === "undefined" || !state) return null;
 
   if (compareChartInstance) {
     compareChartInstance.destroy();
@@ -294,197 +294,189 @@ export function renderCompareChart(canvasEl, type, chartType, appData, isDark) {
   }
 
   const { gridColor, textColor, tooltipBg, tooltipText, tooltipBorder } = getChartThemeColors(isDark);
+  const ctx = canvasEl.getContext("2d");
 
   let labels = [];
   let datasets = [];
 
-  if (type === "loan") {
-    const validLoans = appData.loans.filter((l) => (parseFloat(l.amount) || 0) > 0);
-    if (validLoans.length === 0) return null;
+  if (category === "loan") {
+    labels = state.loans.map((l) => l.name || "Loan");
+    const paymentData = [];
+    const interestData = [];
 
-    labels = validLoans.map((l) => l.name);
-    const intData = [];
-    const timeData = [];
-    const bgColorsInt = [];
-
-    validLoans.forEach((l) => {
-      const metrics = calcLoanMetrics(l);
-      intData.push(metrics.new_interest);
-      timeData.push(metrics.monthsRemaining / 12);
-      bgColorsInt.push(colorMap[l.color] || "#0ea5e9");
+    state.loans.forEach((loan) => {
+      const m = calcLoanMetrics(loan);
+      paymentData.push(Math.round(m.actualPayment));
+      interestData.push(Math.round(m.new_interest));
     });
 
     datasets = [
       {
-        label: "Total Interest Paid ($)",
-        data: intData,
-        backgroundColor: bgColorsInt,
-        borderRadius: 6,
-        yAxisID: "y",
+        label: "Monthly Payment ($)",
+        data: paymentData,
+        backgroundColor: "rgba(14, 165, 233, 0.7)",
+        borderColor: "#0ea5e9",
+        borderWidth: 1.5,
       },
       {
-        label: "Years to Payoff",
-        data: timeData,
-        backgroundColor: isDark ? "rgba(59, 130, 246, 0.8)" : "rgba(59, 130, 246, 0.4)",
-        borderColor: "#3b82f6",
-        borderWidth: 2,
-        borderRadius: 6,
-        yAxisID: "y1",
+        label: "Total Lifetime Interest ($)",
+        data: interestData,
+        backgroundColor: "rgba(244, 63, 94, 0.7)",
+        borderColor: "#f43f5e",
+        borderWidth: 1.5,
       },
     ];
-  } else if (type === "interest") {
-    const validInvs = appData.investments;
-    if (validInvs.length === 0) return null;
+  } else if (category === "dashboard") {
+    labels = state.dashboards.map((d) => d.name || "Budget");
+    const incomeData = [];
+    const expenseData = [];
+    const wiggleData = [];
 
-    labels = Array.from({ length: 11 }, (_, i) => `Year ${i}`);
-
-    datasets = validInvs.map((inv) => {
-      const p = parseFloat(inv.principal) || 0;
-      const pmt = parseFloat(inv.monthly) || 0;
-      const rate = (parseFloat(inv.rate) || 0) / 100;
-      const rateOver = (parseFloat(inv.rateOverCap) || 0) / 100;
-      const cap = parseFloat(inv.rateCap) || 0;
-      const taxMult = 1 - (parseFloat(inv.taxBracket) || 0) / 100;
-
-      const r1 = (rate * taxMult) / 12;
-      const r2 = (rateOver * taxMult) / 12;
-
-      const balances = [p];
-      let currentBal = p;
-
-      for (let y = 1; y <= 10; y++) {
-        for (let m = 1; m <= 12; m++) {
-          let interest = cap > 0
-            ? Math.min(currentBal, cap) * r1 + Math.max(0, currentBal - cap) * r2
-            : currentBal * r1;
-          currentBal += interest + pmt;
-        }
-        balances.push(Math.round(currentBal));
-      }
-
-      const hex = colorMap[inv.color] || "#3b82f6";
-      return {
-        label: inv.name,
-        data: balances,
-        borderColor: hex,
-        backgroundColor: hex + "33",
-        borderWidth: 3,
-        tension: 0.35,
-        fill: false,
-      };
-    });
-  } else if (type === "dashboard") {
-    if (appData.dashboards.length === 0) return null;
-    labels = appData.dashboards.map((d) => d.name);
-
-    const incData = [];
-    const expData = [];
-    const netData = [];
-
-    appData.dashboards.forEach((d) => {
-      const metrics = calcBudgetMetrics(d, appData);
-      incData.push(Math.round(metrics.monthlyInc));
-      expData.push(Math.round(metrics.monthlyExp));
-      netData.push(Math.round(metrics.netMonthly));
+    state.dashboards.forEach((d) => {
+      const m = calcBudgetMetrics(d, state);
+      incomeData.push(Math.round(m.monthlyInc));
+      expenseData.push(Math.round(m.monthlyExp));
+      wiggleData.push(Math.round(m.netMonthly));
     });
 
     datasets = [
-      { label: "Monthly Income", data: incData, backgroundColor: "#10b981", borderRadius: 6 },
-      { label: "Monthly Expenses", data: expData, backgroundColor: "#f43f5e", borderRadius: 6 },
-      { label: "Wiggle Room", data: netData, backgroundColor: "#3b82f6", borderRadius: 6 },
+      {
+        label: "Monthly Income ($)",
+        data: incomeData,
+        backgroundColor: "rgba(16, 185, 129, 0.7)",
+        borderColor: "#10b981",
+        borderWidth: 1.5,
+      },
+      {
+        label: "Monthly Outflow ($)",
+        data: expenseData,
+        backgroundColor: "rgba(244, 63, 94, 0.7)",
+        borderColor: "#f43f5e",
+        borderWidth: 1.5,
+      },
+      {
+        label: "Net Wiggle Room ($)",
+        data: wiggleData,
+        backgroundColor: "rgba(14, 165, 233, 0.7)",
+        borderColor: "#0ea5e9",
+        borderWidth: 1.5,
+      },
     ];
-  } else if (type === "rent") {
-    if (appData.rents.length === 0) return null;
-    labels = appData.rents.map((r) => r.name);
+  } else if (category === "rent") {
+    labels = state.rents.map((r) => r.name || "Rent");
+    const baseRentData = [];
+    const utilitiesData = [];
 
-    const baseData = appData.rents.map((r) => parseFloat(r.baseRent) || 0);
-    const utilData = appData.rents.map((r) => {
+    state.rents.forEach((r) => {
       const m = calcRentMetrics(r);
-      return m.utilitiesTotal;
+      baseRentData.push(Math.round(m.base));
+      utilitiesData.push(Math.round(m.utilitiesTotal));
     });
 
     datasets = [
-      { label: "Base Rent", data: baseData, backgroundColor: "#3b82f6", borderRadius: 6 },
-      { label: "Utilities & Fees", data: utilData, backgroundColor: "#f59e0b", borderRadius: 6 },
+      {
+        label: "Base Rent ($)",
+        data: baseRentData,
+        backgroundColor: "rgba(14, 165, 233, 0.7)",
+        borderColor: "#0ea5e9",
+        borderWidth: 1.5,
+      },
+      {
+        label: "Utilities & Fees ($)",
+        data: utilitiesData,
+        backgroundColor: "rgba(245, 158, 11, 0.7)",
+        borderColor: "#f59e0b",
+        borderWidth: 1.5,
+      },
+    ];
+  } else if (category === "interest") {
+    labels = state.investments.map((i) => i.name || "Account");
+    const yieldData = [];
+    const fv5Data = [];
+
+    state.investments.forEach((i) => {
+      const m = calcInvestmentMetrics(i);
+      yieldData.push(Math.round(m.firstMonthYield * 12));
+      fv5Data.push(Math.round(m.fv5Years));
+    });
+
+    datasets = [
+      {
+        label: "Est. Year 1 Yield ($)",
+        data: yieldData,
+        backgroundColor: "rgba(16, 185, 129, 0.7)",
+        borderColor: "#10b981",
+        borderWidth: 1.5,
+      },
+      {
+        label: "5-Year Projected Balance ($)",
+        data: fv5Data,
+        backgroundColor: "rgba(59, 130, 246, 0.7)",
+        borderColor: "#3b82f6",
+        borderWidth: 1.5,
+      },
     ];
   }
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: textColor,
-          font: { family: "'Plus Jakarta Sans', sans-serif", weight: "600" },
-        },
-      },
-      tooltip: {
-        backgroundColor: tooltipBg,
-        titleColor: tooltipText,
-        bodyColor: tooltipText,
-        borderColor: tooltipBorder,
-        borderWidth: 1,
-        padding: 12,
-      },
-    },
-  };
+  const isRadar = chartType === "radar";
 
-  if (chartType === "radar") {
-    chartOptions.scales = {
-      r: {
-        grid: { color: gridColor },
-        pointLabels: { color: textColor, font: { weight: "700" } },
-        ticks: { display: false },
-      },
-    };
-    datasets.forEach((ds) => {
-      delete ds.yAxisID;
-      if (Array.isArray(ds.backgroundColor)) {
-        ds.backgroundColor = ds.backgroundColor.map((c) => (c.length === 7 ? c + "33" : c));
-        ds.borderColor = ds.backgroundColor.map((c) => c.substring(0, 7));
-        ds.borderWidth = 2;
-      }
-    });
-  } else {
-    chartOptions.scales = {
-      x: {
-        stacked: type === "rent" && chartType === "bar",
-        grid: { color: gridColor, drawBorder: false },
-        ticks: { color: textColor },
-      },
-      y: {
-        stacked: type === "rent" && chartType === "bar",
-        grid: { color: gridColor, drawBorder: false },
-        ticks: {
-          color: textColor,
-          callback: (v) => "$" + v.toLocaleString(),
+  compareChartInstance = new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels,
+      datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            color: textColor,
+            font: {
+              family: "'Plus Jakarta Sans', sans-serif",
+              weight: "600",
+              size: 12,
+            },
+            usePointStyle: true,
+          },
+        },
+        tooltip: {
+          backgroundColor: tooltipBg,
+          titleColor: tooltipText,
+          bodyColor: tooltipText,
+          borderColor: tooltipBorder,
+          borderWidth: 1,
+          padding: 10,
+          callbacks: {
+            label: (c) => `${c.dataset.label}: ${fmt.format(c.raw)}`,
+          },
         },
       },
-      ...(type === "loan" && (chartType === "bar" || chartType === "line")
+      scales: isRadar
         ? {
-            y1: {
-              type: "linear",
-              display: true,
-              position: "right",
-              grid: { drawOnChartArea: false },
-              ticks: { color: "#3b82f6" },
-              title: { display: true, text: "Years", color: "#3b82f6", font: { weight: "700" } },
+            r: {
+              grid: { color: gridColor },
+              angleLines: { color: gridColor },
+              pointLabels: { color: textColor, font: { weight: "600", size: 12 } },
+              ticks: { color: textColor, backdropColor: "transparent" },
             },
           }
-        : {}),
-    };
-  }
-
-  const ctx = canvasEl.getContext("2d");
-  compareChartInstance = new Chart(ctx, {
-    type: chartType || "bar",
-    data: { labels, datasets },
-    options: chartOptions,
+        : {
+            x: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor },
+            },
+            y: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: {
+                color: textColor,
+                callback: (v) => "$" + v.toLocaleString(),
+              },
+            },
+          },
+    },
   });
 
   return compareChartInstance;

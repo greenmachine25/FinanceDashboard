@@ -1,5 +1,6 @@
 /**
  * Firebase Auth & Cloud Firestore Realtime Sync Module
+ * Provides secure Google Sign-In and private user document synchronization.
  */
 
 const firebaseConfig = {
@@ -48,6 +49,7 @@ export async function initFirebase(onStateSynced, onAuthChanged, showToast) {
     authInstance = getAuth(app);
     dbInstance = getFirestore(app);
     googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: "select_account" });
 
     onAuthStateChanged(authInstance, async (user) => {
       currentUser = user;
@@ -57,7 +59,8 @@ export async function initFirebase(onStateSynced, onAuthChanged, showToast) {
 
       if (user) {
         if (showToast) {
-          showToast(`Welcome, ${user.displayName ? user.displayName.split(" ")[0] : "User"}! Syncing data...`);
+          const name = user.displayName ? user.displayName.split(" ")[0] : "User";
+          showToast(`Connected as ${name}. Syncing cloud data...`);
         }
 
         try {
@@ -69,19 +72,19 @@ export async function initFirebase(onStateSynced, onAuthChanged, showToast) {
             if (typeof onStateSynced === "function") {
               onStateSynced(cloudData);
             }
-            if (showToast) showToast("Cloud data synced successfully!");
+            if (showToast) showToast("Cloud workspace synced securely.");
           } else {
-            // First time login - upload local state
+            // First time login - upload existing local workspace
             if (typeof onStateSynced === "function") {
               const localState = onStateSynced(null);
               if (localState) {
-                await setDoc(docRef, { appData: localState }, { merge: true });
+                await setDoc(docRef, { appData: localState, updatedAt: Date.now() }, { merge: true });
               }
             }
           }
         } catch (err) {
-          console.error("Cloud data pull failed:", err);
-          if (showToast) showToast("Failed to pull cloud data.", true);
+          console.error("Cloud data pull error:", err);
+          if (showToast) showToast("Cloud sync failed. Operating in local mode.", true);
         }
       }
     });
@@ -91,31 +94,34 @@ export async function initFirebase(onStateSynced, onAuthChanged, showToast) {
         try {
           await signInWithPopup(authInstance, googleProvider);
         } catch (err) {
-          console.error("Login error:", err);
-          if (showToast) showToast("Login failed: " + err.message, true);
+          console.error("Authentication error:", err);
+          if (err.code !== "auth/popup-closed-by-user" && showToast) {
+            showToast("Sign in unsuccessful. Please try again.", true);
+          }
         }
       },
       logout: async () => {
         try {
           await signOut(authInstance);
-          if (showToast) showToast("Signed out successfully.");
+          currentUser = null;
+          if (showToast) showToast("Signed out securely.");
         } catch (err) {
           console.error("Sign out error:", err);
-          if (showToast) showToast("Logout failed: " + err.message, true);
+          if (showToast) showToast("Sign out encountered an issue.", true);
         }
       },
       saveToCloud: async (data) => {
         if (!currentUser || !dbInstance) return;
         try {
           const docRef = doc(dbInstance, "users", currentUser.uid);
-          await setDoc(docRef, { appData: data }, { merge: true });
+          await setDoc(docRef, { appData: data, updatedAt: Date.now() }, { merge: true });
         } catch (err) {
           console.error("Cloud sync save error:", err);
         }
       },
     };
   } catch (error) {
-    console.warn("Firebase failed to load (offline mode):", error);
+    console.warn("Firebase unavailable (running in local offline mode):", error);
     return null;
   }
 }
