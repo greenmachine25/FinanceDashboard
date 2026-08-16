@@ -2,7 +2,7 @@
  * Utility functions, formatters, sanitizers, and data export/import helpers
  */
 
-export const APP_VERSION = "0.14";
+export const APP_VERSION = "0.15";
 
 export const colorMap = {
   "bg-emerald-500": "#10b981",
@@ -14,9 +14,7 @@ export const colorMap = {
   "bg-violet-500": "#8b5cf6",
   "bg-purple-500": "#a855f7",
   "bg-fuchsia-500": "#d946ef",
-  "bg-pink-500": "#ec4899",
-  "bg-rose-500": "#f43f5e",
-  "bg-amber-500": "#f59e0b",
+  "bg-slate-700": "#334155",
 };
 
 export const cardColors = Object.keys(colorMap);
@@ -29,16 +27,52 @@ export function getRandomColor(excludeColor = null) {
 export const fmt = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+export const fmtPrecise = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 
-export const fmtInt = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-});
+/**
+ * Smooth Animated Number Counter for Large KPI Values
+ */
+export function animateValue(el, targetValue, duration = 400, formatFn = (v) => fmt.format(v)) {
+  if (!el) return;
+  const endNum = typeof targetValue === "number" ? targetValue : (parseFloat(targetValue) || 0);
+  const startNum = parseFloat(el.dataset.val) || 0;
+  el.dataset.val = endNum;
+
+  if (Math.abs(endNum - startNum) < 0.01) {
+    el.innerText = formatFn(endNum);
+    return;
+  }
+
+  el.classList.remove("value-pulse");
+  void el.offsetWidth;
+  el.classList.add("value-pulse");
+
+  const startTime = performance.now();
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease Out Quart
+    const ease = 1 - Math.pow(1 - progress, 4);
+    const current = startNum + (endNum - startNum) * ease;
+    el.innerText = formatFn(current);
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      el.innerText = formatFn(endNum);
+    }
+  }
+  requestAnimationFrame(update);
+}
 
 export const fmtCompact = new Intl.NumberFormat("en-US", {
   style: "currency",

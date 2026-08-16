@@ -2,7 +2,7 @@
  * Master Overview Tab Renderer
  */
 
-import { fmt, escapeHtml, refreshIcons } from "../utils.js";
+import { fmt, escapeHtml, refreshIcons, animateValue } from "../utils.js";
 import { calcOverviewMetrics, calcBudgetMetrics } from "../calculations.js";
 
 export function updateOverviewDOM(state) {
@@ -18,9 +18,9 @@ export function updateOverviewDOM(state) {
   const assetsEl = container.querySelector(".overview-total-assets");
   const debtEl = container.querySelector(".overview-total-debt");
 
-  if (nwEl) nwEl.innerText = fmt.format(overviewMetrics.netWorth);
-  if (assetsEl) assetsEl.innerText = fmt.format(overviewMetrics.totalAssets);
-  if (debtEl) debtEl.innerText = fmt.format(overviewMetrics.totalDebt);
+  if (nwEl) animateValue(nwEl, overviewMetrics.netWorth);
+  if (assetsEl) animateValue(assetsEl, overviewMetrics.totalAssets);
+  if (debtEl) animateValue(debtEl, overviewMetrics.totalDebt);
 
   if (budgetMetrics) {
     const inEl = container.querySelector(".overview-cash-in");
@@ -31,13 +31,13 @@ export function updateOverviewDOM(state) {
     const r3El = container.querySelector(".overview-runway-3mo");
     const r6El = container.querySelector(".overview-runway-6mo");
 
-    if (inEl) inEl.innerText = fmt.format(budgetMetrics.monthlyInc);
-    if (outEl) outEl.innerText = fmt.format(budgetMetrics.monthlyExp);
-    if (wiggleEl) wiggleEl.innerText = fmt.format(budgetMetrics.netMonthly);
-    if (srEl) srEl.innerText = `${Math.round(budgetMetrics.savingsRate)}%`;
-    if (srBarEl) srBarEl.style.width = `${budgetMetrics.savingsRate}%`;
-    if (r3El) r3El.innerText = fmt.format(budgetMetrics.emergencyFund3Mo);
-    if (r6El) r6El.innerText = fmt.format(budgetMetrics.emergencyFund6Mo);
+    if (inEl) animateValue(inEl, budgetMetrics.monthlyInc);
+    if (outEl) animateValue(outEl, budgetMetrics.monthlyExp);
+    if (wiggleEl) animateValue(wiggleEl, budgetMetrics.netMonthly);
+    if (srEl) animateValue(srEl, Math.round(budgetMetrics.savingsRate), 300, (v) => `${Math.round(v)}%`);
+    if (srBarEl) srBarEl.style.width = `${Math.min(Math.max(budgetMetrics.savingsRate, 0), 100)}%`;
+    if (r3El) animateValue(r3El, budgetMetrics.emergencyFund3Mo);
+    if (r6El) animateValue(r6El, budgetMetrics.emergencyFund6Mo);
   }
 }
 
