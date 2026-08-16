@@ -1,20 +1,33 @@
 /**
- * Rent Scenarios Tab Renderer
+ * Rent Scenarios Tab Renderer (Ultra-responsive, zero-lag in-place typing)
  */
 
 import { fmt, cardColors, refreshIcons, escapeHtml } from "../utils.js";
 import { calcRentMetrics } from "../calculations.js";
+import { updateStateSilently } from "../state.js";
 import { initSortableContainer } from "./dragDrop.js";
+
+export function updateRentCardMetrics(cardEl, rent) {
+  if (!cardEl || !rent) return;
+  const metrics = calcRentMetrics(rent);
+  if (!metrics) return;
+
+  const monthlyEl = cardEl.querySelector(".rent-m-monthly");
+  const yearlyEl = cardEl.querySelector(".rent-m-yearly");
+
+  if (monthlyEl) monthlyEl.innerText = fmt.format(metrics.totalMonthly);
+  if (yearlyEl) yearlyEl.innerText = fmt.format(metrics.totalYearly);
+}
 
 export function renderRents(container, state, handlers) {
   if (!container || !state) return;
 
   const {
-    onUpdateProp,
     onToggleMinimize,
     onUpdateColor,
     onDuplicate,
     onDelete,
+    onFastUpdate,
   } = handlers;
 
   container.innerHTML = state.rents
@@ -120,12 +133,12 @@ export function renderRents(container, state, handlers) {
               <div>
                 <span class="metric-label tooltip-help" title="Total estimated monthly housing cost including all utilities.">Total Monthly Cost</span>
               </div>
-              <span class="font-mono" style="font-size: 1.45rem; font-weight: 800; color: var(--brand-teal);">${fmt.format(metrics.totalMonthly)}</span>
+              <span class="font-mono rent-m-monthly" style="font-size: 1.45rem; font-weight: 800; color: var(--brand-teal);">${fmt.format(metrics.totalMonthly)}</span>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
               <span class="metric-label tooltip-help" title="Total expenditure for 1 full year (12 months).">Estimated Annual Cost</span>
-              <span class="font-mono" style="font-size: 1rem; font-weight: 700; color: var(--text-main);">${fmt.format(metrics.totalYearly)}</span>
+              <span class="font-mono rent-m-yearly" style="font-size: 1rem; font-weight: 700; color: var(--text-main);">${fmt.format(metrics.totalYearly)}</span>
             </div>
           </div>
         </div>
@@ -133,15 +146,40 @@ export function renderRents(container, state, handlers) {
     })
     .join("");
 
-  // Attach Event Listeners
-  container.querySelectorAll(".rent-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.rentId), "name", e.target.value);
-  });
-
+  // Live in-place input listeners
   container.querySelectorAll(".rent-prop-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.rentId), e.target.dataset.prop, e.target.value);
+    input.oninput = (e) => {
+      const rentId = parseInt(e.target.dataset.rentId);
+      const prop = e.target.dataset.prop;
+      const rent = state.rents.find((r) => r.id === rentId);
+      if (rent) {
+        rent[prop] = e.target.value;
+        const cardEl = document.getElementById(`rent-${rentId}`);
+        updateRentCardMetrics(cardEl, rent);
+        if (typeof onFastUpdate === "function") onFastUpdate();
+        updateStateSilently((s) => {
+          const item = s.rents.find((x) => x.id === rentId);
+          if (item) item[prop] = e.target.value;
+        });
+      }
+    };
   });
 
+  container.querySelectorAll(".rent-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const rentId = parseInt(e.target.dataset.rentId);
+      const rent = state.rents.find((r) => r.id === rentId);
+      if (rent) {
+        rent.name = e.target.value;
+        updateStateSilently((s) => {
+          const item = s.rents.find((x) => x.id === rentId);
+          if (item) item.name = e.target.value;
+        });
+      }
+    };
+  });
+
+  // Structural Actions
   container.querySelectorAll(".rent-min-toggle").forEach((btn) => {
     btn.onclick = (e) => onToggleMinimize("rent", parseInt(e.currentTarget.dataset.rentId));
   });

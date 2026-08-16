@@ -1,28 +1,44 @@
 /**
- * Budget Scenarios Tab Renderer
+ * Budget Scenarios Tab Renderer (Ultra-responsive, zero-lag in-place typing)
  */
 
 import { fmt, cardColors, refreshIcons, parseNum, escapeHtml } from "../utils.js";
 import { calcBudgetMetrics, calcRentMetrics, calcLoanMetrics } from "../calculations.js";
+import { updateStateSilently } from "../state.js";
 import { initSortableContainer } from "./dragDrop.js";
+
+export function updateBudgetCardMetrics(cardEl, dash, state) {
+  if (!cardEl || !dash) return;
+  const metrics = calcBudgetMetrics(dash, state);
+  if (!metrics) return;
+
+  const dailyEl = cardEl.querySelector(".dash-m-daily");
+  const monthlyEl = cardEl.querySelector(".dash-m-monthly");
+  const yearlyEl = cardEl.querySelector(".dash-m-yearly");
+  const wiggleEl = cardEl.querySelector(".dash-m-wiggle");
+  const expTotalEl = cardEl.querySelector(".dash-m-exp-total");
+
+  if (dailyEl) dailyEl.innerText = fmt.format(metrics.dailyInc);
+  if (monthlyEl) monthlyEl.innerText = fmt.format(metrics.monthlyInc);
+  if (yearlyEl) yearlyEl.innerText = fmt.format(metrics.yearlyInc);
+  if (wiggleEl) wiggleEl.innerText = fmt.format(metrics.netMonthly);
+  if (expTotalEl) expTotalEl.innerText = `Total monthly obligations: ${fmt.format(metrics.monthlyExp)}`;
+}
 
 export function renderBudgets(container, state, handlers) {
   if (!container || !state) return;
 
   const {
-    onUpdateName,
-    onUpdateIncome,
     onUpdateLinkedItem,
     onToggleMinimize,
     onUpdateColor,
     onDuplicate,
     onDelete,
     onAddExpense,
-    onUpdateExpense,
     onDeleteExpense,
     onAddEarning,
-    onUpdateEarning,
     onDeleteEarning,
+    onFastUpdate,
   } = handlers;
 
   container.innerHTML = state.dashboards
@@ -135,19 +151,19 @@ export function renderBudgets(container, state, handlers) {
               <div class="metric-box" style="padding: 0.65rem 0.85rem;">
                 <div>
                   <p class="metric-label">Daily</p>
-                  <p class="font-mono" style="font-weight: 700; font-size: 0.95rem;">${fmt.format(metrics.dailyInc)}</p>
+                  <p class="font-mono dash-m-daily" style="font-weight: 700; font-size: 0.95rem;">${fmt.format(metrics.dailyInc)}</p>
                 </div>
               </div>
               <div class="metric-box" style="padding: 0.65rem 0.85rem; border-color: rgba(14, 165, 233, 0.3);">
                 <div>
                   <p class="metric-label" style="color: var(--brand-teal);">Monthly</p>
-                  <p class="font-mono" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-teal);">${fmt.format(metrics.monthlyInc)}</p>
+                  <p class="font-mono dash-m-monthly" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-teal);">${fmt.format(metrics.monthlyInc)}</p>
                 </div>
               </div>
               <div class="metric-box" style="padding: 0.65rem 0.85rem; border-color: rgba(59, 130, 246, 0.3);">
                 <div>
                   <p class="metric-label" style="color: var(--brand-blue);">Yearly</p>
-                  <p class="font-mono" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-blue);">${fmt.format(metrics.yearlyInc)}</p>
+                  <p class="font-mono dash-m-yearly" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-blue);">${fmt.format(metrics.yearlyInc)}</p>
                 </div>
               </div>
             </div>
@@ -242,11 +258,11 @@ export function renderBudgets(container, state, handlers) {
             <div class="metric-box" style="border-color: rgba(14, 165, 233, 0.35); background: var(--bg-surface-elevated);">
               <div>
                 <span class="metric-label" style="color: var(--brand-teal);">Net Monthly Wiggle Room</span>
-                <p style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.15rem;">
+                <p class="dash-m-exp-total" style="font-size: 0.725rem; color: var(--text-muted); margin-top: 0.15rem;">
                   Total monthly obligations: ${fmt.format(metrics.monthlyExp)}
                 </p>
               </div>
-              <span class="font-mono" style="font-size: 1.5rem; font-weight: 800; color: var(--brand-teal);">${fmt.format(metrics.netMonthly)}</span>
+              <span class="font-mono dash-m-wiggle" style="font-size: 1.5rem; font-weight: 800; color: var(--brand-teal);">${fmt.format(metrics.netMonthly)}</span>
             </div>
           </div>
         </div>
@@ -254,15 +270,177 @@ export function renderBudgets(container, state, handlers) {
     })
     .join("");
 
-  // Attach Event Handlers
-  container.querySelectorAll(".dash-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateName(parseInt(e.target.dataset.dashId), e.target.value);
-  });
-
+  // Live Input Event Handlers (In-place instant metric update without destroying DOM)
   container.querySelectorAll(".dash-income-input").forEach((input) => {
-    input.oninput = (e) => onUpdateIncome(parseInt(e.target.dataset.dashId), e.target.value);
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        dash.income = e.target.value;
+        const cardEl = document.getElementById(`dash-${dashId}`);
+        updateBudgetCardMetrics(cardEl, dash, state);
+        if (typeof onFastUpdate === "function") onFastUpdate();
+        updateStateSilently((s) => {
+          const d = s.dashboards.find((x) => x.id === dashId);
+          if (d) d.income = e.target.value;
+        });
+      }
+    };
   });
 
+  container.querySelectorAll(".dash-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        dash.name = e.target.value;
+        updateStateSilently((s) => {
+          const d = s.dashboards.find((x) => x.id === dashId);
+          if (d) d.name = e.target.value;
+        });
+      }
+    };
+  });
+
+  container.querySelectorAll(".exp-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const expId = parseInt(e.target.dataset.expId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const exp = dash.expenses.find((x) => x.id === expId);
+        if (exp) {
+          exp.name = e.target.value;
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ex = d.expenses.find((x) => x.id === expId);
+              if (ex) ex.name = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  container.querySelectorAll(".exp-amt-input").forEach((input) => {
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const expId = parseInt(e.target.dataset.expId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const exp = dash.expenses.find((x) => x.id === expId);
+        if (exp) {
+          exp.amount = e.target.value;
+          const cardEl = document.getElementById(`dash-${dashId}`);
+          updateBudgetCardMetrics(cardEl, dash, state);
+          if (typeof onFastUpdate === "function") onFastUpdate();
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ex = d.expenses.find((x) => x.id === expId);
+              if (ex) ex.amount = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  container.querySelectorAll(".exp-freq-select").forEach((sel) => {
+    sel.onchange = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const expId = parseInt(e.target.dataset.expId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const exp = dash.expenses.find((x) => x.id === expId);
+        if (exp) {
+          exp.freq = e.target.value;
+          const cardEl = document.getElementById(`dash-${dashId}`);
+          updateBudgetCardMetrics(cardEl, dash, state);
+          if (typeof onFastUpdate === "function") onFastUpdate();
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ex = d.expenses.find((x) => x.id === expId);
+              if (ex) ex.freq = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  container.querySelectorAll(".earn-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const earnId = parseInt(e.target.dataset.earnId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const earn = dash.earnings.find((x) => x.id === earnId);
+        if (earn) {
+          earn.name = e.target.value;
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ea = d.earnings.find((x) => x.id === earnId);
+              if (ea) ea.name = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  container.querySelectorAll(".earn-amt-input").forEach((input) => {
+    input.oninput = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const earnId = parseInt(e.target.dataset.earnId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const earn = dash.earnings.find((x) => x.id === earnId);
+        if (earn) {
+          earn.amount = e.target.value;
+          const cardEl = document.getElementById(`dash-${dashId}`);
+          updateBudgetCardMetrics(cardEl, dash, state);
+          if (typeof onFastUpdate === "function") onFastUpdate();
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ea = d.earnings.find((x) => x.id === earnId);
+              if (ea) ea.amount = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  container.querySelectorAll(".earn-freq-select").forEach((sel) => {
+    sel.onchange = (e) => {
+      const dashId = parseInt(e.target.dataset.dashId);
+      const earnId = parseInt(e.target.dataset.earnId);
+      const dash = state.dashboards.find((d) => d.id === dashId);
+      if (dash) {
+        const earn = dash.earnings.find((x) => x.id === earnId);
+        if (earn) {
+          earn.freq = e.target.value;
+          const cardEl = document.getElementById(`dash-${dashId}`);
+          updateBudgetCardMetrics(cardEl, dash, state);
+          if (typeof onFastUpdate === "function") onFastUpdate();
+          updateStateSilently((s) => {
+            const d = s.dashboards.find((x) => x.id === dashId);
+            if (d) {
+              const ea = d.earnings.find((x) => x.id === earnId);
+              if (ea) ea.freq = e.target.value;
+            }
+          });
+        }
+      }
+    };
+  });
+
+  // Linked item selectors (updates link and recalculates)
   container.querySelectorAll(".dash-link-rent").forEach((sel) => {
     sel.onchange = (e) => onUpdateLinkedItem(parseInt(e.target.dataset.dashId), "linkedRentId", e.target.value);
   });
@@ -275,6 +453,7 @@ export function renderBudgets(container, state, handlers) {
     sel.onchange = (e) => onUpdateLinkedItem(parseInt(e.target.dataset.dashId), "linkedInvestmentId", e.target.value);
   });
 
+  // Structural Actions (triggers full re-render)
   container.querySelectorAll(".dash-min-toggle").forEach((btn) => {
     btn.onclick = (e) => onToggleMinimize("dashboard", parseInt(e.currentTarget.dataset.dashId));
   });
@@ -305,36 +484,12 @@ export function renderBudgets(container, state, handlers) {
     btn.onclick = (e) => onAddExpense(parseInt(e.currentTarget.dataset.dashId));
   });
 
-  container.querySelectorAll(".exp-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateExpense(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.expId), "name", e.target.value);
-  });
-
-  container.querySelectorAll(".exp-amt-input").forEach((input) => {
-    input.oninput = (e) => onUpdateExpense(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.expId), "amount", e.target.value);
-  });
-
-  container.querySelectorAll(".exp-freq-select").forEach((sel) => {
-    sel.onchange = (e) => onUpdateExpense(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.expId), "freq", e.target.value);
-  });
-
   container.querySelectorAll(".exp-del-btn").forEach((btn) => {
     btn.onclick = (e) => onDeleteExpense(parseInt(e.currentTarget.dataset.dashId), parseInt(e.currentTarget.dataset.expId));
   });
 
   container.querySelectorAll(".add-earn-btn").forEach((btn) => {
     btn.onclick = (e) => onAddEarning(parseInt(e.currentTarget.dataset.dashId));
-  });
-
-  container.querySelectorAll(".earn-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateEarning(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.earnId), "name", e.target.value);
-  });
-
-  container.querySelectorAll(".earn-amt-input").forEach((input) => {
-    input.oninput = (e) => onUpdateEarning(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.earnId), "amount", e.target.value);
-  });
-
-  container.querySelectorAll(".earn-freq-select").forEach((sel) => {
-    sel.onchange = (e) => onUpdateEarning(parseInt(e.target.dataset.dashId), parseInt(e.target.dataset.earnId), "freq", e.target.value);
   });
 
   container.querySelectorAll(".earn-del-btn").forEach((btn) => {

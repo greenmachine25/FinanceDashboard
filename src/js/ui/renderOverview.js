@@ -5,6 +5,42 @@
 import { fmt, escapeHtml, refreshIcons } from "../utils.js";
 import { calcOverviewMetrics, calcBudgetMetrics } from "../calculations.js";
 
+export function updateOverviewDOM(state) {
+  const container = document.getElementById("overviewContainer");
+  if (!container || !state) return;
+
+  const mp = state.masterPlan || { budgetId: "", rentId: "", loanId: "", invId: "" };
+  const overviewMetrics = calcOverviewMetrics(state);
+  const activeBudget = state.dashboards.find((d) => d.id == mp.budgetId) || null;
+  const budgetMetrics = activeBudget ? calcBudgetMetrics(activeBudget, state) : null;
+
+  const nwEl = container.querySelector(".overview-net-worth");
+  const assetsEl = container.querySelector(".overview-total-assets");
+  const debtEl = container.querySelector(".overview-total-debt");
+
+  if (nwEl) nwEl.innerText = fmt.format(overviewMetrics.netWorth);
+  if (assetsEl) assetsEl.innerText = fmt.format(overviewMetrics.totalAssets);
+  if (debtEl) debtEl.innerText = fmt.format(overviewMetrics.totalDebt);
+
+  if (budgetMetrics) {
+    const inEl = container.querySelector(".overview-cash-in");
+    const outEl = container.querySelector(".overview-cash-out");
+    const wiggleEl = container.querySelector(".overview-wiggle");
+    const srEl = container.querySelector(".overview-savings-rate");
+    const srBarEl = container.querySelector(".overview-savings-bar");
+    const r3El = container.querySelector(".overview-runway-3mo");
+    const r6El = container.querySelector(".overview-runway-6mo");
+
+    if (inEl) inEl.innerText = fmt.format(budgetMetrics.monthlyInc);
+    if (outEl) outEl.innerText = fmt.format(budgetMetrics.monthlyExp);
+    if (wiggleEl) wiggleEl.innerText = fmt.format(budgetMetrics.netMonthly);
+    if (srEl) srEl.innerText = `${Math.round(budgetMetrics.savingsRate)}%`;
+    if (srBarEl) srBarEl.style.width = `${budgetMetrics.savingsRate}%`;
+    if (r3El) r3El.innerText = fmt.format(budgetMetrics.emergencyFund3Mo);
+    if (r6El) r6El.innerText = fmt.format(budgetMetrics.emergencyFund6Mo);
+  }
+}
+
 export function renderOverview(container, state, onMasterPlanChange) {
   if (!container || !state) return;
 
@@ -71,18 +107,18 @@ export function renderOverview(container, state, onMasterPlanChange) {
         <p class="net-worth-label tooltip-help" title="Aggregated starting balance of all Savings & Goals minus outstanding Loans.">
           Total Starting Net Worth
         </p>
-        <h1 class="net-worth-amount font-mono">
+        <h1 class="net-worth-amount font-mono overview-net-worth">
           ${fmt.format(overviewMetrics.netWorth)}
         </h1>
       </div>
       <div class="net-worth-stats">
         <div class="net-worth-stat-box">
           <p class="net-worth-stat-label">Total Assets</p>
-          <p class="net-worth-stat-value font-mono">${fmt.format(overviewMetrics.totalAssets)}</p>
+          <p class="net-worth-stat-value font-mono overview-total-assets">${fmt.format(overviewMetrics.totalAssets)}</p>
         </div>
         <div class="net-worth-stat-box dark-box">
           <p class="net-worth-stat-label">Total Debt</p>
-          <p class="net-worth-stat-value font-mono" style="color: #fca5a5;">${fmt.format(overviewMetrics.totalDebt)}</p>
+          <p class="net-worth-stat-value font-mono overview-total-debt" style="color: #fca5a5;">${fmt.format(overviewMetrics.totalDebt)}</p>
         </div>
       </div>
     </div>
@@ -99,7 +135,7 @@ export function renderOverview(container, state, onMasterPlanChange) {
               <i data-lucide="arrow-down-left" style="width: 1.15rem; height: 1.15rem;"></i>
             </div>
           </div>
-          <p class="metric-value font-mono" style="color: var(--brand-emerald);">${fmt.format(budgetMetrics.monthlyInc)}</p>
+          <p class="metric-value font-mono overview-cash-in" style="color: var(--brand-emerald);">${fmt.format(budgetMetrics.monthlyInc)}</p>
           <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Primary pay & extra income</p>
         </div>
 
@@ -110,7 +146,7 @@ export function renderOverview(container, state, onMasterPlanChange) {
               <i data-lucide="arrow-up-right" style="width: 1.15rem; height: 1.15rem;"></i>
             </div>
           </div>
-          <p class="metric-value font-mono" style="color: var(--brand-rose);">${fmt.format(budgetMetrics.monthlyExp)}</p>
+          <p class="metric-value font-mono overview-cash-out" style="color: var(--brand-rose);">${fmt.format(budgetMetrics.monthlyExp)}</p>
           <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Expenses, housing, debt & savings</p>
         </div>
 
@@ -121,7 +157,7 @@ export function renderOverview(container, state, onMasterPlanChange) {
               <i data-lucide="wallet" style="width: 1.15rem; height: 1.15rem;"></i>
             </div>
           </div>
-          <p class="metric-value font-mono" style="color: var(--brand-teal);">${fmt.format(budgetMetrics.netMonthly)}</p>
+          <p class="metric-value font-mono overview-wiggle" style="color: var(--brand-teal);">${fmt.format(budgetMetrics.netMonthly)}</p>
           <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">Unallocated discretionary buffer</p>
         </div>
       </div>
@@ -131,12 +167,12 @@ export function renderOverview(container, state, onMasterPlanChange) {
         <div class="glass-card" style="padding: 1.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
             <span class="metric-label">Savings & Investment Rate</span>
-            <span class="font-mono" style="font-weight: 800; color: var(--brand-emerald); font-size: 1.1rem;">
+            <span class="font-mono overview-savings-rate" style="font-weight: 800; color: var(--brand-emerald); font-size: 1.1rem;">
               ${Math.round(budgetMetrics.savingsRate)}%
             </span>
           </div>
           <div class="progress-track" style="margin-bottom: 0.5rem;">
-            <div class="progress-fill bg-emerald-500" style="width: ${budgetMetrics.savingsRate}%;"></div>
+            <div class="progress-fill overview-savings-bar bg-emerald-500" style="width: ${budgetMetrics.savingsRate}%;"></div>
           </div>
           <p style="font-size: 0.75rem; color: var(--text-muted);">
             Percentage of monthly cash flow directed into high-yield savings, goals, or retained wiggle room.
@@ -154,13 +190,13 @@ export function renderOverview(container, state, onMasterPlanChange) {
             <div class="metric-box" style="flex: 1; padding: 0.5rem 0.75rem;">
               <div>
                 <p style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">3 Months</p>
-                <p class="font-mono" style="font-weight: 700; font-size: 0.95rem;">${fmt.format(budgetMetrics.emergencyFund3Mo)}</p>
+                <p class="font-mono overview-runway-3mo" style="font-weight: 700; font-size: 0.95rem;">${fmt.format(budgetMetrics.emergencyFund3Mo)}</p>
               </div>
             </div>
             <div class="metric-box" style="flex: 1; padding: 0.5rem 0.75rem; border-color: var(--brand-blue-dim);">
               <div>
                 <p style="font-size: 0.7rem; color: var(--brand-blue); font-weight: 600;">6 Months</p>
-                <p class="font-mono" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-blue);">${fmt.format(budgetMetrics.emergencyFund6Mo)}</p>
+                <p class="font-mono overview-runway-6mo" style="font-weight: 700; font-size: 0.95rem; color: var(--brand-blue);">${fmt.format(budgetMetrics.emergencyFund6Mo)}</p>
               </div>
             </div>
           </div>

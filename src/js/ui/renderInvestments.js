@@ -1,21 +1,40 @@
 /**
- * APY Savings Scenarios Tab Renderer
+ * APY Savings Scenarios Tab Renderer (Ultra-responsive, zero-lag in-place typing)
  */
 
 import { fmt, cardColors, refreshIcons, escapeHtml } from "../utils.js";
 import { calcInvestmentMetrics } from "../calculations.js";
+import { updateStateSilently } from "../state.js";
 import { initSortableContainer } from "./dragDrop.js";
+
+export function updateInvestmentCardMetrics(cardEl, inv) {
+  if (!cardEl || !inv) return;
+  const metrics = calcInvestmentMetrics(inv);
+  if (!metrics) return;
+
+  const yieldEl = cardEl.querySelector(".inv-m-yield");
+  const fv1El = cardEl.querySelector(".inv-m-fv1");
+  const fv2El = cardEl.querySelector(".inv-m-fv2");
+  const fv5El = cardEl.querySelector(".inv-m-fv5");
+  const fv10El = cardEl.querySelector(".inv-m-fv10");
+
+  if (yieldEl) yieldEl.innerText = fmt.format(metrics.firstMonthYield);
+  if (fv1El) fv1El.innerText = fmt.format(metrics.fv1Year);
+  if (fv2El) fv2El.innerText = fmt.format(metrics.fv2Years);
+  if (fv5El) fv5El.innerText = fmt.format(metrics.fv5Years);
+  if (fv10El) fv10El.innerText = fmt.format(metrics.fv10Years);
+}
 
 export function renderInvestments(container, state, handlers) {
   if (!container || !state) return;
 
   const {
-    onUpdateProp,
     onToggleMinimize,
     onUpdateColor,
     onDuplicate,
     onDelete,
     onShowApyChart,
+    onFastUpdate,
   } = handlers;
 
   container.innerHTML = state.investments
@@ -125,26 +144,26 @@ export function renderInvestments(container, state, handlers) {
                   Est. 1st Mo. Yield (Net)
                 </span>
               </div>
-              <span class="font-mono" style="font-size: 1.4rem; font-weight: 800; color: var(--brand-blue);">${fmt.format(metrics.firstMonthYield)}</span>
+              <span class="font-mono inv-m-yield" style="font-size: 1.4rem; font-weight: 800; color: var(--brand-blue);">${fmt.format(metrics.firstMonthYield)}</span>
             </div>
 
             <!-- Future Balance Projections Grid -->
             <div class="cards-grid cards-grid-4" style="gap: 0.4rem; text-align: center; margin-bottom: 0.85rem;">
               <div class="metric-box" style="padding: 0.45rem; flex-direction: column;">
                 <p class="metric-label" style="font-size: 0.675rem;">1 Year</p>
-                <p class="font-mono" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv1Year)}</p>
+                <p class="font-mono inv-m-fv1" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv1Year)}</p>
               </div>
               <div class="metric-box" style="padding: 0.45rem; flex-direction: column;">
                 <p class="metric-label" style="font-size: 0.675rem;">2 Years</p>
-                <p class="font-mono" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv2Years)}</p>
+                <p class="font-mono inv-m-fv2" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv2Years)}</p>
               </div>
               <div class="metric-box" style="padding: 0.45rem; flex-direction: column;">
                 <p class="metric-label" style="font-size: 0.675rem;">5 Years</p>
-                <p class="font-mono" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv5Years)}</p>
+                <p class="font-mono inv-m-fv5" style="font-size: 0.825rem; font-weight: 700; margin-top: 0.15rem;">${fmt.format(metrics.fv5Years)}</p>
               </div>
               <div class="metric-box" style="padding: 0.45rem; flex-direction: column; border-color: rgba(59, 130, 246, 0.35); background: var(--bg-surface-elevated);">
                 <p class="metric-label" style="font-size: 0.675rem; color: var(--brand-blue);">10 Years</p>
-                <p class="font-mono" style="font-size: 0.825rem; font-weight: 800; color: var(--brand-blue); margin-top: 0.15rem;">${fmt.format(metrics.fv10Years)}</p>
+                <p class="font-mono inv-m-fv10" style="font-size: 0.825rem; font-weight: 800; color: var(--brand-blue); margin-top: 0.15rem;">${fmt.format(metrics.fv10Years)}</p>
               </div>
             </div>
 
@@ -157,15 +176,40 @@ export function renderInvestments(container, state, handlers) {
     })
     .join("");
 
-  // Attach Event Listeners
-  container.querySelectorAll(".inv-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.invId), "name", e.target.value);
-  });
-
+  // Live in-place input listeners
   container.querySelectorAll(".inv-prop-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.invId), e.target.dataset.prop, e.target.value);
+    input.oninput = (e) => {
+      const invId = parseInt(e.target.dataset.invId);
+      const prop = e.target.dataset.prop;
+      const inv = state.investments.find((i) => i.id === invId);
+      if (inv) {
+        inv[prop] = e.target.value;
+        const cardEl = document.getElementById(`inv-${invId}`);
+        updateInvestmentCardMetrics(cardEl, inv);
+        if (typeof onFastUpdate === "function") onFastUpdate();
+        updateStateSilently((s) => {
+          const item = s.investments.find((x) => x.id === invId);
+          if (item) item[prop] = e.target.value;
+        });
+      }
+    };
   });
 
+  container.querySelectorAll(".inv-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const invId = parseInt(e.target.dataset.invId);
+      const inv = state.investments.find((i) => i.id === invId);
+      if (inv) {
+        inv.name = e.target.value;
+        updateStateSilently((s) => {
+          const item = s.investments.find((x) => x.id === invId);
+          if (item) item.name = e.target.value;
+        });
+      }
+    };
+  });
+
+  // Structural Actions
   container.querySelectorAll(".inv-min-toggle").forEach((btn) => {
     btn.onclick = (e) => onToggleMinimize("interest", parseInt(e.currentTarget.dataset.invId));
   });

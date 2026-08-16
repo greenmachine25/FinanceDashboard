@@ -32,7 +32,7 @@ import { initFirebase } from "./firebase.js";
 import { showToast } from "./ui/toast.js";
 import { openModal, closeModal, initModalListeners } from "./ui/modals.js";
 import { switchTab, initSwipeNavigation } from "./ui/tabs.js";
-import { renderOverview } from "./ui/renderOverview.js";
+import { renderOverview, updateOverviewDOM } from "./ui/renderOverview.js";
 import { renderBudgets } from "./ui/renderBudgets.js";
 import { renderGoals } from "./ui/renderGoals.js";
 import { renderRents } from "./ui/renderRents.js";
@@ -63,7 +63,7 @@ function applyTheme(theme) {
 /**
  * Global Render Dispatcher
  */
-function renderAll(state, category = null) {
+function renderAll(state) {
   if (!overviewContainer) {
     overviewContainer = document.getElementById("overviewContainer");
     dashboardsContainer = document.getElementById("dashboardsContainer");
@@ -73,7 +73,9 @@ function renderAll(state, category = null) {
     interestContainer = document.getElementById("interestContainer");
   }
 
-  // Always refresh Overview and Tab contents
+  const fastUpdateHandler = () => updateOverviewDOM(getState());
+
+  // Refresh Overview
   renderOverview(overviewContainer, state, (prop, val) => {
     updateState((s) => {
       s.masterPlan[prop] = val ? parseInt(val) : "";
@@ -81,21 +83,8 @@ function renderAll(state, category = null) {
     }, "overview");
   });
 
+  // Render Budgets
   renderBudgets(dashboardsContainer, state, {
-    onUpdateName: (id, val) => {
-      updateState((s) => {
-        const item = s.dashboards.find((d) => d.id === id);
-        if (item) item.name = val;
-        return s;
-      }, "dashboard");
-    },
-    onUpdateIncome: (id, val) => {
-      updateState((s) => {
-        const item = s.dashboards.find((d) => d.id === id);
-        if (item) item.income = val;
-        return s;
-      }, "dashboard");
-    },
     onUpdateLinkedItem: (id, prop, val) => {
       updateState((s) => {
         const item = s.dashboards.find((d) => d.id === id);
@@ -114,16 +103,6 @@ function renderAll(state, category = null) {
         return s;
       }, "dashboard");
     },
-    onUpdateExpense: (dashId, expId, field, val) => {
-      updateState((s) => {
-        const d = s.dashboards.find((x) => x.id === dashId);
-        if (d) {
-          const exp = d.expenses.find((e) => e.id === expId);
-          if (exp) exp[field] = val;
-        }
-        return s;
-      }, "dashboard");
-    },
     onDeleteExpense: (dashId, expId) => {
       updateState((s) => {
         const d = s.dashboards.find((x) => x.id === dashId);
@@ -138,16 +117,6 @@ function renderAll(state, category = null) {
         return s;
       }, "dashboard");
     },
-    onUpdateEarning: (dashId, earnId, field, val) => {
-      updateState((s) => {
-        const d = s.dashboards.find((x) => x.id === dashId);
-        if (d) {
-          const earn = d.earnings.find((e) => e.id === earnId);
-          if (earn) earn[field] = val;
-        }
-        return s;
-      }, "dashboard");
-    },
     onDeleteEarning: (dashId, earnId) => {
       updateState((s) => {
         const d = s.dashboards.find((x) => x.id === dashId);
@@ -155,8 +124,10 @@ function renderAll(state, category = null) {
         return s;
       }, "dashboard");
     },
+    onFastUpdate: fastUpdateHandler,
   });
 
+  // Render Goals
   renderGoals(goalsContainer, state, {
     onUpdateProp: (id, prop, val) => {
       updateState((s) => {
@@ -169,30 +140,20 @@ function renderAll(state, category = null) {
     onUpdateColor: (type, id, color) => updateColor(type, id, color),
     onDuplicate: (id) => duplicateItem("goal", id),
     onDelete: (id) => deleteItem("goal", id),
+    onFastUpdate: fastUpdateHandler,
   });
 
+  // Render Rents
   renderRents(rentsContainer, state, {
-    onUpdateProp: (id, prop, val) => {
-      updateState((s) => {
-        const item = s.rents.find((r) => r.id === id);
-        if (item) item[prop] = val;
-        return s;
-      }, "rent");
-    },
     onToggleMinimize: (type, id) => toggleMinimize(type, id),
     onUpdateColor: (type, id, color) => updateColor(type, id, color),
     onDuplicate: (id) => duplicateItem("rent", id),
     onDelete: (id) => deleteItem("rent", id),
+    onFastUpdate: fastUpdateHandler,
   });
 
+  // Render Loans
   renderLoans(loansContainer, state, {
-    onUpdateProp: (id, prop, val) => {
-      updateState((s) => {
-        const item = s.loans.find((l) => l.id === id);
-        if (item) item[prop] = val;
-        return s;
-      }, "loan");
-    },
     onToggleMinimize: (type, id) => toggleMinimize(type, id),
     onUpdateColor: (type, id, color) => updateColor(type, id, color),
     onDuplicate: (id) => duplicateItem("loan", id),
@@ -200,21 +161,17 @@ function renderAll(state, category = null) {
     onShowAmortization: (id) => showAmortizationModal(id),
     onShowSweetSpot: (id) => showSweetSpotModal(id),
     onOptimizeAccelerator: (id, mode) => applyOptimalAccelerator(id, mode),
+    onFastUpdate: fastUpdateHandler,
   });
 
+  // Render Investments
   renderInvestments(interestContainer, state, {
-    onUpdateProp: (id, prop, val) => {
-      updateState((s) => {
-        const item = s.investments.find((i) => i.id === id);
-        if (item) item[prop] = val;
-        return s;
-      }, "interest");
-    },
     onToggleMinimize: (type, id) => toggleMinimize(type, id),
     onUpdateColor: (type, id, color) => updateColor(type, id, color),
     onDuplicate: (id) => duplicateItem("interest", id),
     onDelete: (id) => deleteItem("interest", id),
     onShowApyChart: (id) => showApyChartModal(id),
+    onFastUpdate: fastUpdateHandler,
   });
 }
 
@@ -676,8 +633,12 @@ async function bootstrap() {
   renderAll(state);
 
   // Subscribe to state updates
-  subscribe((newState, changedCategory) => {
-    renderAll(newState, changedCategory);
+  subscribe((newState, options) => {
+    if (options && options.reRender === false) {
+      updateOverviewDOM(newState);
+      return;
+    }
+    renderAll(newState);
   });
 
   // Initialize Firebase Cloud Sync

@@ -40,10 +40,10 @@ export function subscribe(listener) {
   return () => subscribers.delete(listener);
 }
 
-function notifySubscribers(changedCategory = null) {
+function notifySubscribers(options = { reRender: true, category: null }) {
   subscribers.forEach((fn) => {
     try {
-      fn(state, changedCategory);
+      fn(state, options);
     } catch (err) {
       console.error("Subscriber notification error:", err);
     }
@@ -61,19 +61,24 @@ const debouncedSave = debounce(() => {
   }
 }, 600);
 
-export function setState(newState, changedCategory = null) {
+export function setState(newState, options = { reRender: true, category: null }) {
   state = migrateState(newState);
   debouncedSave();
-  notifySubscribers(changedCategory);
+  notifySubscribers(typeof options === "string" ? { reRender: true, category: options } : options);
 }
 
-export function updateState(updaterFn, changedCategory = null) {
+export function updateState(updaterFn, options = { reRender: true, category: null }) {
   const updated = updaterFn(state);
-  if (updated) {
+  if (updated && options.reRender) {
     state = migrateState(updated);
   }
   debouncedSave();
-  notifySubscribers(changedCategory);
+  notifySubscribers(typeof options === "string" ? { reRender: true, category: options } : options);
+}
+
+export function updateStateSilently(updaterFn) {
+  updaterFn(state);
+  debouncedSave();
 }
 
 /**

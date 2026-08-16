@@ -1,16 +1,59 @@
 /**
- * Loan Scenarios Tab Renderer
+ * Loan Scenarios Tab Renderer (Ultra-responsive, zero-lag in-place typing)
  */
 
 import { fmt, cardColors, refreshIcons, escapeHtml } from "../utils.js";
 import { calcLoanMetrics } from "../calculations.js";
+import { updateStateSilently } from "../state.js";
 import { initSortableContainer } from "./dragDrop.js";
+
+export function updateLoanCardMetrics(cardEl, loan) {
+  if (!cardEl || !loan) return;
+  const metrics = calcLoanMetrics(loan);
+  if (!metrics) return;
+
+  const baseEl = cardEl.querySelector(".loan-m-base");
+  const interestEl = cardEl.querySelector(".loan-m-interest");
+  const firstIntEl = cardEl.querySelector(".loan-m-first-int");
+  const firstPrinEl = cardEl.querySelector(".loan-m-first-prin");
+  const barEl = cardEl.querySelector(".loan-m-int-bar");
+  const actualEl = cardEl.querySelector(".loan-m-actual");
+  const payoffEl = cardEl.querySelector(".loan-m-payoff");
+  const savedEl = cardEl.querySelector(".loan-m-saved");
+  const effScoreEl = cardEl.querySelector(".loan-m-eff-score");
+  const effFillEl = cardEl.querySelector(".loan-m-eff-fill");
+
+  if (baseEl) baseEl.innerText = `${fmt.format(metrics.base_payment)}/mo`;
+  if (interestEl) interestEl.innerText = fmt.format(metrics.base_interest);
+  if (firstIntEl) firstIntEl.innerText = `Interest: ${fmt.format(metrics.first_mo_int)}`;
+  if (firstPrinEl) firstPrinEl.innerText = `Principal: ${fmt.format(metrics.first_mo_prin)}`;
+  if (barEl) barEl.style.width = `${metrics.int_pct}%`;
+  if (actualEl) actualEl.innerText = `${fmt.format(metrics.actualPayment)}/mo`;
+  if (payoffEl) payoffEl.innerText = metrics.payoffDateString;
+
+  if (savedEl) {
+    if (metrics.months_saved > 0) {
+      savedEl.style.display = "block";
+      savedEl.innerText = `Saved ${(metrics.months_saved / 12).toFixed(1)} yrs & ${fmt.format(metrics.interest_saved)}`;
+    } else {
+      savedEl.style.display = "none";
+    }
+  }
+
+  if (effScoreEl) effScoreEl.innerText = `${Math.round(metrics.efficiency)}%`;
+  if (effFillEl) {
+    effFillEl.style.height = `${metrics.efficiency}%`;
+    let effColor = "var(--brand-emerald)";
+    if (metrics.efficiency < 15) effColor = "var(--brand-amber)";
+    else if (metrics.efficiency < 50) effColor = "var(--brand-teal)";
+    effFillEl.style.background = effColor;
+  }
+}
 
 export function renderLoans(container, state, handlers) {
   if (!container || !state) return;
 
   const {
-    onUpdateProp,
     onToggleMinimize,
     onUpdateColor,
     onDuplicate,
@@ -18,6 +61,7 @@ export function renderLoans(container, state, handlers) {
     onShowAmortization,
     onShowSweetSpot,
     onOptimizeAccelerator,
+    onFastUpdate,
   } = handlers;
 
   container.innerHTML = state.loans
@@ -122,22 +166,22 @@ export function renderLoans(container, state, handlers) {
             <div class="metric-box" style="border-color: rgba(59, 130, 246, 0.3);">
               <div>
                 <p class="metric-label" style="color: var(--brand-blue);">Standard Payment</p>
-                <p class="font-mono" style="font-size: 1.35rem; font-weight: 800; color: var(--brand-blue);">${fmt.format(metrics.base_payment)}/mo</p>
+                <p class="font-mono loan-m-base" style="font-size: 1.35rem; font-weight: 800; color: var(--brand-blue);">${fmt.format(metrics.base_payment)}/mo</p>
               </div>
               <div style="text-align: right;">
                 <p class="metric-label" style="color: var(--brand-rose);">Remaining Interest</p>
-                <p class="font-mono" style="font-size: 1.25rem; font-weight: 800; color: var(--brand-rose);">${fmt.format(metrics.base_interest)}</p>
+                <p class="font-mono loan-m-interest" style="font-size: 1.25rem; font-weight: 800; color: var(--brand-rose);">${fmt.format(metrics.base_interest)}</p>
               </div>
             </div>
 
             <!-- Initial Payment Breakdown Bar -->
             <div style="background: var(--bg-surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 0.75rem 0.9rem;">
               <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.35rem;">
-                <span style="color: var(--brand-rose);">Interest: ${fmt.format(metrics.first_mo_int)}</span>
-                <span style="color: var(--brand-teal);">Principal: ${fmt.format(metrics.first_mo_prin)}</span>
+                <span class="loan-m-first-int" style="color: var(--brand-rose);">Interest: ${fmt.format(metrics.first_mo_int)}</span>
+                <span class="loan-m-first-prin" style="color: var(--brand-teal);">Principal: ${fmt.format(metrics.first_mo_prin)}</span>
               </div>
               <div class="progress-track" style="height: 0.5rem;">
-                <div class="progress-fill" style="background: var(--brand-rose); width: ${metrics.int_pct}%;"></div>
+                <div class="progress-fill loan-m-int-bar" style="background: var(--brand-rose); width: ${metrics.int_pct}%;"></div>
               </div>
             </div>
 
@@ -182,31 +226,23 @@ export function renderLoans(container, state, handlers) {
           <div class="card-footer ${isMin ? "hidden" : ""}" style="${isMin ? "display: none;" : ""}">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
-                ${
-                  metrics.efficiency > 0
-                    ? `
-                  <div style="position: relative; width: 2.6rem; height: 2.6rem; border-radius: var(--radius-md); background: var(--bg-surface-input); border: 1px solid var(--border-subtle); overflow: hidden; display: flex; align-items: center; justify-content: center;"
-                    class="tooltip-help" title="Payoff Efficiency Score: avoided interest proportion.">
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; height: ${metrics.efficiency}%; background: ${effColor}; transition: height 0.5s ease;"></div>
-                    <span class="font-mono" style="position: relative; z-index: 1; font-weight: 800; font-size: 0.85rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${Math.round(metrics.efficiency)}%</span>
-                  </div>
-                `
-                    : ""
-                }
+                <div style="position: relative; width: 2.6rem; height: 2.6rem; border-radius: var(--radius-md); background: var(--bg-surface-input); border: 1px solid var(--border-subtle); overflow: hidden; display: flex; align-items: center; justify-content: center;"
+                  class="tooltip-help" title="Payoff Efficiency Score: avoided interest proportion.">
+                  <div class="loan-m-eff-fill" style="position: absolute; bottom: 0; left: 0; right: 0; height: ${metrics.efficiency}%; background: ${effColor}; transition: height 0.3s ease;"></div>
+                  <span class="font-mono loan-m-eff-score" style="position: relative; z-index: 1; font-weight: 800; font-size: 0.85rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${Math.round(metrics.efficiency)}%</span>
+                </div>
                 <div>
                   <p class="metric-label">Effective Payment</p>
-                  <p class="font-mono" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">${fmt.format(metrics.actualPayment)}/mo</p>
+                  <p class="font-mono loan-m-actual" style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">${fmt.format(metrics.actualPayment)}/mo</p>
                 </div>
               </div>
 
               <div style="text-align: right;">
                 <p class="metric-label">Estimated Payoff</p>
-                <p class="font-mono" style="font-size: 1.05rem; font-weight: 700; color: var(--brand-teal);">${metrics.payoffDateString}</p>
-                ${
-                  metrics.months_saved > 0
-                    ? `<span style="font-size: 0.725rem; color: var(--brand-emerald); font-weight: 700;">Saved ${(metrics.months_saved / 12).toFixed(1)} yrs & ${fmt.format(metrics.interest_saved)}</span>`
-                    : ""
-                }
+                <p class="font-mono loan-m-payoff" style="font-size: 1.05rem; font-weight: 700; color: var(--brand-teal);">${metrics.payoffDateString}</p>
+                <span class="loan-m-saved" style="font-size: 0.725rem; color: var(--brand-emerald); font-weight: 700; display: ${metrics.months_saved > 0 ? "block" : "none"};">
+                  Saved ${(metrics.months_saved / 12).toFixed(1)} yrs & ${fmt.format(metrics.interest_saved)}
+                </span>
               </div>
             </div>
 
@@ -225,15 +261,40 @@ export function renderLoans(container, state, handlers) {
     })
     .join("");
 
-  // Attach Event Listeners
-  container.querySelectorAll(".loan-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.loanId), "name", e.target.value);
-  });
-
+  // Live in-place input event listeners
   container.querySelectorAll(".loan-prop-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.loanId), e.target.dataset.prop, e.target.value);
+    input.oninput = (e) => {
+      const loanId = parseInt(e.target.dataset.loanId);
+      const prop = e.target.dataset.prop;
+      const loan = state.loans.find((l) => l.id === loanId);
+      if (loan) {
+        loan[prop] = e.target.value;
+        const cardEl = document.getElementById(`loan-${loanId}`);
+        updateLoanCardMetrics(cardEl, loan);
+        if (typeof onFastUpdate === "function") onFastUpdate();
+        updateStateSilently((s) => {
+          const l = s.loans.find((x) => x.id === loanId);
+          if (l) l[prop] = e.target.value;
+        });
+      }
+    };
   });
 
+  container.querySelectorAll(".loan-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const loanId = parseInt(e.target.dataset.loanId);
+      const loan = state.loans.find((l) => l.id === loanId);
+      if (loan) {
+        loan.name = e.target.value;
+        updateStateSilently((s) => {
+          const l = s.loans.find((x) => x.id === loanId);
+          if (l) l.name = e.target.value;
+        });
+      }
+    };
+  });
+
+  // Structural Actions
   container.querySelectorAll(".loan-min-toggle").forEach((btn) => {
     btn.onclick = (e) => onToggleMinimize("loan", parseInt(e.currentTarget.dataset.loanId));
   });

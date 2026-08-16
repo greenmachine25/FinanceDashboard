@@ -1,10 +1,37 @@
 /**
- * Goals (Sinking Funds) Tab Renderer
+ * Goals (Sinking Funds) Tab Renderer (Ultra-responsive, zero-lag in-place typing)
  */
 
 import { cardColors, refreshIcons, escapeHtml } from "../utils.js";
 import { calcGoalMetrics } from "../calculations.js";
+import { updateStateSilently } from "../state.js";
 import { initSortableContainer } from "./dragDrop.js";
+
+export function updateGoalCardMetrics(cardEl, goal) {
+  if (!cardEl || !goal) return;
+  const metrics = calcGoalMetrics(goal);
+  if (!metrics) return;
+
+  const pctEl = cardEl.querySelector(".goal-m-pct");
+  const barEl = cardEl.querySelector(".goal-m-bar");
+  const timeEl = cardEl.querySelector(".goal-m-time");
+  const dateEl = cardEl.querySelector(".goal-m-date");
+
+  if (pctEl) pctEl.innerText = `${Math.round(metrics.progressPct)}%`;
+  if (barEl) barEl.style.width = `${metrics.progressPct}%`;
+  if (timeEl) {
+    timeEl.innerText = metrics.timeRemainingText;
+    if (metrics.isCompleted) {
+      timeEl.classList.add("text-brand-emerald");
+    } else {
+      timeEl.classList.remove("text-brand-emerald");
+    }
+  }
+  if (dateEl) {
+    dateEl.innerText = metrics.targetDateString;
+    dateEl.style.display = metrics.targetDateString ? "block" : "none";
+  }
+}
 
 export function renderGoals(container, state, handlers) {
   if (!container || !state) return;
@@ -15,6 +42,7 @@ export function renderGoals(container, state, handlers) {
     onUpdateColor,
     onDuplicate,
     onDelete,
+    onFastUpdate,
   } = handlers;
 
   container.innerHTML = state.goals
@@ -115,11 +143,11 @@ export function renderGoals(container, state, handlers) {
           <div class="card-footer ${isMin ? "hidden" : ""}" style="${isMin ? "display: none;" : ""}">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.45rem;">
               <span class="input-label">Progress</span>
-              <span class="font-mono" style="font-weight: 800; font-size: 0.95rem; color: var(--brand-fuchsia);">${Math.round(metrics.progressPct)}%</span>
+              <span class="font-mono goal-m-pct" style="font-weight: 800; font-size: 0.95rem; color: var(--brand-fuchsia);">${Math.round(metrics.progressPct)}%</span>
             </div>
             
             <div class="progress-track" style="margin-bottom: 0.85rem;">
-              <div class="progress-fill ${goal.color || "bg-fuchsia-500"}" style="width: ${metrics.progressPct}%;"></div>
+              <div class="progress-fill goal-m-bar ${goal.color || "bg-fuchsia-500"}" style="width: ${metrics.progressPct}%;"></div>
             </div>
 
             <div class="metric-box" style="padding: 0.75rem 0.95rem;">
@@ -128,10 +156,10 @@ export function renderGoals(container, state, handlers) {
                 <span style="font-size: 0.8rem; font-weight: 600;">Time Remaining:</span>
               </div>
               <div style="text-align: right;">
-                <span class="font-mono ${metrics.isCompleted ? "text-brand-emerald" : ""}" style="font-weight: 700; font-size: 1rem; ${metrics.isCompleted ? "color: var(--brand-emerald);" : ""}">
+                <span class="font-mono goal-m-time ${metrics.isCompleted ? "text-brand-emerald" : ""}" style="font-weight: 700; font-size: 1rem; ${metrics.isCompleted ? "color: var(--brand-emerald);" : ""}">
                   ${metrics.timeRemainingText}
                 </span>
-                ${metrics.targetDateString ? `<span style="display: block; font-size: 0.7rem; color: var(--text-muted);">${metrics.targetDateString}</span>` : ""}
+                <span class="goal-m-date" style="display: ${metrics.targetDateString ? "block" : "none"}; font-size: 0.7rem; color: var(--text-muted);">${metrics.targetDateString}</span>
               </div>
             </div>
           </div>
@@ -140,19 +168,44 @@ export function renderGoals(container, state, handlers) {
     })
     .join("");
 
-  // Attach Event Listeners
-  container.querySelectorAll(".goal-name-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.goalId), "name", e.target.value);
+  // Live in-place input listeners
+  container.querySelectorAll(".goal-prop-input").forEach((input) => {
+    input.oninput = (e) => {
+      const goalId = parseInt(e.target.dataset.goalId);
+      const prop = e.target.dataset.prop;
+      const goal = state.goals.find((g) => g.id === goalId);
+      if (goal) {
+        goal[prop] = e.target.value;
+        const cardEl = document.getElementById(`goal-${goalId}`);
+        updateGoalCardMetrics(cardEl, goal);
+        if (typeof onFastUpdate === "function") onFastUpdate();
+        updateStateSilently((s) => {
+          const item = s.goals.find((x) => x.id === goalId);
+          if (item) item[prop] = e.target.value;
+        });
+      }
+    };
   });
 
-  container.querySelectorAll(".goal-prop-input").forEach((input) => {
-    input.oninput = (e) => onUpdateProp(parseInt(e.target.dataset.goalId), e.target.dataset.prop, e.target.value);
+  container.querySelectorAll(".goal-name-input").forEach((input) => {
+    input.oninput = (e) => {
+      const goalId = parseInt(e.target.dataset.goalId);
+      const goal = state.goals.find((g) => g.id === goalId);
+      if (goal) {
+        goal.name = e.target.value;
+        updateStateSilently((s) => {
+          const item = s.goals.find((x) => x.id === goalId);
+          if (item) item.name = e.target.value;
+        });
+      }
+    };
   });
 
   container.querySelectorAll(".goal-link-budget").forEach((sel) => {
     sel.onchange = (e) => onUpdateProp(parseInt(e.target.dataset.goalId), "linkedDashboardId", e.target.value ? parseInt(e.target.value) : null);
   });
 
+  // Structural Actions
   container.querySelectorAll(".goal-min-toggle").forEach((btn) => {
     btn.onclick = (e) => onToggleMinimize("goal", parseInt(e.currentTarget.dataset.goalId));
   });
